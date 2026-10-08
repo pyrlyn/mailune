@@ -743,3 +743,13 @@ Done when: a question returns an answer whose citations point at retrieved ids. 
 Execution plan: `mailune-core` only: an `Answerer` trait and `ask(question, fused hits, limit, text lookup, answerer)` that passes the top passages to the answerer and keeps only citations of retrieved ids; no passage or no valid citation is an error, not an unsourced answer. Tests use `fuse` output and scripted answerers.
 
 What landed: `mailune-core` gains `ask(question, hits, limit, text, answerer)` and an `Answerer` trait (the router in `mailune-ai` can implement it; `mailune-ai` untouched). The first `limit` fused hits that have text become `Passage`s; with none the answerer is not called (`Error::NothingRetrieved`). The draft's citations are filtered to retrieved ids, deduplicated, in citation order; an empty draft or one citing nothing retrieved is `Error::Uncited`, and a model failure is `Error::Answerer`. Tests run `fuse` output through scripted answerers that cite an invented id, a duplicate and an unretrieved hit. No cloud model.
+
+### B9. WASM subset
+
+Depends on: P1, P4, S6.
+
+Done when: protocol types, MIME parse, threading, and the query parser agree with a native parity test. If the wasm32 target is not installed, do not install it; say so in the commit.
+
+Execution plan: new crate `mailune-wasm`: wasm-bindgen exports that forward to protocol serde, `mailune_mime::parse`, `thread_messages` and `parse_query`, with JSON shapes kept in one module. Native parity tests compare each export with the native call. Build the module with `cargo rustc --crate-type cdylib` for wasm32 (target installed).
+
+What landed: New crate `mailune-wasm` (wasm-bindgen 0.2.129, already in the lock): `normalizeEnvelope` (protocol `Envelope` JSON round trip), `parseMime` (headers and part list), `threadMessages` (JSON in, thread trees out) and `parseQuery` (terms). Each export is one forwarding expression; the JSON shapes live in `json.rs`, so the domain crates stay serde-free. Native parity tests compare every export with the native call, errors included. The wasm32 target is installed: `cargo build --workspace --exclude mailune-cli --lib --target wasm32-unknown-unknown` passes and `cargo rustc -p mailune-wasm --target wasm32-unknown-unknown --crate-type cdylib --release` writes a 1.1 MB module. No `cdylib` in the manifest, because the Android cross build has no linker. rsa (in `mailune-mime`) pulls getrandom 0.2, which has no browser backend by default, so the crate enables getrandom's `js` feature on wasm32 only. 186 production lines.

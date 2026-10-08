@@ -77,7 +77,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B9 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -654,14 +653,6 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
 Execution plan: `mailune-store` benches and one test.
-
-### B9. WASM subset
-
-Depends on: P1, P4, S6.
-
-Done when: protocol types, MIME parse, threading, and the query parser agree with a native parity test. If the wasm32 target is not installed, do not install it; say so in the commit.
-
-Execution plan: new crate `mailune-wasm`. Stay under 500 production lines.
 
 ### R8. Integration compose file
 

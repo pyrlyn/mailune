@@ -54,6 +54,11 @@ axum = { version = "0.8.9", default-features = false, features = ["query"] }
 # mailune-push tests drive the router in process with `oneshot`; no socket.
 tokio = "1.53.2"
 tower = "0.5.3"
+# mailune-wasm: the browser surface.
+wasm-bindgen = "0.2.129"
+# mailune-wasm on wasm32: rsa (DKIM, in mailune-mime) pulls getrandom 0.2,
+# which needs its `js` backend in the browser.
+getrandom-02 = { package = "getrandom", version = "0.2.17", features = ["js"] }
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
 # mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.

@@ -44,3 +44,5 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | axum | local | https://github.com/tokio-rs/axum | Push relay webhook router |
 | tokio | local (dev) | https://github.com/tokio-rs/tokio | Runtime for the push relay's in-process router tests |
 | tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |
+| wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
+| getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
