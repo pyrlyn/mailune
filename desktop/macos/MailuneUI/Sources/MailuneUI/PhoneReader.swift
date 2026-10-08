@@ -28,6 +28,22 @@ public struct PhoneReader: View {
             Text(presentation.remoteContentEnabled ? "Remote content on" : "Remote content off")
                 .font(MailuneType.body)
                 .accessibilityIdentifier("phone-remote-content")
+            if let assist = AssistFixtures.assist(forThread: message.id) {
+                Text(assist.summary)
+                    .font(MailuneType.body)
+                    .accessibilityIdentifier("phone-summary")
+                    .accessibilityLabel("Summary")
+                HStack(spacing: MailuneSpace.s) {
+                    ForEach(assist.replies, id: \.self) { reply in
+                        Text(reply)
+                            .font(MailuneType.body)
+                            .padding(.horizontal, MailuneSpace.s)
+                            .background(MailuneColor.accent.opacity(0.15), in: Capsule())
+                            .accessibilityIdentifier("phone-reply-\(reply)")
+                            .accessibilityLabel("Reply \(reply)")
+                    }
+                }
+            }
         }
         .padding(MailuneSpace.m)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
