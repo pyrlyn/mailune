@@ -1,0 +1,19 @@
+[package]
+name = "mailune-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Command-line surface for Mailune"
+
+[dependencies]
+anyhow = { workspace = true }
+mailune-app = { path = "../mailune-app" }
+
+[dev-dependencies]
+cargo_metadata = { workspace = true }
+syn = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,15 @@
+[package]
+name = "mailune-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Pure mail domain: sync, threading, queue, rules"
+
+[dependencies]
+mailune-protocol = { path = "../mailune-protocol" }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

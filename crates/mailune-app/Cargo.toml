@@ -1,0 +1,15 @@
+[package]
+name = "mailune-app"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Assembles config, domain and adapters into a running core"
+
+[dependencies]
+mailune-core = { path = "../mailune-core" }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

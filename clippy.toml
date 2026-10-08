@@ -1,0 +1,5 @@
+# Production code denies unwrap, expect and panic via workspace lints.
+# Tests may use them; these flags cover `#[cfg(test)]` and integration tests.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true

@@ -1,0 +1,905 @@
+---
+source: crates/mailune-protocol/src/lib.rs
+expression: schemas
+---
+{
+  "Envelope": {
+    "$defs": {
+      "Address": {
+        "description": "Someone a message is from, to or copied to.",
+        "properties": {
+          "email": {
+            "description": "Addr-spec (`ana@acme.io`).",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name when the header had one.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "Flags": {
+        "description": "Flags stored with a message. `seen` is the inverse of the list's unread\nmark only for a one-message thread; a thread row keeps its own `unread`.",
+        "properties": {
+          "answered": {
+            "description": "`\\Answered`.",
+            "type": "boolean"
+          },
+          "deleted": {
+            "description": "`\\Deleted`. Distinct from the Trash mailbox.",
+            "type": "boolean"
+          },
+          "draft": {
+            "description": "`\\Draft`.",
+            "type": "boolean"
+          },
+          "flagged": {
+            "description": "`\\Flagged`. The UI calls this a star.",
+            "type": "boolean"
+          },
+          "keywords": {
+            "description": "Server keywords and labels (`snoozed`, a user label).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "seen": {
+            "description": "`\\Seen`.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "seen",
+          "flagged",
+          "draft",
+          "answered",
+          "deleted",
+          "keywords"
+        ],
+        "type": "object"
+      },
+      "MessageId": {
+        "description": "One message.",
+        "type": "string"
+      },
+      "ThreadId": {
+        "description": "One conversation, as the provider or the threading engine names it.",
+        "type": "string"
+      },
+      "TransportSecurity": {
+        "description": "How the message travelled. End-to-end crypto is a later crate.",
+        "oneOf": [
+          {
+            "const": "clear",
+            "description": "The mock's `Not encrypted`.",
+            "type": "string"
+          },
+          {
+            "const": "tls",
+            "description": "The mock's `Encrypted (TLS)`.",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Headers and flags for one message, enough for a list and a reader chrome.",
+    "properties": {
+      "attachment_count": {
+        "description": "How many attachments the message has. Bytes live in the blob store.",
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "cc": {
+        "description": "`Cc`.",
+        "items": {
+          "$ref": "#/$defs/Address"
+        },
+        "type": "array"
+      },
+      "flags": {
+        "$ref": "#/$defs/Flags",
+        "description": "Standard flags and keywords."
+      },
+      "from": {
+        "$ref": "#/$defs/Address",
+        "description": "`From`."
+      },
+      "id": {
+        "$ref": "#/$defs/MessageId",
+        "description": "This message."
+      },
+      "snippet": {
+        "description": "One-line preview. The full body is not part of the envelope.",
+        "type": "string"
+      },
+      "stamp": {
+        "description": "The mock's `stamp` (a display string, not a parsed timestamp).",
+        "type": "string"
+      },
+      "subject": {
+        "description": "Subject. The mock stores it on the thread; a message still has one.",
+        "type": "string"
+      },
+      "thread": {
+        "$ref": "#/$defs/ThreadId",
+        "description": "Conversation it belongs to."
+      },
+      "to": {
+        "description": "`To`, split from the mock's comma-separated string.",
+        "items": {
+          "$ref": "#/$defs/Address"
+        },
+        "type": "array"
+      },
+      "transport": {
+        "$ref": "#/$defs/TransportSecurity",
+        "description": "Transport security shown in the reader."
+      }
+    },
+    "required": [
+      "id",
+      "thread",
+      "from",
+      "to",
+      "cc",
+      "subject",
+      "stamp",
+      "snippet",
+      "flags",
+      "attachment_count",
+      "transport"
+    ],
+    "title": "Envelope",
+    "type": "object"
+  },
+  "Event": {
+    "$defs": {
+      "AccountId": {
+        "description": "One mail account.",
+        "type": "string"
+      },
+      "Address": {
+        "description": "Someone a message is from, to or copied to.",
+        "properties": {
+          "email": {
+            "description": "Addr-spec (`ana@acme.io`).",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name when the header had one.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "Category": {
+        "description": "Triage tab. The mock stores `cat` as `0` Primary, `1` Social,\n`2` Promotions, `3` Updates.",
+        "oneOf": [
+          {
+            "const": "primary",
+            "description": "`cat` 0.",
+            "type": "string"
+          },
+          {
+            "const": "social",
+            "description": "`cat` 1.",
+            "type": "string"
+          },
+          {
+            "const": "promotions",
+            "description": "`cat` 2.",
+            "type": "string"
+          },
+          {
+            "const": "updates",
+            "description": "`cat` 3.",
+            "type": "string"
+          }
+        ]
+      },
+      "MailboxId": {
+        "description": "One mailbox, special-use or user-created.",
+        "type": "string"
+      },
+      "ThreadId": {
+        "description": "One conversation, as the provider or the threading engine names it.",
+        "type": "string"
+      },
+      "ThreadRow": {
+        "description": "One row in the thread list. Initials, tint and selection are UI state\nand are not stored here.",
+        "properties": {
+          "account": {
+            "$ref": "#/$defs/AccountId",
+            "description": "Owning account."
+          },
+          "category": {
+            "$ref": "#/$defs/Category",
+            "description": "Triage tab."
+          },
+          "draft": {
+            "description": "The conversation is a draft.",
+            "type": "boolean"
+          },
+          "flagged": {
+            "description": "Starred.",
+            "type": "boolean"
+          },
+          "from": {
+            "$ref": "#/$defs/Address",
+            "description": "Sender shown on the row."
+          },
+          "has_attachment": {
+            "description": "At least one message has an attachment.",
+            "type": "boolean"
+          },
+          "id": {
+            "$ref": "#/$defs/ThreadId",
+            "description": "Conversation id."
+          },
+          "important": {
+            "description": "Marked important.",
+            "type": "boolean"
+          },
+          "labels": {
+            "description": "Label texts. Colours stay in the UI.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mailbox": {
+            "$ref": "#/$defs/MailboxId",
+            "description": "Mailbox the row was listed from."
+          },
+          "message_count": {
+            "description": "How many messages the conversation holds.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "pinned": {
+            "description": "Pinned to the top of the list.",
+            "type": "boolean"
+          },
+          "snippet": {
+            "description": "One-line preview.",
+            "type": "string"
+          },
+          "snoozed": {
+            "description": "Hidden until a snooze wakes it.",
+            "type": "boolean"
+          },
+          "stamp": {
+            "description": "Display stamp.",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Subject.",
+            "type": "string"
+          },
+          "unread": {
+            "description": "The row is unread. Not the same bit as one message's `\\Seen`.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "account",
+          "from",
+          "subject",
+          "snippet",
+          "stamp",
+          "message_count",
+          "unread",
+          "flagged",
+          "important",
+          "pinned",
+          "snoozed",
+          "draft",
+          "has_attachment",
+          "category",
+          "mailbox",
+          "labels"
+        ],
+        "type": "object"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "A fact the UI renders. Surfaces do not invent these.",
+    "oneOf": [
+      {
+        "additionalProperties": false,
+        "description": "A conflict, rollback or other sentence the UI shows as a notice.",
+        "properties": {
+          "notice": {
+            "properties": {
+              "message": {
+                "description": "Text the UI can show. Not a message body.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "message"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "notice"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "The current page of the thread list.",
+        "properties": {
+          "snapshot": {
+            "properties": {
+              "threads": {
+                "description": "Rows in list order.",
+                "items": {
+                  "$ref": "#/$defs/ThreadRow"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "threads"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "snapshot"
+        ],
+        "type": "object"
+      }
+    ],
+    "title": "Event"
+  },
+  "Submission": {
+    "$defs": {
+      "AccountId": {
+        "description": "One mail account.",
+        "type": "string"
+      },
+      "Address": {
+        "description": "Someone a message is from, to or copied to.",
+        "properties": {
+          "email": {
+            "description": "Addr-spec (`ana@acme.io`).",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name when the header had one.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "MailboxId": {
+        "description": "One mailbox, special-use or user-created.",
+        "type": "string"
+      },
+      "ThreadId": {
+        "description": "One conversation, as the provider or the threading engine names it.",
+        "type": "string"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "A typed request from a surface. The core applies it; the model only\nproposes values of this enum.",
+    "oneOf": [
+      {
+        "const": "refresh",
+        "description": "Reload the visible mailbox.",
+        "type": "string"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Open one conversation.",
+        "properties": {
+          "open_thread": {
+            "properties": {
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "open_thread"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Send a draft. Confirmation still happens in the app before this is applied.",
+        "properties": {
+          "send": {
+            "properties": {
+              "body": {
+                "description": "Plain body. Rich MIME is built by the MIME crate.",
+                "type": "string"
+              },
+              "subject": {
+                "description": "Subject line.",
+                "type": "string"
+              },
+              "to": {
+                "description": "Recipients.",
+                "items": {
+                  "$ref": "#/$defs/Address"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "to",
+              "subject",
+              "body"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "send"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Store a draft without sending.",
+        "properties": {
+          "save_draft": {
+            "properties": {
+              "body": {
+                "description": "Plain body.",
+                "type": "string"
+              },
+              "subject": {
+                "description": "Subject line.",
+                "type": "string"
+              },
+              "to": {
+                "description": "Recipients so far.",
+                "items": {
+                  "$ref": "#/$defs/Address"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "to",
+              "subject",
+              "body"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "save_draft"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Archive these conversations.",
+        "properties": {
+          "archive": {
+            "properties": {
+              "threads": {
+                "description": "Conversations to archive.",
+                "items": {
+                  "$ref": "#/$defs/ThreadId"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "threads"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "archive"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Move these conversations to Trash. Confirmation still happens in the app.",
+        "properties": {
+          "delete": {
+            "properties": {
+              "threads": {
+                "description": "Conversations to delete.",
+                "items": {
+                  "$ref": "#/$defs/ThreadId"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "threads"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "delete"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Mark these conversations as spam.",
+        "properties": {
+          "spam": {
+            "properties": {
+              "threads": {
+                "description": "Conversations to mark.",
+                "items": {
+                  "$ref": "#/$defs/ThreadId"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "threads"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "spam"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Hide a conversation until a preset (`later`, `tomorrow`, …).",
+        "properties": {
+          "snooze": {
+            "properties": {
+              "preset": {
+                "description": "The mock passes the preset as a string the UI already chose.",
+                "type": "string"
+              },
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread",
+              "preset"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "snooze"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Move a conversation into a mailbox.",
+        "properties": {
+          "move_to": {
+            "properties": {
+              "mailbox": {
+                "$ref": "#/$defs/MailboxId",
+                "description": "Destination mailbox."
+              },
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread",
+              "mailbox"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "move_to"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Toggle `\\Flagged` on a conversation.",
+        "properties": {
+          "toggle_star": {
+            "properties": {
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "toggle_star"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Toggle unread on a conversation.",
+        "properties": {
+          "toggle_read": {
+            "properties": {
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "toggle_read"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Add or remove a label.",
+        "properties": {
+          "apply_label": {
+            "properties": {
+              "label": {
+                "description": "Label text from the UI.",
+                "type": "string"
+              },
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread",
+              "label"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "apply_label"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Run a search query.",
+        "properties": {
+          "search": {
+            "properties": {
+              "query": {
+                "description": "The query string, including tokens such as `from:`.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "search"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Show another account's mailboxes.",
+        "properties": {
+          "switch_account": {
+            "properties": {
+              "account": {
+                "$ref": "#/$defs/AccountId",
+                "description": "Which account."
+              }
+            },
+            "required": [
+              "account"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "switch_account"
+        ],
+        "type": "object"
+      },
+      {
+        "const": "undo",
+        "description": "Reverse the last reversible command.",
+        "type": "string"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Download one attachment by the name the UI shows.",
+        "properties": {
+          "download": {
+            "properties": {
+              "name": {
+                "description": "File name from the mock. A content id replaces this when blobs exist.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "download"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Start sign-in. The password is not in this value.",
+        "properties": {
+          "sign_in": {
+            "properties": {
+              "email": {
+                "description": "Account address.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "email"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "sign_in"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Start account creation. The password is not in this value.",
+        "properties": {
+          "sign_up": {
+            "properties": {
+              "email": {
+                "description": "Account address.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Display name.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "email"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "sign_up"
+        ],
+        "type": "object"
+      },
+      {
+        "const": "sign_out",
+        "description": "Leave the current session.",
+        "type": "string"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Pick a plan by its key (`free`, `plus`, `team`).",
+        "properties": {
+          "choose_plan": {
+            "properties": {
+              "plan": {
+                "description": "Plan key from the mock.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "plan"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "choose_plan"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Switch UI language. Empty means English, matching the mock.",
+        "properties": {
+          "set_language": {
+            "properties": {
+              "code": {
+                "description": "Language code, or empty for English.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "set_language"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "description": "Ask for a summary of one conversation. Encrypted mail stays local.",
+        "properties": {
+          "summarize": {
+            "properties": {
+              "thread": {
+                "$ref": "#/$defs/ThreadId",
+                "description": "Which conversation."
+              }
+            },
+            "required": [
+              "thread"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "summarize"
+        ],
+        "type": "object"
+      }
+    ],
+    "title": "Submission"
+  }
+}
