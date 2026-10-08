@@ -5,6 +5,8 @@
 
 mod host;
 mod scenario;
+mod synth;
 
 pub use host::{FakeHost, poll_now};
 pub use scenario::Scenario;
+pub use synth::{SyntheticMessage, SyntheticThread, ThreadKind, mailbox};
