@@ -5,6 +5,7 @@ options:
   bundleIdPrefix: app.mailune
   deploymentTarget:
     macOS: "26.0"
+    iOS: "26.0"
   createIntermediateGroups: true
 settings:
   base:
@@ -68,6 +69,30 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Mailune
         ARCHS: arm64
+  MailuneIOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: iOS
+    dependencies:
+      - package: MailuneModel
+      - package: MailuneUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios
+        PRODUCT_NAME: MailuneIOS
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
 schemes:
   Mailune:
     build:
@@ -79,3 +104,7 @@ schemes:
       targets:
         - MailuneTests
         - MailuneUITests
+  MailuneIOS:
+    build:
+      targets:
+        MailuneIOS: all

@@ -17,11 +17,7 @@ public struct ShellView: View {
 
     public var body: some View {
         NavigationSplitView {
-            List(selection: $mailbox) {
-                Text(Copy.text("inbox.title", language: "en")).tag("Inbox")
-                Text("Sent").tag("Sent")
-            }
-            .navigationSplitViewColumnWidth(min: 160, ideal: 200)
+            mailboxList
         } content: {
             ThreadList(selected: $selected)
                 .navigationSplitViewColumnWidth(min: 220, ideal: 280)
@@ -78,6 +74,25 @@ public struct ShellView: View {
                 query = ""
             }
         }
+    }
+}
+
+extension ShellView {
+    @ViewBuilder
+    private var mailboxList: some View {
+        // The single-value selection initializer is a macOS sidebar API.
+        #if os(macOS)
+        List(selection: $mailbox) {
+            Text(Copy.text("inbox.title", language: "en")).tag("Inbox")
+            Text("Sent").tag("Sent")
+        }
+        .navigationSplitViewColumnWidth(min: 160, ideal: 200)
+        #else
+        List {
+            Text(Copy.text("inbox.title", language: "en"))
+            Text("Sent")
+        }
+        #endif
     }
 }
 
