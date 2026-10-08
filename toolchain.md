@@ -18,3 +18,5 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | cargo_metadata | local | https://github.com/oli-obk/cargo_metadata | Crate-boundary test over `cargo metadata` |
 | syn | local | https://github.com/dtolnay/syn | `//!` header check and forward-only FFI scaffold |
 | thiserror | local | https://github.com/dtolnay/thiserror | One error enum per library crate |
+| encoding_rs | local | https://github.com/hsivonen/encoding_rs | Canonical charset name for a MIME part |
+| mail-parser | local | https://github.com/stalwartlabs/mail-parser | RFC 5322 / MIME parse |
