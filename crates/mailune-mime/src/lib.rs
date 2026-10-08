@@ -3,6 +3,7 @@
 //! `mail-parser` owns the grammar. This crate owns the domain shape the
 //! rest of Mailune sees. Nothing here opens a socket.
 
+mod auth;
 mod build;
 mod contacts;
 mod html;
@@ -13,6 +14,9 @@ mod quirks;
 mod remote;
 mod unsubscribe;
 
+pub use auth::{
+    AuthBadge, AuthResult, DkimDns, DkimVerdict, MethodBadge, authentication_badge, verify_dkim,
+};
 pub use build::{Attachment, Outbound, build};
 pub use contacts::{RankedContact, Sighting, rank_contacts};
 pub use html::{SanitizedHtml, sanitize_html};
@@ -38,4 +42,7 @@ pub enum Error {
     /// The HTML fragment could not be turned into a plain-text alternative.
     #[error("html could not be turned into text")]
     Html,
+    /// The Authentication-Results header had no server id.
+    #[error("authentication-results could not be read")]
+    AuthenticationResults,
 }

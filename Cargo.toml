@@ -51,6 +51,11 @@ base64 = "0.23"
 ammonia = "4.2.1"
 # mailune-mime: plain text from the sanitized HTML fragment. 0.17.1 checked on crates.io 2026-10-08.
 html2text = "0.17.1"
+# mailune-mime: DKIM rsa-sha256. 0.9.10 is the stable line (0.10 is still a release candidate), checked on crates.io 2026-10-08.
+# The sha2 feature re-exports the digest the verifier hashes with.
+rsa = { version = "0.9.10", features = ["sha2"] }
+# mailune-mime tests: generate a DKIM key. 0.8 matches rsa 0.9's rand_core. 0.8.8 checked on crates.io 2026-10-08.
+rand = "0.8.8"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
