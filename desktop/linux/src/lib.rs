@@ -5,11 +5,13 @@
 //! The host keeps secrets, banners, the network path, and the OAuth redirect
 //! in process. It does not open a socket.
 
+mod composer;
 mod host;
 mod list;
 mod reader;
 mod shell;
 
+pub use composer::{Composer, load_composer};
 pub use host::LinuxHost;
 pub use list::{ThreadList, load_list};
 pub use reader::{Reader, load_reader};

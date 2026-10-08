@@ -1,0 +1,5 @@
+recipient ada@example.com
+subject Hello
+body See you at the dock
+send off
+confirm required
