@@ -4,6 +4,10 @@
 //! these bodies are parsed in-process. Nothing here opens a socket.
 //! `Email/get` goes through `mailune-fixture`.
 
+mod push;
+
+pub use push::{StateChange, parse_event_source, parse_websocket};
+
 use mailune_protocol::Envelope;
 use mailune_store::{
     AccountRow, FlagRow, MailboxRow, MembershipRow, MessageRow, Store, SyncStateRow, ThreadRow,
