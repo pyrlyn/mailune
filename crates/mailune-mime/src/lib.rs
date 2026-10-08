@@ -4,6 +4,7 @@
 //! rest of Mailune sees. Nothing here opens a socket.
 
 mod auth;
+mod autocrypt;
 mod build;
 mod calendar;
 mod chunk;
@@ -21,6 +22,9 @@ mod unsubscribe;
 
 pub use auth::{
     AuthBadge, AuthResult, DkimDns, DkimVerdict, MethodBadge, authentication_badge, verify_dkim,
+};
+pub use autocrypt::{
+    AutocryptHeader, GossipKey, PreferEncrypt, autocrypt_header, gossip_keys, parse_autocrypt,
 };
 pub use build::{Attachment, Outbound, build};
 pub use calendar::{Invite, InviteKind, parse_invite};
