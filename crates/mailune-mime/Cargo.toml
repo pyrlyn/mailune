@@ -13,6 +13,7 @@ base64 = { workspace = true }
 encoding_rs = { workspace = true }
 html2text = { workspace = true }
 icalendar = { workspace = true }
+chrono = { workspace = true }
 mail-builder = { workspace = true }
 mail-parser = { workspace = true }
 mailune-protocol = { path = "../mailune-protocol" }

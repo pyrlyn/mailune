@@ -1658,6 +1658,7 @@ version = "0.1.0"
 dependencies = [
  "ammonia",
  "base64 0.23.1",
+ "chrono",
  "ed25519-dalek 3.0.0",
  "encoding_rs",
  "html2text",

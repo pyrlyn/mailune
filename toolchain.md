@@ -32,6 +32,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
+| chrono | local | https://github.com/chronotope/chrono | Civil date for an ICS suggestion |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | cms | local | https://github.com/RustCrypto/formats | S/MIME CMS verify, decrypt, sign, and encrypt |
