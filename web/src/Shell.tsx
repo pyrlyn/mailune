@@ -10,6 +10,7 @@ import {
   type ThreadFixture,
 } from "./fixture";
 import { translate } from "./i18n";
+import { mailboxIds, mailboxQuery } from "./jmap";
 import "./shell.css";
 
 export function Shell() {
@@ -49,6 +50,7 @@ export function ShellView({
   const selected = chosenThread(threads, selectedId);
   const ai = chosenAi(selected.id);
   const folders = [...new Set(threads.map((thread) => thread.folder))];
+  const mailboxes = mailboxIds(mailboxQuery);
   return (
     <div className="shell">
       <section className="pane" data-pane="folders" aria-label="Folders">
@@ -61,6 +63,14 @@ export function ShellView({
             <li key={folder}>{folder === "Inbox" ? translate("en", "inbox") : folder}</li>
           ))}
         </ul>
+        <section aria-label="Mailboxes">
+          <button type="button">Mailbox query</button>
+          <ul>
+            {mailboxes.map((id) => (
+              <li key={id}>{id}</li>
+            ))}
+          </ul>
+        </section>
       </section>
       <section className="pane" data-pane="list" aria-label="Threads">
         <ul>
