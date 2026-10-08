@@ -1,0 +1,68 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+# Bare `cargo run` / `cargo build` resolve against the CLI. The manifest is
+# virtual (no root package). Test and lint commands pass `--workspace`.
+default-members = ["crates/mailune-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+# GPLv3 or the royalty-free licence in LICENSE-ROYALTY-FREE.md, at the user's choice.
+license = "GPL-3.0-or-later OR LicenseRef-Mailune-Royalty-Free"
+
+# Versions live here once. Members write `dep = { workspace = true }`.
+[workspace.dependencies]
+# One error enum per library crate.
+thiserror = "2"
+# mailune-protocol: the contract is serde so every surface sees one shape.
+serde = { version = "1", features = ["derive"] }
+# mailune-protocol: JSON Schema committed via insta. 1.2.2 checked on crates.io 2026-10-08.
+schemars = "1.2.2"
+# mailune-protocol tests: turn a schema into a snapshot value.
+serde_json = "1"
+# mailune-protocol tests: the committed JSON Schema. 1.49.0 checked on crates.io 2026-10-08.
+insta = { version = "1.49.0", features = ["json"] }
+# mailune-cli only. Library crates return their own error type.
+anyhow = "1"
+# mailune-cli tests: the dependency-direction check reads `cargo metadata`.
+cargo_metadata = "0.23.1"
+# mailune-cli tests: parse Rust sources for the forward-only FFI scaffold.
+# 3.0.6 checked on crates.io 2026-10-08. Parsing only; default features stay off.
+syn = { version = "3.0.6", default-features = false, features = ["full", "parsing"] }
+
+# Lints every member inherits through `[lints] workspace = true`. CI runs
+# clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
+# `unwrap_used`, `expect_used` and `panic` are denied outside tests; clippy.toml
+# turns them back on under `#[cfg(test)]` and integration tests.
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+
+# Dev builds: debug info for our own crates only. Line tables still give
+# file:line in backtraces; dependency DWARF is the bulk of a debug target/.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+opt-level = 1
+
+# The profile that dist builds with. Ordinary `--release` stays fast.
+# `panic = "abort"` is absent: a panicking extension must become an error
+# the process can skip (fail open), which abort removes.
+[profile.dist]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
