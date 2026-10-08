@@ -603,3 +603,13 @@ Done when: short, detailed, and action-item summaries are cached by content hash
 Execution plan: `mailune-ai` `summary.rs`: three versioned templates (`summarize-short`, `summarize-detailed`, `action-items`) in the registry snapshot, and a `SummaryCache` keyed by SHA-256 over template id, version and the rendered thread. Calls go through any `Provider`; tests use the scripted engine.
 
 What landed: Short, detailed and action-item summaries come from three new registry templates and are cached by a SHA-256 content hash that includes the template version. A repeat costs no model call, an edited thread misses, and a failed call caches nothing.
+
+### A12. Daily digest
+
+Depends on: A11. Reuse: the summary cache.
+
+Done when: a digest covers messages since a given instant and skips older ones.
+
+Execution plan: `mailune-ai` `digest.rs`: `daily_digest` filters each thread to messages received at or after `since`, skips threads with none, summarizes the rest through the A11 cache (short kind), cites message ids, and orders entries newest first.
+
+What landed: A daily digest covers only messages received at or after a given instant: older mail and threads with nothing new never reach the model. Each entry is a cached short summary that cites its message ids; entries are newest first.

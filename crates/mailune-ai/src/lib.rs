@@ -5,6 +5,7 @@
 
 mod agent;
 pub mod catalog;
+mod digest;
 mod engine;
 mod guard;
 mod ledger;
@@ -23,6 +24,7 @@ pub use agent::{
     Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Requested, Scope, ToolCall,
     UndoRecord, needs_confirmation, parse_call,
 };
+pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
     generate_json, hash_embedding,
