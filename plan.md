@@ -46,7 +46,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| T4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A27 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -496,14 +495,6 @@ Depends on: S6. Reuse: the search parser already in `mailune-core`.
 Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
 
 Execution plan: `mailune-core` only. Do not depend on `mailune-store`.
-
-### T4. Queue property tests
-
-Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
-
-Done when: random ops against a model mailbox keep idempotency and undo invariants.
-
-Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
 
 ### A19. Natural-language rules
 

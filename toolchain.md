@@ -51,6 +51,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | tokio | local | https://github.com/tokio-rs/tokio | `mailune-server`: async runtime and TCP listener |
 | tokio-tungstenite | local (dev) | https://github.com/snapview/tokio-tungstenite | `mailune-server` tests: real WebSocket client; the line axum already uses |
 | futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
+| proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
 
 Gradle (`desktop/android`):
 

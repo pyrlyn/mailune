@@ -86,6 +86,9 @@ tokio = { version = "1.53.2", features = ["macros", "net", "rt-multi-thread"] }
 tokio-tungstenite = "0.29.0"
 # mailune-server tests: Sink and Stream on the client socket. 0.3.34 checked on crates.io 2026-10-08.
 futures-util = { version = "0.3.34", default-features = false, features = ["sink"] }
+# mailune-core tests: property tests of the op queue. 1.11.0 checked on crates.io 2026-10-08.
+# Without default features: no fork or timeout support, which would spawn processes and write temp files.
+proptest = { version = "1.11.0", default-features = false, features = ["std"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 

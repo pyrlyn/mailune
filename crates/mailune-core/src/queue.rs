@@ -410,4 +410,320 @@ mod tests {
         ));
         assert_eq!(queue.due(wake).len(), 2);
     }
+
+    /// Random operations against a model mailbox (T4).
+    ///
+    /// The model is the person's view: every thread starts in the inbox, a
+    /// move's `from` is where the thread is now, and undo drops the latest
+    /// pending op. After every step the queue must agree with the model, a
+    /// replayed op must change nothing, and a fresh op undone at once must
+    /// leave no trace.
+    mod props {
+        use std::collections::HashMap;
+        use std::time::{Duration, SystemTime};
+
+        use mailune_protocol::{MailboxId, ThreadId};
+        use proptest::prelude::*;
+
+        use super::super::{IdempotencyKey, Op, Queue, When};
+        use crate::Error;
+
+        const WINDOW: Duration = Duration::from_secs(5);
+        const THREADS: u8 = 3;
+        const MAILBOXES: [&str; 3] = ["inbox", "archive", "trash"];
+        const KEYS: u8 = 8;
+
+        #[derive(Debug, Clone)]
+        enum Step {
+            Enqueue {
+                key: u8,
+                thread: u8,
+                kind: u8,
+                to: u8,
+                wake: u8,
+            },
+            Replay(u8),
+            Reuse(u8),
+            Ack(u8),
+            Resolve(u8, u8),
+            Undo,
+            Tick(u8),
+        }
+
+        fn step() -> impl Strategy<Value = Step> {
+            prop_oneof![
+                4 => (0..KEYS, 0..THREADS, 0..4u8, 0..3u8, 0..20u8).prop_map(
+                    |(key, thread, kind, to, wake)| Step::Enqueue { key, thread, kind, to, wake }
+                ),
+                1 => any::<u8>().prop_map(Step::Replay),
+                1 => any::<u8>().prop_map(Step::Reuse),
+                1 => (0..KEYS).prop_map(Step::Ack),
+                1 => (0..KEYS, 0..3u8).prop_map(|(key, to)| Step::Resolve(key, to)),
+                2 => Just(Step::Undo),
+                1 => (0..8u8).prop_map(Step::Tick),
+            ]
+        }
+
+        #[derive(Clone, Copy, PartialEq, Eq, Debug)]
+        enum Status {
+            Pending,
+            Done,
+            Conflicted,
+        }
+
+        /// The reference: a list of accepted ops and where each thread is.
+        #[derive(Default)]
+        struct Model {
+            ops: Vec<(String, Op, SystemTime, Status)>,
+            at: HashMap<ThreadId, MailboxId>,
+        }
+
+        impl Model {
+            fn location(&self, thread: &ThreadId) -> MailboxId {
+                self.at
+                    .get(thread)
+                    .cloned()
+                    .unwrap_or_else(|| MailboxId::new(MAILBOXES[0]))
+            }
+
+            fn find(&mut self, key: &str) -> Option<&mut (String, Op, SystemTime, Status)> {
+                self.ops.iter_mut().find(|entry| entry.0 == key)
+            }
+        }
+
+        /// What a test can see of a queue.
+        #[derive(Debug, PartialEq)]
+        struct View {
+            pending: Vec<String>,
+            places: Vec<MailboxId>,
+            schedules: Vec<Option<(When, SystemTime)>>,
+            due: Vec<String>,
+        }
+
+        fn thread(index: u8) -> ThreadId {
+            ThreadId::new(format!("t{index}"))
+        }
+
+        fn view(queue: &Queue, now: SystemTime) -> View {
+            let threads: Vec<ThreadId> = (0..THREADS).map(thread).collect();
+            let keys =
+                |list: Vec<&IdempotencyKey>| list.iter().map(|k| k.as_str().to_string()).collect();
+            View {
+                pending: keys(queue.pending()),
+                places: threads
+                    .iter()
+                    .map(|t| {
+                        queue
+                            .location(t)
+                            .cloned()
+                            .unwrap_or_else(|| MailboxId::new(MAILBOXES[0]))
+                    })
+                    .collect(),
+                schedules: threads.iter().map(|t| queue.schedule(t)).collect(),
+                due: keys(queue.due(now)),
+            }
+        }
+
+        fn model_view(model: &Model, now: SystemTime) -> View {
+            let pending = |filter: &dyn Fn(&Op) -> bool| {
+                model
+                    .ops
+                    .iter()
+                    .filter(|entry| entry.3 == Status::Pending && filter(&entry.1))
+                    .map(|entry| entry.0.clone())
+                    .collect()
+            };
+            let schedule = |t: &ThreadId| {
+                model.ops.iter().rev().find_map(|(_, op, _, status)| {
+                    let (id, kind, at) = match op {
+                        Op::Snooze { thread, until } => (thread, When::Snooze, *until),
+                        Op::Reminder { thread, at } => (thread, When::Reminder, *at),
+                        Op::ReplyLater { thread, at } => (thread, When::ReplyLater, *at),
+                        Op::Move { .. } => return None,
+                    };
+                    (*status == Status::Pending && id == t).then_some((kind, at))
+                })
+            };
+            let threads: Vec<ThreadId> = (0..THREADS).map(thread).collect();
+            View {
+                pending: pending(&|_| true),
+                places: threads.iter().map(|t| model.location(t)).collect(),
+                schedules: threads.iter().map(schedule).collect(),
+                due: pending(&|op| match op {
+                    Op::Snooze { until: at, .. }
+                    | Op::Reminder { at, .. }
+                    | Op::ReplyLater { at, .. } => *at <= now,
+                    Op::Move { .. } => false,
+                }),
+            }
+        }
+
+        fn make_op(model: &Model, thread_index: u8, kind: u8, to: u8, wake: SystemTime) -> Op {
+            let thread = thread(thread_index);
+            match kind {
+                0 => Op::Move {
+                    from: model.location(&thread),
+                    to: MailboxId::new(MAILBOXES[usize::from(to)]),
+                    thread,
+                },
+                1 => Op::Snooze {
+                    thread,
+                    until: wake,
+                },
+                2 => Op::Reminder { thread, at: wake },
+                _ => Op::ReplyLater { thread, at: wake },
+            }
+        }
+
+        /// Applies `step` to both sides and checks the step's own invariant.
+        fn run(
+            queue: &mut Queue,
+            model: &mut Model,
+            now: &mut SystemTime,
+            fresh: &mut u32,
+            step: Step,
+        ) {
+            match step {
+                Step::Enqueue {
+                    key,
+                    thread,
+                    kind,
+                    to,
+                    wake,
+                } => {
+                    let key = format!("k{key}");
+                    let op = make_op(
+                        model,
+                        thread,
+                        kind,
+                        to,
+                        *now + Duration::from_secs(wake.into()),
+                    );
+                    let got = queue.enqueue(IdempotencyKey::new(key.clone()), op.clone(), *now);
+                    match model.find(&key) {
+                        Some(entry) if entry.1 == op => assert!(got.is_ok()),
+                        Some(_) => assert!(matches!(got, Err(Error::KeyMismatch))),
+                        None => {
+                            got.unwrap();
+                            if let Op::Move { thread, to, .. } = &op {
+                                model.at.insert(thread.clone(), to.clone());
+                            }
+                            model.ops.push((key, op, *now, Status::Pending));
+                        }
+                    }
+                }
+                Step::Replay(_) | Step::Reuse(_) if model.ops.is_empty() => {}
+                Step::Replay(pick) => {
+                    // Idempotency: the same key and op a second time is a no-op.
+                    let (key, op, _, _) = model.ops[usize::from(pick) % model.ops.len()].clone();
+                    let before = view(queue, *now);
+                    queue.enqueue(IdempotencyKey::new(key), op, *now).unwrap();
+                    assert_eq!(view(queue, *now), before);
+                }
+                Step::Reuse(pick) => {
+                    // A key names one op: a different op under it changes nothing.
+                    let (key, op, _, _) = model.ops[usize::from(pick) % model.ops.len()].clone();
+                    let other = match op {
+                        Op::Move { thread, .. } => Op::Snooze {
+                            thread,
+                            until: SystemTime::UNIX_EPOCH,
+                        },
+                        Op::Snooze { thread, .. }
+                        | Op::Reminder { thread, .. }
+                        | Op::ReplyLater { thread, .. } => Op::Move {
+                            from: MailboxId::new(MAILBOXES[0]),
+                            to: MailboxId::new(MAILBOXES[1]),
+                            thread,
+                        },
+                    };
+                    let before = view(queue, *now);
+                    assert!(matches!(
+                        queue.enqueue(IdempotencyKey::new(key), other, *now),
+                        Err(Error::KeyMismatch)
+                    ));
+                    assert_eq!(view(queue, *now), before);
+                }
+                Step::Ack(key) => {
+                    let key = format!("k{key}");
+                    let got = queue.ack(&IdempotencyKey::new(key.clone()));
+                    match model.find(&key) {
+                        Some(entry) => {
+                            got.unwrap();
+                            if entry.3 == Status::Pending {
+                                entry.3 = Status::Done;
+                            }
+                        }
+                        None => assert!(matches!(got, Err(Error::UnknownOp))),
+                    }
+                }
+                Step::Resolve(key, to) => {
+                    let key = format!("k{key}");
+                    let server = MailboxId::new(MAILBOXES[usize::from(to)]);
+                    let got = queue.resolve_move(&IdempotencyKey::new(key.clone()), server.clone());
+                    match model.find(&key).map(|entry| (entry.1.clone(), entry)) {
+                        Some((Op::Move { thread, .. }, entry)) => {
+                            got.unwrap();
+                            entry.3 = Status::Conflicted;
+                            model.at.insert(thread, server);
+                        }
+                        Some(_) => assert!(matches!(got, Err(Error::NotAMove))),
+                        None => assert!(matches!(got, Err(Error::UnknownOp))),
+                    }
+                }
+                Step::Undo => {
+                    let got = queue.undo(*now);
+                    match model
+                        .ops
+                        .iter()
+                        .rposition(|entry| entry.3 == Status::Pending)
+                    {
+                        None => assert!(matches!(got, Err(Error::UnknownOp))),
+                        Some(index) if *now > model.ops[index].2 + WINDOW => {
+                            assert!(matches!(got, Err(Error::UndoExpired)));
+                        }
+                        Some(index) => {
+                            got.unwrap();
+                            let (_, op, _, _) = model.ops.remove(index);
+                            if let Op::Move { thread, from, .. } = op {
+                                model.at.insert(thread, from);
+                            }
+                        }
+                    }
+                }
+                Step::Tick(secs) => *now += Duration::from_secs(secs.into()),
+            }
+            // Undo invariant: a fresh op undone at once leaves no trace.
+            *fresh += 1;
+            let before = view(queue, *now);
+            let op = make_op(
+                model,
+                (*fresh % u32::from(THREADS)) as u8,
+                (*fresh % 4) as u8,
+                1,
+                *now,
+            );
+            queue
+                .enqueue(IdempotencyKey::new(format!("fresh{fresh}")), op, *now)
+                .unwrap();
+            queue.undo(*now).unwrap();
+            assert_eq!(view(queue, *now), before);
+        }
+
+        proptest! {
+            // No regression files: tests do not write to the source tree.
+            #![proptest_config(ProptestConfig { failure_persistence: None, ..ProptestConfig::default() })]
+
+            #[test]
+            fn the_queue_matches_the_model_mailbox(steps in prop::collection::vec(step(), 1..60)) {
+                let mut queue = Queue::new(WINDOW);
+                let mut model = Model::default();
+                let mut now = SystemTime::UNIX_EPOCH;
+                let mut fresh = 0;
+                for step in steps {
+                    run(&mut queue, &mut model, &mut now, &mut fresh, step);
+                    prop_assert_eq!(view(&queue, now), model_view(&model, now));
+                }
+            }
+        }
+    }
 }

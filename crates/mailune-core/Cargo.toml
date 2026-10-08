@@ -11,5 +11,8 @@ description = "Pure mail domain: sync, threading, queue, rules"
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [lints]
 workspace = true
