@@ -2016,6 +2016,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-linux"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "mailune-mime"
 version = "0.1.0"
 dependencies = [

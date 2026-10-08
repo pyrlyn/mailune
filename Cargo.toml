@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*"]
+members = ["crates/*", "desktop/linux"]
 # fuzz/ is its own cargo-fuzz workspace. Excluded so `cargo test --workspace` does not build it.
 exclude = ["fuzz"]
 # Bare `cargo run` / `cargo build` resolve against the CLI. The manifest is
