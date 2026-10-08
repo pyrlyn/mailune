@@ -4,6 +4,10 @@
 //! token, a subject, or mail text is refused and not stored. The process
 //! does not call Apple or Google.
 
+mod client;
+
+pub use client::{Client, Registration};
+
 use std::sync::{Arc, Mutex};
 
 use axum::Router;
@@ -40,6 +44,9 @@ pub enum Error {
     /// The in-memory wake list could not be locked.
     #[error("relay state could not be locked")]
     Lock,
+    /// A device id was empty.
+    #[error("device id is empty")]
+    Device,
 }
 
 /// An empty wake. The only field is the account to sync.
