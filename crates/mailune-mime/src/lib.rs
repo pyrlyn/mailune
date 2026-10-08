@@ -4,6 +4,7 @@
 //! rest of Mailune sees. Nothing here opens a socket.
 
 mod build;
+mod contacts;
 mod link;
 mod message;
 mod parse;
@@ -12,6 +13,7 @@ mod remote;
 mod unsubscribe;
 
 pub use build::{Attachment, Outbound, build};
+pub use contacts::{RankedContact, Sighting, rank_contacts};
 pub use link::{LinkCheck, inspect_link};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
