@@ -1,11 +1,5 @@
-import { InboxIcon } from "./InboxIcon";
-import { translate } from "./i18n";
+import { Shell } from "./Shell";
 
 export function App() {
-  return (
-    <main>
-      <InboxIcon />
-      <h1>{translate("en", "title")}</h1>
-    </main>
-  );
+  return <Shell />;
 }
