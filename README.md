@@ -1,3 +1,6 @@
+> [!NOTE]
+> This project is under active development. We need "testing volunteers": try it and report what breaks.
+
 # Mailune
 
 A local-first mail client with private AI, for macOS, iOS, Windows, Linux, Android and the web.

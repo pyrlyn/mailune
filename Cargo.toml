@@ -93,11 +93,9 @@ debug = "line-tables-only"
 debug = false
 opt-level = 1
 
-# The profile that dist builds with. Ordinary `--release` stays fast.
+# The profile that dist builds with: `dev`, so release binaries are dev builds
+# (unoptimized, line tables, no LTO, not stripped).
 # `panic = "abort"` is absent: a panicking extension must become an error
 # the process can skip (fail open), which abort removes.
 [profile.dist]
-inherits = "release"
-lto = "fat"
-codegen-units = 1
-strip = "symbols"
+inherits = "dev"
