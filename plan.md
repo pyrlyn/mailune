@@ -20,7 +20,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| A3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -295,14 +294,6 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
-
-### A3. Local engine adapter
-
-Depends on: A1. Reuse: a scripted engine, not a real model runtime.
-
-Done when: generation, an embedding vector, and JSON-structured output come from a trait the test implements. No process and no download.
-
-Execution plan: `mailune-ai` only.
 
 ### A4. Model catalog and verified blobs
 

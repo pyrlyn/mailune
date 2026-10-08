@@ -66,13 +66,10 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::future::Future;
-    use std::pin::pin;
-    use std::task::{Context, Poll, Waker};
-
     use mailune_protocol::{ModelCapability as PlatformCapability, ModelPrompt, PlatformModel};
 
     use super::{PlatformBridge, map_capability};
+    use crate::testing::drive;
     use crate::{Completion, Feature, ModelKind, PrivacyClass, Prompt, Provider};
 
     struct Ready {
@@ -90,15 +87,6 @@ mod tests {
         async fn complete(&self, prompt: &ModelPrompt) -> Result<String, mailune_protocol::Error> {
             assert_eq!(prompt.max_output_tokens, 256);
             Ok(self.reply.clone())
-        }
-    }
-
-    fn drive<T>(future: impl Future<Output = T>) -> T {
-        let mut future = pin!(future);
-        let mut context = Context::from_waker(Waker::noop());
-        match future.as_mut().poll(&mut context) {
-            Poll::Ready(value) => value,
-            Poll::Pending => panic!("platform model waited"),
         }
     }
 

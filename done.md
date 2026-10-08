@@ -573,3 +573,13 @@ Done when: a read-only tool is exposed and a send tool stays behind the in-app a
 Execution plan: New crate `mailune-mcp` on rmcp 3.5: a `summarize` tool (read-only hint) and a `send` tool, each forwarding one `Agent::request` call. `mailune-ai` gains `request`, `held` and `approve` so a caller that cannot confirm gets send held for the app. Test drives the server over a tokio duplex.
 
 What landed: New crate `mailune-mcp` (rmcp 3.5.1). `summarize` is read-only and runs through the A28 policy and scope; `send` is held for in-app approval (`Agent::approve` with `Confirmation::Confirmed`), and an MCP client has no argument that confirms. The test drives the server over an in-memory duplex, so no listener opens.
+
+### A3. Local engine adapter
+
+Depends on: A1. Reuse: a scripted engine, not a real model runtime.
+
+Done when: generation, an embedding vector, and JSON-structured output come from a trait the test implements. No process and no download.
+
+Execution plan: `mailune-ai` `engine.rs`: a `LocalEngine` trait (generate, embed, capability), `generate_json` that decodes untrusted JSON output, a `LocalProvider` adapter onto `Provider`, and a `ScriptedEngine` that later features and A30 replay.
+
+What landed: A `LocalEngine` trait gives generation, an embedding vector and JSON-shaped output (`generate_json`, bad output is `Error::BadOutput`). `LocalProvider` puts an engine behind the router as a local model. `ScriptedEngine` replays canned replies and embeds by word hashing; no process, no download.

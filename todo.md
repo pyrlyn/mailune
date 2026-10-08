@@ -14,7 +14,6 @@
 - X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 - X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
-- A3. Local engine adapter
 - A4. Model catalog and verified blobs
 - A6. Cloud BYOK request shapes
 - A11. Thread summary cache

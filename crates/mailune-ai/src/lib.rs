@@ -4,6 +4,7 @@
 //! model. This crate does not call a network provider.
 
 mod agent;
+mod engine;
 mod guard;
 mod ledger;
 mod platform;
@@ -13,9 +14,16 @@ mod redact;
 mod router;
 mod triage;
 
+#[cfg(test)]
+mod testing;
+
 pub use agent::{
     Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Requested, Scope, ToolCall,
     UndoRecord, needs_confirmation, parse_call,
+};
+pub use engine::{
+    Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
+    generate_json, hash_embedding,
 };
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
@@ -151,6 +159,12 @@ pub enum Error {
     /// Send and delete wait for the person to confirm in the app.
     #[error("tool call needs confirmation in the app")]
     NeedsConfirmation,
+    /// The local runtime failed. The text names the failure, never the prompt.
+    #[error("local engine: {0}")]
+    Engine(String),
+    /// Model output did not have the shape the feature asked for.
+    #[error("model output did not have the expected shape")]
+    BadOutput,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
@@ -204,14 +218,11 @@ pub fn allow_cloud(prompt: &Prompt) -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use std::future::Future;
-    use std::pin::pin;
-    use std::task::{Context, Poll, Waker};
-
     use super::{
         Completion, Error, Feature, ModelCapability, ModelKind, PrivacyClass, Prompt, Provider,
         allow_cloud, select,
     };
+    use crate::testing::drive;
 
     fn model(id: &str, kind: ModelKind) -> ModelCapability {
         ModelCapability {
@@ -219,15 +230,6 @@ mod tests {
             kind,
             context_tokens: None,
             features: vec![Feature::Summarize],
-        }
-    }
-
-    fn drive<T>(future: impl Future<Output = T>) -> T {
-        let mut future = pin!(future);
-        let mut context = Context::from_waker(Waker::noop());
-        match future.as_mut().poll(&mut context) {
-            Poll::Ready(value) => value,
-            Poll::Pending => panic!("provider waited"),
         }
     }
 
