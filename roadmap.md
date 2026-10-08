@@ -157,6 +157,7 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 
 ## Ph6 Trust, agents, AI v2, push relay
 
+- C7 · S · after P1 · DKIM remainder: ed25519, simple canonicalization, and the `l=` body-length tag. rsa-sha256 relaxed/relaxed already verifies in `mailune-mime`. Reuse: the verifier already there.
 - A15 · M · after A14, S3 · Style profile learned locally from Sent (per-recipient tier). Reuse: NEW.
 - A19 · M · after A16, A9 · Natural-language rules → typed rule DSL, preview matches before enabling. Reuse: NEW.
 - A22 · M · after A2, P26, P25 · Scheduling extraction: dates, times, intents → ICS suggestion with availability. Reuse: NEW; jiff (rust.md).

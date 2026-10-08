@@ -245,3 +245,303 @@ What landed: `mailune-testkit` builds those shapes in memory.
 ### P12, P14, and P15 stayed on the roadmap
 
 The in-memory operation queue, autoconfig parsing, and PKCE S256 landed. Persistence, live ISPDB/SRV/MX lookup, and the OAuth loopback plus refresh are still the roadmap lines for those ids.
+
+### A2. Privacy policy router
+
+Depends on: A1. Reuse: runa-fit hardware probe.
+
+Done when: a feature's privacy class, a capability probe, a fallback chain, and a budget pick a provider. Encrypted mail stays on a local model.
+
+Execution plan: `mailune-ai` only. No network.
+
+What landed: The router in `mailune-ai` picks a provider from privacy class, capabilities, a fallback chain, and a budget. Encrypted mail stays on a local model.
+
+### A7. Data-flow ledger
+
+Depends on: A2. Reuse: cox usage-ledger convention.
+
+Done when: an in-memory ledger records feature, provider, bytes, message ids, and retention class.
+
+Execution plan: `mailune-ai` only. No store.
+
+What landed: An in-memory ledger records feature, provider, bytes, message ids, and retention class.
+
+### A9. Prompt-injection guard and tool permissions
+
+Depends on: A1. Reuse: cox-permission; aulo fail-closed conventions.
+
+Done when: untrusted model output cannot call a tool the policy did not allow, and a failed check denies the call.
+
+Execution plan: `mailune-ai` only. Policy code is not inside a prompt.
+
+What landed: A policy outside the model approves a typed tool call and denies anything it did not allow.
+
+### A10. Prompt registry
+
+Depends on: A1. Reuse: NEW.
+
+Done when: versioned prompt templates have an insta snapshot. No gettext.
+
+Execution plan: `mailune-ai` only.
+
+What landed: Versioned prompt templates have a committed insta snapshot. No gettext.
+
+### A16. Triage heuristics
+
+Depends on: A1. Reuse: existing `Category` on the protocol.
+
+Done when: header heuristics assign Primary, Social, Promotions, or Updates without calling a model.
+
+Execution plan: `mailune-ai` only.
+
+What landed: Header heuristics assign the existing `Category` values. No model call.
+
+### A17. Priority score and needs-reply
+
+Depends on: A16. Reuse: NEW.
+
+Done when: a priority score and a needs-reply flag come from flags and headers.
+
+Execution plan: `mailune-ai` only.
+
+What landed: Priority and needs-reply come from flags and headers. No model call.
+
+### A18. First-time sender screener
+
+Depends on: A16. Reuse: NEW.
+
+Done when: an address with no prior inbound message is marked as a first-time sender.
+
+Execution plan: `mailune-mime` only.
+
+What landed: An address with no prior inbound message is screened; a repeat is not.
+
+### A21. Follow-up detector
+
+Depends on: A2. Reuse: NEW.
+
+Done when: a sent message with no later inbound from that address is awaiting a reply.
+
+Execution plan: `mailune-core` only.
+
+What landed: A sent message with no later inbound from that address is awaiting a reply. Pure function in `mailune-core`.
+
+### A24. Extraction cards
+
+Depends on: A2, P1. Reuse: NEW.
+
+Done when: plain text yields an OTP, a tracking number, an invoice total, or a flight code when the fixture contains one.
+
+Execution plan: `mailune-mime` only. Heuristics, no model.
+
+What landed: Plain text yields an OTP, a tracking number, an invoice total, or a flight code from fixtures.
+
+### B1. View models for list, thread, composer, settings
+
+Depends on: F9. Reuse: cox-app; view-model shapes from the protocol `Event`.
+
+Done when: folding events updates a thread list, an open thread, a composer draft, and a settings snapshot. No printing.
+
+Execution plan: `mailune-app` only. Keep `ready()`.
+
+What landed: Folding events updates a thread list, an open thread, a composer draft, and a settings snapshot. Composer and settings still read notice text, because `Event` has no typed payloads for them yet.
+
+### B7. Contract scenario JSON
+
+Depends on: T1. Reuse: ketch contract JSON.
+
+Done when: a testkit scenario fold is written as JSON another front end can replay.
+
+Execution plan: `mailune-testkit` only.
+
+What landed: A testkit scenario fold is written as JSON.
+
+### B8. JSON-RPC surface
+
+Depends on: F7. Reuse: rtok JSON-RPC shape.
+
+Done when: typed JSON-RPC methods forward to a handler trait and return `Event`s. No axum, no socket.
+
+Execution plan: new crate `mailune-rpc`.
+
+What landed: `mailune-rpc` forwards typed JSON-RPC methods to a handler trait. No socket.
+
+### C2. OpenPGP encrypt, sign, decrypt, verify
+
+Depends on: P1, C1. Reuse: `pgp` from rust.md.
+
+Done when: a test generates a key, signs and encrypts a message, then decrypts and verifies it. Key bytes are not in `Debug`. No keychain.
+
+Execution plan: new crate `mailune-crypto`.
+
+What landed: `mailune-crypto` generates a key, signs and encrypts, then decrypts and verifies. `Debug` hides key bytes. No keychain.
+
+### C7. Authentication-Results and DKIM verify
+
+Depends on: P1. Reuse: `mail-auth` if it is the maintained verifier.
+
+Done when: `Authentication-Results` becomes a badge, and DKIM verifies against a DNS answer supplied by a trait. No network.
+
+Execution plan: `mailune-mime` only.
+
+What landed: `Authentication-Results` becomes a badge, and DKIM rsa-sha256 with relaxed/relaxed verifies against a supplied TXT record. ed25519, simple canonicalization, and the `l=` tag are still open.
+
+### C10. Fuzz targets for MIME, autoconfig, and search
+
+Depends on: P1, P14, S6. Reuse: `libfuzzer-sys` from rust.md.
+
+Done when: fuzz targets exist for MIME parse, autoconfig XML, and the search query parser, and `cargo test --workspace` does not build them.
+
+Execution plan: `fuzz/` excluded from workspace members. Do not edit the parsers except to expose a public entry that already exists.
+
+What landed: Fuzz targets for MIME parse, autoconfig XML, and the search query live in `fuzz/`, which is excluded from the workspace.
+
+### P3. HTML policy
+
+Depends on: P1. Reuse: ammonia. `text-sanitize` is not available; do not vendor it.
+
+Done when: HTML is sanitized, `cid:` is rewritten, remote images are stripped, and a plain-text alternative is produced. Nothing is fetched.
+
+Execution plan: `mailune-mime` only.
+
+What landed: HTML is sanitized with ammonia, `cid:` is rewritten, remote images are stripped, and html2text produces the plain alternative. `text-sanitize` is still unavailable.
+
+### P5. IMAP connection state machine
+
+Depends on: P0, F8. Reuse: `imap-codec` 1.0.0, already chosen.
+
+Done when: a connection state machine speaks CAPABILITY and LOGIN to the in-memory scripted server. No TCP and no TLS socket.
+
+Execution plan: new crate `mailune-imap`.
+
+What landed: An in-memory state machine speaks CAPABILITY and LOGIN to the scripted server. No TCP and no TLS handshake.
+
+### P6. IMAP LIST to mailbox roles
+
+Depends on: P5. Reuse: `imap-codec`.
+
+Done when: a LIST response maps SPECIAL-USE and common names onto `MailboxRole`.
+
+Execution plan: `mailune-imap` only.
+
+What landed: LIST maps SPECIAL-USE and common names onto `MailboxRole`.
+
+### P13. SMTP send behind a fake transport
+
+Depends on: P2. Reuse: `lettre` if it is the maintained SMTP crate.
+
+Done when: a message is handed to a fake transport, including a send-later delay decision. No socket. Saving to Sent is a result value, not a store write.
+
+Execution plan: new crate `mailune-smtp`.
+
+What landed: A message is handed to an in-memory transport, including a send-later decision. `lettre` was not linked: its SMTP client opens a socket, and the message is already built.
+
+### P14. Autoconfig lookup behind a fetch trait
+
+Depends on: F8. Reuse: the XML and JSON parsers already in `mailune-auth`.
+
+Done when: a fetch trait returns fixture bytes for ISPDB, and SRV/MX heuristics fill host, port, and security. No live DNS.
+
+Execution plan: `mailune-auth` only.
+
+What landed: A fetch trait returns fixture bytes. SRV and MX heuristics fill host, port, and security. No live DNS.
+
+### P15. OAuth loopback and refresh
+
+Depends on: F8, C1. Reuse: PKCE S256 already in `mailune-auth`; cox-mcp loopback shape.
+
+Done when: a listener trait receives a redirect and a refresh rotates the token in memory. No TCP bind and no keychain.
+
+Execution plan: `mailune-auth` only.
+
+What landed: A listener trait accepts the redirect and refresh rotates an in-memory token. No TCP bind and no keychain.
+
+### P16. Sync scheduler
+
+Depends on: F8. Reuse: `NetworkState` on the protocol.
+
+Done when: a per-account scheduler pauses when offline, metered, or low-battery, and orders work by priority. No sleeping thread.
+
+Execution plan: `mailune-core` only.
+
+What landed: The scheduler orders accounts by priority and pauses when offline, metered, or low-battery. No sleeping thread.
+
+### P26. iCalendar parse
+
+Depends on: P1. Reuse: NEW. Survey a maintained iCalendar crate before writing a parser.
+
+Done when: a REQUEST or REPLY fixture becomes a typed invite. No SMTP.
+
+Execution plan: `mailune-mime` or a new `mailune-cal` if the MIME crate would mix two jobs. Prefer `mailune-mime` if the file stays small.
+
+What landed: An iCalendar REQUEST or REPLY becomes a typed invite. No SMTP.
+
+### P29. New-mail notification policy
+
+Depends on: P16, A17. Reuse: NEW.
+
+Done when: VIP, quiet hours, and a priority flag decide notify or suppress.
+
+Execution plan: `mailune-core` only. Take a plain score input so this file does not depend on `mailune-ai`.
+
+What landed: VIP, quiet hours, and a plain priority number decide notify or suppress. No OS notification.
+
+### P30. Snooze, reminder, and reply-later ops
+
+Depends on: the in-memory queue. Reuse: the queue already in `mailune-core`.
+
+Done when: snooze, reminder, and reply-later are scheduled ops with an undo window. No METADATA protocol.
+
+Execution plan: `mailune-core` only.
+
+What landed: Snooze, reminder, and reply-later are scheduled ops on the in-memory queue, with its undo window.
+
+### R9. Nightly fuzz workflow
+
+Depends on: C10. Reuse: cox nightly fuzz workflow.
+
+Done when: a nightly workflow runs the fuzz targets for a short time. Do not change the required PR checks in `ci.yml`.
+
+Execution plan: `.github/workflows/` only, plus the fuzz crate from C10.
+
+What landed: `.github/workflows/nightly.yml` runs the fuzz targets for a short time. The required PR checks in `ci.yml` are unchanged.
+
+### S10. Chunker
+
+Depends on: P3. Reuse: NEW.
+
+Done when: plain text splits into 400–600 token windows, quotes and a signature are stripped, and each chunk carries a provenance span.
+
+Execution plan: `mailune-mime` only. A token is a whitespace word if no tokenizer crate is already in the repo.
+
+What landed: Plain text splits into 400–600 word windows, with quotes and a signature stripped and a provenance span on each chunk.
+
+### S11. Export eml and mbox
+
+Depends on: P1. Reuse: NEW.
+
+Done when: one message writes as `.eml` and a list writes as mbox.
+
+Execution plan: `mailune-mime` only.
+
+What landed: One message writes as `.eml` and a list writes as mbox.
+
+### T2. Scripted IMAP server
+
+Depends on: P5, T1. Reuse: `imap-codec`; provider quirk rows already in `mailune-mime`.
+
+Done when: an in-memory server answers greeting, CAPABILITY, LOGIN, SELECT, and a fixture FETCH, with one Gmail quirk and one Dovecot quirk.
+
+Execution plan: `mailune-imap` only. No TCP.
+
+What landed: An in-memory server answers greeting, CAPABILITY, LOGIN, SELECT, and a fixture FETCH, with a Gmail quirk and a Dovecot quirk. No TCP.
+
+### T3. JMAP, Gmail, and Graph fixtures
+
+Depends on: T1. Reuse: static fixtures. Prefer fixtures over `wiremock`.
+
+Done when: a JMAP Email/get, a Gmail history list, and a Graph delta page parse into protocol envelopes or thread rows. No network.
+
+Execution plan: new crate `mailune-fixture`.
+
+What landed: Static JMAP, Gmail, and Graph fixtures parse into protocol rows. No network.
