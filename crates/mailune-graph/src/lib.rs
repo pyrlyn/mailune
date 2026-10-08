@@ -4,8 +4,10 @@
 //! and a `$select` message go through `mailune-fixture`, which ignores
 //! `@odata.deltaLink`, so the cursor is read beside the messages.
 
+mod calendar;
 mod mutate;
 
+pub use calendar::{BusyBlock, ContactHit, autocomplete, availability};
 pub use mutate::{
     BatchPart, FlagPatch, Move, SentMail, apply_batch, apply_flag, apply_move, apply_send,
 };
