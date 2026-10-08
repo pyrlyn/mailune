@@ -8,5 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../Mailune.AppCore/Mailune.AppCore.csproj" />
+    <None Include="../Mailune.App/Tokens.xaml" Link="Tokens.xaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
