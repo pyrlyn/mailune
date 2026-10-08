@@ -1,0 +1,7 @@
+# Integration environment for Stalwart and Dovecot.
+# nextest only reads this file. It does not start Docker or open a socket.
+services:
+  stalwart:
+    image: stalwartlabs/stalwart:latest
+  dovecot:
+    image: dovecot/dovecot:latest

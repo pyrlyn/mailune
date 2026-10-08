@@ -2069,6 +2069,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-wasm"
+version = "0.1.0"
+dependencies = [
+ "mailune-core",
+ "mailune-mime",
+ "mailune-protocol",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "maplit"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
