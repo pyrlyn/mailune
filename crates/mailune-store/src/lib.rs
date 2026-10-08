@@ -18,12 +18,14 @@ mod blob;
 mod fts;
 mod repo;
 mod schema;
+mod watch;
 
 pub use blob::BlobStore;
 pub use repo::{
     AccountRow, ContactRow, FlagRow, MailboxRow, MembershipRow, MessageCursor, MessagePage,
     MessageRow, PartRow, SyncStateRow, ThreadRow,
 };
+pub use watch::{ChangeToken, Invalidation};
 
 #[cfg(test)]
 fn scratch_dir() -> PathBuf {
