@@ -9,6 +9,7 @@ use std::io::{Read, Write};
 
 use crate::Error;
 use crate::script::Scripted;
+use crate::sync::parse_select;
 
 /// How to sign in, and whether a real socket must use TLS.
 #[derive(Clone, PartialEq, Eq)]
@@ -39,6 +40,15 @@ enum Phase {
     Authenticated,
 }
 
+/// UIDVALIDITY and EXISTS from SELECT.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SelectedMailbox {
+    /// The UIDVALIDITY the server reported.
+    pub uid_validity: u32,
+    /// How many messages EXISTS reported.
+    pub exists: u32,
+}
+
 /// CAPABILITY and LOGIN against whatever stream the caller provides.
 #[derive(Debug)]
 pub struct Connection<S> {
@@ -53,8 +63,13 @@ pub struct Connection<S> {
 impl Connection<MemStream> {
     /// Read the greeting from a new in-memory server.
     pub fn open(config: Config) -> Result<Self, Error> {
+        Self::open_with(config, Scripted::new())
+    }
+
+    /// Read the greeting from a caller-built scripted mailbox.
+    pub fn open_with(config: Config, server: Scripted) -> Result<Self, Error> {
         let mut connection = Self {
-            io: MemStream::new(),
+            io: MemStream::from_server(server),
             config,
             buf: Vec::new(),
             tag: 0,
@@ -63,6 +78,11 @@ impl Connection<MemStream> {
         };
         connection.read_greeting()?;
         Ok(connection)
+    }
+
+    /// Commands the scripted server has answered, apart from LOGIN.
+    pub fn trace(&self) -> &[String] {
+        self.io.server().trace()
     }
 }
 
@@ -87,6 +107,28 @@ impl<S: Read + Write> Connection<S> {
         }
         self.capabilities = capability_names(&reply);
         Ok(self.capabilities.clone())
+    }
+
+    /// SELECT `mailbox` and read UIDVALIDITY.
+    pub fn select(&mut self, mailbox: &str) -> Result<SelectedMailbox, Error> {
+        let name = quote_atom(mailbox);
+        let reply = self.transact(&format!("SELECT {name}"))?;
+        let (uid_validity, exists) = parse_select(reply.as_bytes())?;
+        Ok(SelectedMailbox {
+            uid_validity,
+            exists,
+        })
+    }
+
+    /// Send one command and return the bytes through its tagged OK.
+    pub(crate) fn transact(&mut self, body: &str) -> Result<String, Error> {
+        let tag = self.next_tag();
+        self.command(&tag, body)?;
+        let reply = self.read_until_tag(&tag)?;
+        if !tagged_ok(&reply, &tag) {
+            return Err(Error::Rejected);
+        }
+        Ok(reply)
     }
 
     /// LOGIN with the username and password from [`Config`].
@@ -163,10 +205,13 @@ pub struct MemStream {
 }
 
 impl MemStream {
-    fn new() -> Self {
-        let server = Scripted::new();
+    fn from_server(server: Scripted) -> Self {
         let inbound = server.greeting().as_bytes().to_vec();
         Self { server, inbound }
+    }
+
+    fn server(&self) -> &Scripted {
+        &self.server
     }
 }
 
