@@ -7,7 +7,7 @@ public struct InboxView: View {
     public init() {}
 
     public var body: some View {
-        Text("Inbox")
+        Text(Copy.text("inbox.title", language: "en"))
             .font(MailuneType.title)
             .foregroundStyle(highlighted ? MailuneColor.accent : MailuneColor.ink)
             .padding(MailuneSpace.m)
