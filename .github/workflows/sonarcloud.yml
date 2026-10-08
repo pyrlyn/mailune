@@ -1,0 +1,39 @@
+name: sonarcloud
+
+# SonarCloud through pyrlyn/ci sonarcloud.yml at the same pin as ci.yml.
+# Coverage is cargo-llvm-cov. With `rust: true` and an empty coverage-command
+# the reusable workflow runs:
+#
+#   cargo llvm-cov --locked --lcov --output-path coverage/lcov.info
+#
+# sonar-project.properties sets sonar.rust.lcov.reportPaths to that file.
+#
+# `soft-fail: true` (also the reusable default) sets continue-on-error on the
+# coverage step and the scan. The reusable workflow already soft-fails when
+# SONAR_TOKEN is absent: its first step prints a notice and exits 0, and every
+# later step is skipped. That input exists, so this caller does not add a
+# second skip.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sonarcloud:
+    uses: pyrlyn/ci/.github/workflows/sonarcloud.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: write # cancel-run on failure
+    with:
+      rust: true
+      soft-fail: true
+      # Rust from mise.toml only. cargo-llvm-cov is installed by the reusable workflow.
+      mise-install-args: rust
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
