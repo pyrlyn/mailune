@@ -9,9 +9,13 @@ let package = Package(
     products: [
         .library(name: "MailuneUI", targets: ["MailuneUI"])
     ],
+    dependencies: [
+        .package(path: "../MailuneModel"),
+    ],
     targets: [
         .target(
             name: "MailuneUI",
+            dependencies: ["MailuneModel"],
             resources: [
                 .process("en.lproj"),
                 .process("en-GB.lproj"),

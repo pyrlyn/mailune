@@ -10,5 +10,6 @@ let package = Package(
     ],
     targets: [
         .target(name: "MailuneModel"),
+        .testTarget(name: "MailuneModelTests", dependencies: ["MailuneModel"]),
     ]
 )

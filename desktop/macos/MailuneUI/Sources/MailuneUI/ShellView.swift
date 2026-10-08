@@ -3,7 +3,7 @@ import SwiftUI
 /// Three panes, a toolbar, one shortcut, and a command palette.
 public struct ShellView: View {
     @State private var mailbox = "Inbox"
-    @State private var thread = "Hello"
+    @State private var selected: Set<String> = []
     @State private var palette = false
     @State private var query = ""
 
@@ -17,14 +17,10 @@ public struct ShellView: View {
             }
             .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         } content: {
-            List(selection: $thread) {
-                Text("Hello").tag("Hello")
-                    .font(MailuneType.body)
-                    .padding(MailuneSpace.s)
-            }
-            .navigationSplitViewColumnWidth(min: 220, ideal: 280)
+            ThreadList(selected: $selected)
+                .navigationSplitViewColumnWidth(min: 220, ideal: 280)
         } detail: {
-            Text(thread)
+            Text(selected.isEmpty ? "No thread" : "\(selected.count) selected")
                 .font(MailuneType.title)
                 .foregroundStyle(MailuneColor.ink)
                 .padding(MailuneSpace.m)
