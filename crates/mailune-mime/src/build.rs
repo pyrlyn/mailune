@@ -71,7 +71,8 @@ fn mail_addr(addr: &Address) -> MailAddress<'_> {
     MailAddress::new_address(addr.name.as_deref(), addr.email.as_str())
 }
 
-fn mail_list(list: &[Address]) -> MailAddress<'_> {
+/// Shared with the export writer so a list stays one header.
+pub(crate) fn mail_list(list: &[Address]) -> MailAddress<'_> {
     MailAddress::new_list(list.iter().map(mail_addr).collect())
 }
 

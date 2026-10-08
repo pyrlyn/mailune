@@ -7,6 +7,7 @@ mod auth;
 mod build;
 mod calendar;
 mod contacts;
+mod export;
 mod html;
 mod link;
 mod message;
@@ -21,6 +22,7 @@ pub use auth::{
 pub use build::{Attachment, Outbound, build};
 pub use calendar::{Invite, InviteKind, parse_invite};
 pub use contacts::{RankedContact, Sighting, rank_contacts};
+pub use export::{write_eml, write_mbox};
 pub use html::{SanitizedHtml, sanitize_html};
 pub use link::{LinkCheck, inspect_link};
 pub use message::{Body, MimeMessage, Part, PartRole};
