@@ -663,3 +663,13 @@ Done when: a compose file names Stalwart and Dovecot, and a test reads that file
 Execution plan: `docker-compose.yml` at the root with `stalwart` (stalwartlabs/stalwart:v0.16.25) and `dovecot` (dovecot/dovecot:2.4.5), tags checked on Docker Hub; ports on 127.0.0.1 only; the Dovecot password comes from `MAILUNE_IT_PASSWORD` so none is committed. `crates/mailune-cli/tests/compose.rs` reads the file as text (no YAML crate) and checks the two services, pinned tags, loopback ports and no literal password. CI is untouched.
 
 What landed: `docker-compose.yml` names `stalwart` (stalwartlabs/stalwart:v0.16.25: IMAP, submission, JMAP/admin HTTP) and `dovecot` (dovecot/dovecot:2.4.5, IMAP on its unprivileged 31143), tags checked on Docker Hub on 2026-10-08. Every port binds to 127.0.0.1, no volume is kept, and the Dovecot password is read from `MAILUNE_IT_PASSWORD`. `crates/mailune-cli/tests/compose.rs` reads the file as text and checks the two services, pinned tags, loopback ports and that no password is committed. Nothing starts Docker or opens a socket; `.github/workflows/ci.yml` is untouched.
+
+### P33. Calendar view
+
+From ideas. Grow the scheduling assistant (A22) and Graph calendar access (P25) into a calendar view.
+
+Done when: the view shows local ICS suggestions. A JMAP Calendars source is added only after that RFC is published.
+
+Execution plan: A22 and P25 have not landed on `main`, so this slice stands alone and leaves room for them: `mailune-app::calendar_view` turns local `text/calendar` parts (through the existing `mailune_mime::parse_invite`) into a `CalendarView` of days with suggested events. REQUESTs only; a re-sent UID replaces the older invite; unreadable or undated parts are counted and skipped; days are `YYYY-MM-DD` as written, time-zone conversion left to the shell. Fixture ICS under `crates/mailune-app/fixtures/`. No JMAP Calendars, no network. The "Done when" names local ICS suggestions only, so the task closes on that; feeding A22 and P25 into the same view belongs to those tasks.
+
+What landed: `mailune-app::calendar_view(parts)` builds a `CalendarView` (days of `CalendarEntry`: uid, title, start, end, organizer) from local ICS through `mailune_mime::parse_invite`. REQUESTs are suggestions, REPLYs are skipped, a re-sent UID replaces the older invite, all-day events sort first in their day, and unreadable or undated parts are counted in `skipped` rather than failing. Three tests over four fixture ICS files. No JMAP Calendars source and no network; A22 and P25 had not landed, so they are not wired in.

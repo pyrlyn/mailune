@@ -166,7 +166,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| P33 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
 | P34 | in progress | P3 | 5 | 0% | Claude / opus-5.5 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
@@ -1454,14 +1453,6 @@ From ideas. The in-SQLite KNN is S8.
 Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
 
 Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
-
-### P33. Calendar view
-
-From ideas. Grow the scheduling assistant (A22) and Graph calendar access (P25) into a calendar view.
-
-Done when: the view shows local ICS suggestions. A JMAP Calendars source is added only after that RFC is published.
-
-Execution plan: a calendar view on `batch7-imap` from fixture ICS. No JMAP Calendars source until that RFC is published.
 
 ### P34. Shared inboxes
 

@@ -1808,6 +1808,7 @@ name = "mailune-app"
 version = "0.1.0"
 dependencies = [
  "mailune-core",
+ "mailune-mime",
  "mailune-protocol",
  "thiserror 2.0.21",
 ]

@@ -4,11 +4,13 @@
 //! Token bytes are read through [`SecretStore`] and never placed on a `Debug`
 //! or log path.
 
+mod calendar;
 mod reducer;
 mod views;
 
 use mailune_protocol::{AccountId, Secret, SecretId, SecretStore};
 
+pub use calendar::{CalendarDay, CalendarEntry, CalendarView, calendar_view};
 pub use reducer::{Msg, Pending, Ui};
 pub use views::{ComposerDraft, OpenThread, SettingsSnapshot, ThreadList, Views};
 
