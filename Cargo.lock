@@ -445,6 +445,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-rpc"
+version = "0.1.0"
+dependencies = [
+ "mailune-protocol",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "mailune-testkit"
 version = "0.1.0"
 dependencies = [
