@@ -94,6 +94,20 @@ struct Queued {
     status: Status,
 }
 
+/// One pending operation, oldest first.
+///
+/// This is the snapshot a store can save. It does not include finished or
+/// conflicted operations.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Pending {
+    /// Idempotency key.
+    pub key: IdempotencyKey,
+    /// The operation to replay.
+    pub op: Op,
+    /// When the person asked. The undo window measures this.
+    pub at: SystemTime,
+}
+
 /// Optimistic moves, keyed for replay.
 pub struct Queue {
     window: Duration,
@@ -196,6 +210,19 @@ impl Queue {
         let queued = self.ops.remove(index);
         revert(&mut self.location, &queued.op);
         Ok(())
+    }
+
+    /// Pending operations still waiting to be replayed, oldest first.
+    pub fn pending_ops(&self) -> Vec<Pending> {
+        self.ops
+            .iter()
+            .filter(|item| item.status == Status::Pending)
+            .map(|item| Pending {
+                key: item.key.clone(),
+                op: item.op.clone(),
+                at: item.at,
+            })
+            .collect()
     }
 
     /// Keys still waiting to be replayed, oldest first.

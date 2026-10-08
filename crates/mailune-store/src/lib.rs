@@ -17,6 +17,7 @@ use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 mod blob;
 mod embed;
 mod fts;
+mod ops;
 mod repo;
 mod schema;
 mod watch;
@@ -59,6 +60,14 @@ pub enum Error {
     /// The text does not include the key or the plaintext.
     #[error("blob could not be stored")]
     Blob,
+}
+
+impl From<diesel::result::Error> for Error {
+    fn from(_: diesel::result::Error) -> Self {
+        // The diesel error can echo SQL. The queue payload is not a secret,
+        // but the database key must not ride along in a failed pragma.
+        Self::Query
+    }
 }
 
 /// A file-backed SQLite database in WAL mode.

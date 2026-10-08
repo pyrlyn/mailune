@@ -16,7 +16,7 @@ pub use cancel::{CancelToken, Progress, run_loop};
 pub use followup::{Exchange, awaiting_reply};
 pub use lock::{AppLock, BiometricRequest};
 pub use notify::{Decision, NoticePolicy, QuietHours};
-pub use queue::{IdempotencyKey, Op, Queue, When};
+pub use queue::{IdempotencyKey, Op, Pending, Queue, When};
 pub use schedule::{Hold, Power, SyncAccount, SyncPlan, plan, plan_for};
 pub use search::{Date, Query, SearchDoc, Term, fuse, parse_query};
 pub use thread::{Container, NormalizedSubject, Threadable, normalize_subject, thread_messages};

@@ -10,6 +10,8 @@ description = "SQLite store: schema, search, blobs, and the op queue"
 [dependencies]
 chacha20poly1305 = { workspace = true }
 diesel = { workspace = true }
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
 diesel_migrations = { workspace = true }
 libsqlite3-sys = { workspace = true }
 rand = { workspace = true }
