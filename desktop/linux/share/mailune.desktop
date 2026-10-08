@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Mailune
+Exec=mailune %u
+MimeType=x-scheme-handler/mailto;

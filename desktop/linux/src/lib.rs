@@ -6,12 +6,14 @@
 //! in process. It does not open a socket.
 
 mod composer;
+mod desktop_file;
 mod host;
 mod list;
 mod reader;
 mod shell;
 
 pub use composer::{Composer, load_composer};
+pub use desktop_file::{DesktopFile, load_desktop_file};
 pub use host::LinuxHost;
 pub use list::{ThreadList, load_list};
 pub use reader::{Reader, load_reader};
