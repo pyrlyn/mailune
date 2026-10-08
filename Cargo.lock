@@ -2101,6 +2101,7 @@ name = "mailune-wasm"
 version = "0.1.0"
 dependencies = [
  "mailune-core",
+ "mailune-jmap",
  "mailune-mime",
  "mailune-protocol",
  "thiserror 2.0.21",

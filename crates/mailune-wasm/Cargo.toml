@@ -5,10 +5,11 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "WASM subset: protocol types, plain MIME, threading, and search"
+description = "WASM subset: protocol types, plain MIME, threading, search, and JMAP queries"
 
 [dependencies]
 mailune-core = { path = "../mailune-core" }
+mailune-jmap = { path = "../mailune-jmap", default-features = false }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 

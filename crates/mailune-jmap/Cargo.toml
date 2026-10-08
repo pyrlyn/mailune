@@ -7,10 +7,16 @@ license.workspace = true
 publish = false
 description = "JMAP sync from scripted JSON bodies"
 
+[features]
+default = ["sync"]
+# Store and fixture writes. The query parser stays available without this so
+# `mailune-wasm` can build for wasm32-unknown-unknown.
+sync = ["dep:mailune-fixture", "dep:mailune-protocol", "dep:mailune-store"]
+
 [dependencies]
-mailune-fixture = { path = "../mailune-fixture" }
-mailune-protocol = { path = "../mailune-protocol" }
-mailune-store = { path = "../mailune-store" }
+mailune-fixture = { path = "../mailune-fixture", optional = true }
+mailune-protocol = { path = "../mailune-protocol", optional = true }
+mailune-store = { path = "../mailune-store", optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

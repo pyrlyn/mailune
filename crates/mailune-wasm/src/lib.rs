@@ -4,7 +4,9 @@
 //! crates. `mailune-mime` does not build for `wasm32-unknown-unknown`
 //! (`getrandom` refuses that target without its `js` feature), so a plain
 //! message is parsed here. A native test checks that parse against
-//! `mailune-mime`. Nothing here opens a socket.
+//! `mailune-mime`. A scripted JMAP `Mailbox/query` is forwarded to
+//! `mailune-jmap` with the store feature off, so this crate still builds for
+//! wasm32. Nothing here opens a socket.
 
 pub use mailune_core::{Container, Query, Threadable, parse_query, thread_messages};
 pub use mailune_protocol::{Address, Envelope};
@@ -26,12 +28,24 @@ pub struct ParsedMail {
     pub text: String,
 }
 
-/// Failure while reading a plain message.
+/// Failure while reading a plain message or a JMAP query.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// The bytes are not a UTF-8 message with a header block.
     #[error("the bytes are not a plain message")]
     Parse,
+    /// The scripted JMAP body was not a query object.
+    #[error(transparent)]
+    Jmap(#[from] mailune_jmap::Error),
+}
+
+/// Mailbox ids from a scripted `Mailbox/query`, in document order.
+///
+/// # Errors
+///
+/// [`Error::Jmap`] when `json` is not a query object.
+pub fn query_mailbox_ids(json: &str) -> Result<Vec<String>, Error> {
+    mailune_jmap::query_mailbox_ids(json).map_err(Error::from)
 }
 
 /// Parses one `text/plain` message. Folded headers and multipart are out of this subset.
@@ -192,6 +206,15 @@ mod tests {
         assert_eq!(
             parse_query(query).unwrap(),
             mailune_core::parse_query(query).unwrap()
+        );
+    }
+
+    #[test]
+    fn a_scripted_mailbox_query_matches_the_native_parser() {
+        let json = r#"{"accountId":"acc-1","queryState":"q1","ids":["inbox","archive"]}"#;
+        assert_eq!(
+            super::query_mailbox_ids(json).unwrap(),
+            mailune_jmap::query_mailbox_ids(json).unwrap()
         );
     }
 }
