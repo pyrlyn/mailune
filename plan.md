@@ -7,13 +7,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
 | C1 | todo | P0 | 2 | 0% | |
-| C11 | todo | P0 | 2 | 0% | |
+| C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | F4 | todo | P0 | 3 | 0% | |
 | F5 | todo | P0 | 2 | 0% | |
-| F8 | todo | P0 | 2 | 0% | |
+| F8 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | F9 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
-| R1 | todo | P0 | 2 | 0% | |
+| R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | R15 | todo | P0 | 2 | 0% | |
 | R16 | todo | P0 | 2 | 0% | |
 | R17 | todo | P0 | 2 | 0% | |
@@ -38,6 +38,8 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
+Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
+
 ### F4. mailune-config: typed TOML, layering, committed JSON Schema
 
 Depends on: F2, X1. Reuse: X1 layered-config (from cox-config/src/load.rs, rtok src/config/validate.rs).
@@ -56,6 +58,8 @@ Depends on: F7. Reuse: cox-ffi src/host.rs (AppHost); ketch-ffi callbacks.rs.
 
 Done when: Traits documented; fakes exist in testkit (T1). Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
+Execution plan: Add host traits `Net`, `Clock`, `Fs`, `SecretStore`, `Notifier`, `NetworkState`, `AuthSession`, `PlatformModel`, `BackgroundScheduler` to `mailune-protocol`, documented, no I/O crates. Shape from `cox-ffi` `src/host.rs` and `ketch-ffi` `callbacks.rs`. A local test fake proves each trait is implementable. The `mailune-testkit` crate is T1 — do not create it. Do not edit CI or threat-model files.
+
 ### F9. Cancellation tokens and progress reporting
 
 Depends on: F8. Reuse: ketch-core src/cancel.rs; ketch-ffi callbacks.rs.
@@ -73,6 +77,8 @@ Done when: en + ru + de/fr/ja load; missing key falls back to msgid. Workspace c
 Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
 
 Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 ### R15. SonarCloud + coverage (cargo-llvm-cov)
 
