@@ -4,8 +4,10 @@
 //! these bodies are parsed in-process. Nothing here opens a socket.
 //! `Email/get` goes through `mailune-fixture`.
 
+mod mutate;
 mod push;
 
+pub use mutate::{FlagChange, Submission, apply_flags, apply_submission};
 pub use push::{StateChange, parse_event_source, parse_websocket};
 
 use mailune_protocol::Envelope;
