@@ -1,6 +1,8 @@
 //! Diesel tables for the v1 migration.
 //!
 //! Column modules come from the `table!` macro, which does not emit docs.
+//! FTS5 virtual tables cannot be expressed in Diesel's DSL, so `message_fts`
+//! is created in a migration and queried with `sql_query`.
 
 #![allow(missing_docs)]
 
