@@ -7,7 +7,8 @@
 //! evicted once the stored total passes the quota: a body can always be
 //! fetched again from the server.
 
-use aes_gcm::aead::{Aead, KeyInit, Payload};
+use aes_gcm::aead::rand_core::RngCore;
+use aes_gcm::aead::{Aead, KeyInit, OsRng, Payload};
 use aes_gcm::{Aes256Gcm, Nonce};
 use diesel::dsl::max;
 use diesel::prelude::*;
@@ -285,7 +286,12 @@ mod tests {
     fn another_key_cannot_read_a_blob() {
         let (_dir, mut store) = store();
         let hash = store.blobs(&KEY, 1 << 20).unwrap().put(b"body").unwrap();
-        let mut other = store.blobs(&[1; 32], 1 << 20).unwrap();
+        let mut other_key = [0u8; 32];
+        OsRng.fill_bytes(&mut other_key);
+        if other_key == KEY {
+            other_key[0] ^= 1;
+        }
+        let mut other = store.blobs(&other_key, 1 << 20).unwrap();
         assert!(matches!(other.get(&hash), Err(Error::BlobKey)));
     }
 
