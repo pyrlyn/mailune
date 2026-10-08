@@ -5,6 +5,7 @@
 
 mod cancel;
 mod followup;
+mod fusion;
 mod lock;
 mod notify;
 mod queue;
@@ -14,6 +15,7 @@ mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
 pub use followup::{Exchange, awaiting_reply};
+pub use fusion::{Candidate, Fused, RRF_K, fuse};
 pub use lock::{AppLock, BiometricRequest};
 pub use notify::{Decision, NoticePolicy, QuietHours};
 pub use queue::{IdempotencyKey, Op, Queue, When};

@@ -36,7 +36,6 @@
 - P11. IMAP mutations
 - S5. FTS5 index
 - S7. Change feed
-- S9. Hybrid retrieval fusion
 - T4. Queue property tests
 - A19. Natural-language rules
 - A25. Phishing and scam assessment

@@ -42,7 +42,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -467,14 +466,6 @@ Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crat
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
 Execution plan: `mailune-store` only.
-
-### S9. Hybrid retrieval fusion
-
-Depends on: S6. Reuse: the search parser already in `mailune-core`.
-
-Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
-
-Execution plan: `mailune-core` only. Do not depend on `mailune-store`.
 
 ### T4. Queue property tests
 

@@ -613,3 +613,13 @@ Done when: vectors stored in SQLite return the nearest neighbours by cosine.
 Execution plan: `vector.rs` in `mailune-store` plus an `embeddings` migration: f32 little-endian vectors per (message, chunk, model); `nearest` scans one account and model and sorts by cosine in Rust. No sqlite-vec.
 
 What landed: An `embeddings` table (third migration) keeps one little-endian f32 vector per message chunk and model, cascading with the message. `Store::put_embedding` upserts a vector; `Store::nearest` scans one account and model, skips other dimensions and zero vectors, and returns the top chunks by cosine with a stable tie order. Store unit tests now share one fixture module.
+
+### S9. Hybrid retrieval fusion
+
+Depends on: S6. Reuse: the search parser already in `mailune-core`.
+
+Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
+
+Execution plan: `fusion.rs` in `mailune-core`: `fuse(lexical, semantic, query)` sums `1/(60 + rank)` per list, then applies the parser's field terms (from, to, has, is, label, before) to each candidate's fields. No store dependency.
+
+What landed: `mailune_core::fuse` fuses a lexical and a semantic ranked list with reciprocal rank fusion at `RRF_K = 60` (a repeated id counts once per list), then keeps only candidates that pass the parsed query's field terms; free-text terms are left to the retrievers. Ties break by message id. No database and no store dependency.
