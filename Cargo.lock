@@ -1687,6 +1687,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-graph"
+version = "0.1.0"
+dependencies = [
+ "mailune-core",
+ "mailune-protocol",
+ "mailune-store",
+ "mailune-testkit",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "mailune-imap"
 version = "0.1.0"
 dependencies = [

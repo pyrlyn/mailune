@@ -1,0 +1,25 @@
+[package]
+name = "mailune-graph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Microsoft Graph mail adapter over an injected HTTP transport"
+
+# graph-rs-sdk is not linked (plan.md P23): it brings its own HTTP client.
+# Requests are built here and sent through the injected `Http` transport.
+[dependencies]
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+mailune-store = { path = "../mailune-store" }
+mailune-testkit = { path = "../mailune-testkit" }
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

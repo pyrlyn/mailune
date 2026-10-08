@@ -55,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P23 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P24 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -565,14 +564,6 @@ Depends on: P17.
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
 
 Execution plan: `mailune-jmap` only.
-
-### P23. Graph mail sync
-
-Depends on: P15, S3. Do not add `graph-rs-sdk`.
-
-Done when: folders, a delta query, and `$select` parse from a scripted body and upsert through the repository. No TCP.
-
-Execution plan: new crate `mailune-graph`.
 
 ### P24. Graph mutations and send
 

@@ -49,7 +49,6 @@
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
-- P23. Graph mail sync
 - P24. Graph mutations and send
 - P25. Graph calendar and contacts
 - B2. UniFFI records

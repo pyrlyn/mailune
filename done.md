@@ -673,3 +673,13 @@ Done when: batchModify labels, send, and a draft run against the scripted transp
 Execution plan: `mailune-gmail` only: `modify_labels` (messages.batchModify, 1000 ids per call), `send_raw` and `create_draft` carrying caller-built RFC 5322 bytes as base64url (workspace `base64`). Scripted-transport tests check the request bodies and status errors.
 
 What landed: `GmailClient::modify_labels` (messages.batchModify, chunked at 1000 ids; mark read = remove `UNREAD`, move = add target and remove source), `send_raw` (messages.send, base64url `raw`, optional `threadId`; documented as call-after-confirmation) returning `Sent { id, thread_id }`, and `create_draft` (drafts.create) returning `Draft { id, message }`. The caller builds the RFC 5322 bytes. Reuses the workspace `base64` crate. Scripted-transport tests check bodies, round-trip the raw bytes, and map a 400 to `Error::Status`.
+
+### P23. Graph mail sync
+
+Depends on: P15, S3. Do not add `graph-rs-sdk`.
+
+Done when: folders, a delta query, and `$select` parse from a scripted body and upsert through the repository. No TCP.
+
+Execution plan: new crate `mailune-graph` without graph-rs-sdk: folders (with child folders and nextLink paging) and a per-folder `messages/delta` with `$select`, resumed from a saved delta link; a 410 restarts the folder. Server links are followed only on the Graph host. Tests upsert scripted pages through `mailune-store`.
+
+What landed: New crate `mailune-graph` (no graph-rs-sdk; requests go through the injected `Http` transport). `GraphClient::folders` walks top-level and child folders across `@odata.nextLink` pages, parents first, with roles from `wellKnownName` when Graph sends it. `delta(folder, saved_link)` runs `messages/delta?$select=...` with `Prefer: odata.maxpagesize=50`, splits `@removed` items from changed ones, and returns the delta link to save; a 410 restarts from scratch. Every server link must start with `https://graph.microsoft.com/` or the call fails with `Error::ForeignLink`, so the token never leaves the Graph host. Page and folder counts are capped. Categories become keywords. Tests upsert scripted folders and two delta rounds through `mailune-store`.
