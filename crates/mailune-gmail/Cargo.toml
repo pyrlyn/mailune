@@ -1,0 +1,19 @@
+[package]
+name = "mailune-gmail"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Gmail API sync from scripted JSON bodies"
+
+[dependencies]
+mailune-fixture = { path = "../mailune-fixture" }
+mailune-protocol = { path = "../mailune-protocol" }
+mailune-store = { path = "../mailune-store" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

@@ -1805,6 +1805,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-gmail"
+version = "0.1.0"
+dependencies = [
+ "mailune-fixture",
+ "mailune-protocol",
+ "mailune-store",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "mailune-imap"
 version = "0.1.0"
 dependencies = [
