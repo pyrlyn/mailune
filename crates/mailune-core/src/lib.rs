@@ -4,8 +4,10 @@
 //! contract and on nothing that opens a socket, a file or a process.
 
 mod cancel;
+mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
+pub use thread::{Container, NormalizedSubject, Threadable, normalize_subject, thread_messages};
 
 /// Failure returned by the domain.
 #[derive(Debug, thiserror::Error)]
