@@ -45,6 +45,11 @@ pub struct Scripted {
     qresync: bool,
     /// Uids removed from the mailbox, with the modseq of the removal.
     vanished: Vec<(u32, u64)>,
+    /// Untagged lines queued for the next IDLE.
+    idle_lines: String,
+    /// After IDLE's reply is queued, the next read is a dropped session.
+    drop_after_idle: bool,
+    closed: bool,
 }
 
 impl Scripted {
@@ -66,7 +71,29 @@ impl Scripted {
             trace: Vec::new(),
             qresync: false,
             vanished: Vec::new(),
+            idle_lines: String::new(),
+            drop_after_idle: false,
+            closed: false,
         }
+    }
+
+    /// Untagged updates the next IDLE writes before it goes quiet.
+    pub fn push_idle(mut self, untagged: &str) -> Self {
+        self.idle_lines.push_str(untagged);
+        if !self.idle_lines.ends_with("\r\n") {
+            self.idle_lines.push_str("\r\n");
+        }
+        self
+    }
+
+    /// Close the session after the IDLE reply, so the client must reconnect.
+    pub fn drop_after_idle(mut self) -> Self {
+        self.drop_after_idle = true;
+        self
+    }
+
+    pub(crate) fn is_closed(&self) -> bool {
+        self.closed
     }
 
     /// Advertise CONDSTORE and QRESYNC, and answer CHANGEDSINCE with VANISHED.
@@ -109,6 +136,9 @@ impl Scripted {
     }
 
     fn respond(&mut self, line: &str) -> String {
+        if line.eq_ignore_ascii_case("DONE") {
+            return "A0 OK IDLE terminated\r\n".to_string();
+        }
         if !line.to_ascii_uppercase().contains(" LOGIN ")
             && !line.to_ascii_uppercase().starts_with("LOGIN ")
         {
@@ -143,9 +173,18 @@ impl Scripted {
             "SEARCH" if self.selected && uid_command => self.search(tag, &rest),
             "FETCH" if self.selected && uid_command => self.uid_fetch(tag, line),
             "FETCH" if self.selected => fetch_response(tag),
-            "SELECT" | "FETCH" | "SEARCH" => format!("{tag} NO not authenticated\r\n"),
+            "IDLE" if self.selected => self.idle(tag),
+            "SELECT" | "FETCH" | "SEARCH" | "IDLE" => format!("{tag} NO not authenticated\r\n"),
             _ => format!("{tag} BAD unknown command\r\n"),
         }
+    }
+
+    fn idle(&mut self, _tag: &str) -> String {
+        let queued = std::mem::take(&mut self.idle_lines);
+        if self.drop_after_idle {
+            self.closed = true;
+        }
+        format!("+ idling\r\n{queued}")
     }
 
     fn select(&mut self, tag: &str) -> String {

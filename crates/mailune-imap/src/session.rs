@@ -131,6 +131,33 @@ impl<S: Read + Write> Connection<S> {
         Ok(reply)
     }
 
+    /// IDLE until the stream is quiet or the server drops it.
+    ///
+    /// The bool is true when the read ended because the session closed.
+    /// A quiet scripted server returns [`Error::Idle`] from the stream
+    /// instead, which is not a drop and does not sleep.
+    pub(crate) fn read_idle(&mut self) -> Result<(String, bool), Error> {
+        let tag = self.next_tag();
+        self.command(&tag, "IDLE")?;
+        let mut raw = String::new();
+        let dropped = loop {
+            match self.read_one_line() {
+                Ok(line) => {
+                    let done = line.starts_with(&tag) && line[tag.len()..].starts_with(' ');
+                    raw.push_str(&line);
+                    raw.push_str("\r\n");
+                    if done {
+                        break false;
+                    }
+                }
+                Err(Error::Idle) => break false,
+                Err(Error::Session) => break true,
+                Err(err) => return Err(err),
+            }
+        };
+        Ok((raw, dropped))
+    }
+
     /// LOGIN with the username and password from [`Config`].
     pub fn login(&mut self) -> Result<(), Error> {
         let tag = self.next_tag();
@@ -188,10 +215,14 @@ impl<S: Read + Write> Connection<S> {
                 return Ok(text.into_owned());
             }
             let mut tmp = [0u8; 512];
-            let read = self.io.read(&mut tmp).map_err(|_| Error::Session)?;
-            if read == 0 {
-                return Err(Error::Session);
-            }
+            let read = match self.io.read(&mut tmp) {
+                Ok(0) => return Err(Error::Session),
+                Ok(read) => read,
+                Err(err) if err.kind() == std::io::ErrorKind::WouldBlock => {
+                    return Err(Error::Idle);
+                }
+                Err(_) => return Err(Error::Session),
+            };
             self.buf.extend_from_slice(&tmp[..read]);
         }
     }
@@ -217,6 +248,14 @@ impl MemStream {
 
 impl Read for MemStream {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        if self.inbound.is_empty() {
+            // An empty buffer is "nothing yet" until the server closes.
+            // IDLE uses that to stop reading without sleeping.
+            if self.server.is_closed() {
+                return Ok(0);
+            }
+            return Err(std::io::Error::new(std::io::ErrorKind::WouldBlock, "idle"));
+        }
         let count = buf.len().min(self.inbound.len());
         buf[..count].copy_from_slice(&self.inbound[..count]);
         self.inbound.drain(..count);

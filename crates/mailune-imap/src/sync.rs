@@ -172,7 +172,7 @@ fn message_from_items(items: &[MessageDataItem<'_>]) -> Option<SyncedMessage> {
     })
 }
 
-fn flag_names(flags: &[FlagFetch<'_>]) -> Vec<String> {
+pub(crate) fn flag_names(flags: &[FlagFetch<'_>]) -> Vec<String> {
     flags
         .iter()
         .map(|flag| match flag {
