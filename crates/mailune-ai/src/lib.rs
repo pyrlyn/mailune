@@ -13,6 +13,7 @@ mod priority;
 mod prompts;
 mod redact;
 mod router;
+mod summary;
 mod triage;
 
 pub use catalog::{BlobStore, Catalog};
@@ -28,6 +29,7 @@ pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use summary::{SummaryCache, SummaryKind, summarize};
 pub use triage::{TriageInput, categorize};
 
 use std::fmt;
