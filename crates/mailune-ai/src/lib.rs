@@ -3,6 +3,7 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod agent;
 mod attachment;
 mod catalog;
 mod cloud;
@@ -25,6 +26,7 @@ mod style;
 mod summary;
 mod triage;
 
+pub use agent::{AgentCall, AuditLine, AuditLog, Scope, ToolPreview, UndoRecord, prepare};
 pub use attachment::summarize_attachment;
 pub use catalog::{BlobStore, Catalog};
 pub use cloud::{
