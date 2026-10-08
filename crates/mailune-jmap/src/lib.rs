@@ -6,11 +6,13 @@
 //! repository takes. Wiring the two together is `mailune-app`'s job.
 
 mod client;
+mod extras;
 mod mail;
 mod mutate;
 mod wire;
 
 pub use client::{JmapClient, Session, SyncBatch};
+pub use extras::{MaskedEmail, SieveScript};
 pub use mail::{Changes, JmapEmail, JmapMailbox, JmapThread, QueryResult};
 
 /// Failure returned by the JMAP adapter. No variant carries the token.

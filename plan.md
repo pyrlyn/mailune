@@ -55,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P21 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P23 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
@@ -566,14 +565,6 @@ Execution plan: `mailune-store` only. Commit on `batch9-store`.
 Depends on: P17.
 
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
-
-Execution plan: `mailune-jmap` only.
-
-### P20. JMAP MaskedEmail and Sieve
-
-Depends on: P19.
-
-Done when: a scripted exchange creates a MaskedEmail and lists a Sieve script. No network.
 
 Execution plan: `mailune-jmap` only.
 

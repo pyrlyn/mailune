@@ -643,3 +643,13 @@ Done when: a scripted exchange applies a flag change and an EmailSubmission. No 
 Execution plan: `mutate.rs` in `mailune-jmap`: keyword and mailbox patches through `Email/set`, and `EmailSubmission/set` with `onSuccessUpdateEmail` filing the draft in Sent. Scripted responses only.
 
 What landed: `JmapClient::set_keywords` and `move_email` send `Email/set` path patches (`keywords/$seen`, `mailboxIds/<id>`), so a replay is idempotent; `notUpdated` becomes `Error::Rejected`. `submit` sends `EmailSubmission/set` under the submission capability and, through `onSuccessUpdateEmail`, clears `$draft` and files the email in Sent; `notCreated` is refused. Scripted exchanges only, no SMTP.
+
+### P20. JMAP MaskedEmail and Sieve
+
+Depends on: P19.
+
+Done when: a scripted exchange creates a MaskedEmail and lists a Sieve script. No network.
+
+Execution plan: `extras.rs` in `mailune-jmap`: `MaskedEmail/set` create under Fastmail's capability and `SieveScript/get` under RFC 9661's, both over the scripted transport.
+
+What landed: `JmapClient::create_masked_email` creates an enabled address through `MaskedEmail/set` under `https://www.fastmail.com/dev/maskedemail` (a `notCreated` refusal is `Error::Rejected`), and `sieve_scripts` lists scripts through `SieveScript/get` under `urn:ietf:params:jmap:sieve` (RFC 9661). Scripted exchanges only.
