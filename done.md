@@ -553,3 +553,13 @@ Requested by the creator. Reuse: translate-toolkit storage classes; research/mai
 Done when: translate-toolkit is pinned in `mise.toml`; `i18n/*.po` is the single source; one command writes every native catalog and fails on broken keys, placeholders or plural forms.
 
 What landed: `"pipx:translate-toolkit" = "3.20.0"` in `mise.toml` with `i18n`, `i18n --check` and `i18n:test` tasks. `i18n/mailune.pot` plus `de`, `fr`, `ja` catalogs imported from research/mail-app (276 strings, msgctxt keys, `{0}` placeholders). `scripts/i18n.py` writes `target/i18n/`: Apple `Localizable.strings` and `.stringsdict`, Android `strings.xml`, Windows `.resw` (plurals as `<key>_<tag>`), Linux `.mo`, web i18next v4 JSON. Gettext plural forms are spread over CLDR tags; placeholders become `%n$@`, `%n$s`, `{n}` or `{{n}}` (`{{count}}` in plurals).
+
+### A28. Agent tools
+
+Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.
+
+Done when: a tool call has a scope, a preview, an undo record, and an audit line. The policy still fails closed. No send without the existing confirmation flag.
+
+Execution plan: `mailune-ai` `agent.rs`: a typed `ToolCall` parsed from strict JSON, an `Agent` that checks the A9 policy and a granted `Scope`, builds a `Preview` and an `UndoRecord`, and appends an `AuditLine` for every decision. `commit` returns submissions for the app; the queue is untouched.
+
+What landed: A typed `ToolCall` (summarize, archive, delete, send) is parsed from strict JSON and checked against the A9 policy and a granted scope. Each call gets a preview, an undo record (moves back to the original mailbox) and content-free audit lines. Send and delete are refused at commit until the app passes `Confirmation::Confirmed`; forward has no contract submission and is denied.

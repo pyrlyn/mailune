@@ -3,6 +3,7 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod agent;
 mod guard;
 mod ledger;
 mod platform;
@@ -12,6 +13,10 @@ mod redact;
 mod router;
 mod triage;
 
+pub use agent::{
+    Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Scope, ToolCall, UndoRecord,
+    needs_confirmation, parse_call,
+};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use platform::{PlatformBridge, map_capability};
@@ -140,6 +145,12 @@ pub enum Error {
     /// No published template has that id and version.
     #[error("unknown prompt template")]
     UnknownPrompt,
+    /// A tool call named a conversation outside the granted scope.
+    #[error("tool call is outside the granted scope")]
+    OutOfScope,
+    /// Send and delete wait for the person to confirm in the app.
+    #[error("tool call needs confirmation in the app")]
+    NeedsConfirmation,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

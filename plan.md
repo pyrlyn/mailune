@@ -20,26 +20,26 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| A3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A12 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A15 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A14 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A15 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A30 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A30 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | C3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P8 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| P9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P7 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| P8 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
+| P9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -50,11 +50,10 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A27 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A28 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| A29 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A27 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A29 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -172,7 +171,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
+| A33 | in progress | P2 | 3 | 0% | Claude / opus-5.5 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
@@ -561,14 +560,6 @@ Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; o
 Done when: a text attachment becomes a summary through the scripted engine. No network.
 
 Execution plan: `mailune-ai` only.
-
-### A28. Agent tools
-
-Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.
-
-Done when: a tool call has a scope, a preview, an undo record, and an audit line. The policy still fails closed. No send without the existing confirmation flag.
-
-Execution plan: `mailune-ai` only. Stay under 500 lines of production code.
 
 ### A29. Local MCP server
 
