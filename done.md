@@ -653,3 +653,13 @@ Done when: random ops against a model mailbox keep idempotency and undo invarian
 Execution plan: a `props` module inside the queue tests drives random steps (enqueue, replay, key reuse, ack, conflict resolve, undo, clock ticks) against a small model mailbox where every thread starts in the inbox and a move's `from` is where the thread is now. After every step the queue's pending keys, locations, schedules and due list must equal the model's; a replay must change nothing; a reused key must fail and change nothing; a fresh op undone at once must leave no trace. proptest 1.11 as a dev-dependency only, default features off, no regression files; `deps.rs` allows it in `mailune-core` as a dev-dependency and nothing else.
 
 What landed: a proptest model test in `mailune-core/src/queue.rs` (`tests::props`). Up to 60 random steps (enqueue, replay, key reuse, ack, conflict resolve, undo, clock ticks) run against a model mailbox; after each, the queue's pending keys, locations, schedules and due list equal the model's, a replay changes nothing, a reused key fails without effect, and a fresh op undone at once leaves no trace. Two hand mutations of the queue (an idempotency bypass and an undo that does not revert) both fail it. proptest 1.11 is a dev-dependency only, default features off, with no regression files; `deps.rs` allows exactly that.
+
+### R8. Integration compose file
+
+Depends on: the IMAP client already on this branch. P7's sync code is on another branch.
+
+Done when: a compose file names Stalwart and Dovecot, and a test reads that file. `nextest` does not start Docker and does not open a socket. Do not edit `.github/workflows/ci.yml`.
+
+Execution plan: `docker-compose.yml` at the root with `stalwart` (stalwartlabs/stalwart:v0.16.25) and `dovecot` (dovecot/dovecot:2.4.5), tags checked on Docker Hub; ports on 127.0.0.1 only; the Dovecot password comes from `MAILUNE_IT_PASSWORD` so none is committed. `crates/mailune-cli/tests/compose.rs` reads the file as text (no YAML crate) and checks the two services, pinned tags, loopback ports and no literal password. CI is untouched.
+
+What landed: `docker-compose.yml` names `stalwart` (stalwartlabs/stalwart:v0.16.25: IMAP, submission, JMAP/admin HTTP) and `dovecot` (dovecot/dovecot:2.4.5, IMAP on its unprivileged 31143), tags checked on Docker Hub on 2026-10-08. Every port binds to 127.0.0.1, no volume is kept, and the Dovecot password is read from `MAILUNE_IT_PASSWORD`. `crates/mailune-cli/tests/compose.rs` reads the file as text and checks the two services, pinned tags, loopback ports and that no password is committed. Nothing starts Docker or opens a socket; `.github/workflows/ci.yml` is untouched.

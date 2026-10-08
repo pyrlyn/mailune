@@ -14,6 +14,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | meson | system | Builds and runs the Vala test of `mailune-capi` | https://github.com/mesonbuild/meson |
 | vala | system (with GLib, GObject and json-glib) | Compiles `crates/mailune-capi/tests/capi.vala` against the VAPI | https://gitlab.gnome.org/GNOME/vala |
 | openssl | system | Regenerates the `mailune-smime` interop fixtures (`fixtures/regenerate.sh`); not needed to build or test | https://github.com/openssl/openssl |
+| docker (compose) | system | Runs the Stalwart and Dovecot integration servers in `docker-compose.yml` by hand; not needed to build or test | https://github.com/docker/compose |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |

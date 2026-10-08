@@ -84,7 +84,6 @@
 - A20. Ask with citations
 - T6. Performance budgets
 - B9. WASM subset
-- R8. Integration compose file
 - E5. Web shell and thread list
 - E6. Web reader
 - E7. Web composer

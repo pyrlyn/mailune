@@ -90,7 +90,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| R8 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -767,14 +766,6 @@ Depends on: P1, P4, S6.
 Done when: protocol types, MIME parse, threading, and the query parser agree with a native parity test. If the wasm32 target is not installed, do not install it; say so in the commit.
 
 Execution plan: new crate `mailune-wasm`. Stay under 500 production lines.
-
-### R8. Integration compose file
-
-Depends on: the IMAP client already on this branch. P7's sync code is on another branch.
-
-Done when: a compose file names Stalwart and Dovecot, and a test reads that file. `nextest` does not start Docker and does not open a socket. Do not edit `.github/workflows/ci.yml`.
-
-Execution plan: `docker-compose.yml` plus one test in `mailune-cli`.
 
 ### E5. Web shell and thread list
 

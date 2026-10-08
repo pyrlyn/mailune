@@ -1,0 +1,25 @@
+# Mail servers for the integration tests. Start them by hand:
+#   MAILUNE_IT_PASSWORD='{PLAIN}choose-one' docker compose up -d
+# `cargo nextest` never starts them: crates/mailune-cli/tests/compose.rs only
+# reads this file. Every port binds to loopback, so these throwaway servers
+# are not reachable from the network. Containers keep no volume, so each run
+# starts clean. Image tags checked on Docker Hub on 2026-10-08.
+services:
+  stalwart:
+    # JMAP, IMAP and SMTP in one server. The admin password is generated on
+    # first start and printed once by `docker compose logs stalwart`.
+    image: stalwartlabs/stalwart:v0.16.25
+    ports:
+      - "127.0.0.1:10143:143" # IMAP
+      - "127.0.0.1:10587:587" # SMTP submission
+      - "127.0.0.1:18080:8080" # HTTP: JMAP and the admin UI
+  dovecot:
+    # IMAP with CONDSTORE and QRESYNC. The 2.4 image runs unprivileged, so it
+    # listens on 31143 rather than 143.
+    image: dovecot/dovecot:2.4.5
+    environment:
+      # Any user name logs in with this password (a Dovecot scheme string).
+      # It comes from the shell so no password is committed.
+      USER_PASSWORD: ${MAILUNE_IT_PASSWORD:?set MAILUNE_IT_PASSWORD}
+    ports:
+      - "127.0.0.1:20143:31143" # IMAP
