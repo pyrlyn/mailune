@@ -66,6 +66,10 @@ icalendar = "0.17.14"
 pgp = { version = "0.20.0", default-features = false }
 # mailune-ffi: Swift, Kotlin and C# bindings from proc-macros. 0.32.2 is the line ketch-ffi and cox-ffi use.
 uniffi = "0.32.2"
+# mailune-capi: `malloc`/`free` for answers, so GLib's `g_free` frees them. Same line as ketch-capi.
+libc = "0.2.189"
+# mailune-capi tests: the header drift test; the library alone, without its CLI. Same line as ketch-capi.
+cbindgen = { version = "0.29.4", default-features = false }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 

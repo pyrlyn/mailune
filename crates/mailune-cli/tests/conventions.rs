@@ -1,10 +1,10 @@
 //! Convention gates: every Rust file opens with a `//!` header, and an
 //! exported FFI body is one expression.
 //!
-//! The FFI crate does not exist yet. Fixtures prove the gate, and the same
-//! check walks `crates/mailune-ffi/src` once that surface lands. The shape
-//! follows cox-ffi's forward-only test: `syn` parses the file, and a body
-//! that is not a single expression statement fails.
+//! Fixtures prove the gate, and the same check walks `crates/mailune-ffi/src`
+//! (`#[uniffi::export]`) and `crates/mailune-capi/src` (`#[unsafe(no_mangle)]`).
+//! The shape follows cox-ffi's forward-only test: `syn` parses the file, and
+//! a body that is not a single expression statement fails.
 
 #![allow(clippy::unwrap_used, clippy::panic)]
 
@@ -47,6 +47,19 @@ fn is_uniffi_export(attrs: &[Attribute]) -> bool {
     })
 }
 
+/// `#[no_mangle]` or the 2024 spelling `#[unsafe(no_mangle)]`: a C export.
+fn is_c_export(attrs: &[Attribute]) -> bool {
+    attrs.iter().any(|attr| match &attr.meta {
+        Meta::Path(path) => path.is_ident("no_mangle"),
+        Meta::List(list) => list.path.is_ident("unsafe") && list.tokens.to_string() == "no_mangle",
+        Meta::NameValue(_) => false,
+    })
+}
+
+fn is_export(attrs: &[Attribute]) -> bool {
+    is_uniffi_export(attrs) || is_c_export(attrs)
+}
+
 fn is_cfg_test(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| match &attr.meta {
         Meta::List(list) => list.path.is_ident("cfg") && list.tokens.to_string().contains("test"),
@@ -74,12 +87,12 @@ fn export_violations(file: &str, items: &[Item], out: &mut Vec<String>) {
     };
     for item in items {
         match item {
-            Item::Fn(func) if is_uniffi_export(&func.attrs) => {
+            Item::Fn(func) if is_export(&func.attrs) => {
                 note(out, &func.sig.ident.to_string(), &func.block);
             }
             Item::Impl(imp) => {
                 for method in imp.items.iter().filter_map(|item| match item {
-                    ImplItem::Fn(func) if is_uniffi_export(&func.attrs) => Some(func),
+                    ImplItem::Fn(func) if is_export(&func.attrs) => Some(func),
                     _ => None,
                 }) {
                     note(out, &method.sig.ident.to_string(), &method.block);
@@ -143,11 +156,17 @@ fn a_multi_statement_export_fails() {
 }
 
 #[test]
-fn ffi_sources_stay_forward_only_when_the_crate_exists() {
-    let src = workspace_root().join("crates/mailune-ffi/src");
-    if !src.is_dir() {
-        return;
-    }
+fn a_multi_statement_c_export_fails() {
+    let source = "#[unsafe(no_mangle)]\npub extern \"C\" fn send() { let a = 1; go(a) }\n";
+    assert_eq!(
+        violations_in("abi.rs", source),
+        ["abi.rs: fn send — 2 statements"]
+    );
+}
+
+fn assert_forward_only(krate: &str) {
+    let src = workspace_root().join("crates").join(krate).join("src");
+    assert!(src.is_dir(), "{krate} has no src/");
     let mut files = Vec::new();
     rust_sources(&src, &mut files);
     let mut found = Vec::new();
@@ -158,7 +177,17 @@ fn ffi_sources_stay_forward_only_when_the_crate_exists() {
     }
     assert!(
         found.is_empty(),
-        "mailune-ffi holds a multi-expression export — forward one call:\n{}",
+        "{krate} holds a multi-expression export — forward one call:\n{}",
         found.join("\n")
     );
+}
+
+#[test]
+fn ffi_sources_stay_forward_only() {
+    assert_forward_only("mailune-ffi");
+}
+
+#[test]
+fn capi_sources_stay_forward_only() {
+    assert_forward_only("mailune-capi");
 }

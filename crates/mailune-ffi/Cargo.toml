@@ -12,12 +12,23 @@ description = "Mailune assembly exported through UniFFI for the Swift, Kotlin an
 # load, and `lib` lets tests and a later bindgen binary link the crate as Rust.
 crate-type = ["lib", "staticlib", "cdylib"]
 
+[features]
+schema = ["dep:schemars"]
+
 [dependencies]
 mailune-app = { path = "../mailune-app" }
 mailune-protocol = { path = "../mailune-protocol" }
+# The JSON Schema of the records, for mailune-capi's payload schema; only its
+# drift test turns it on.
+schemars = { workspace = true, optional = true }
+# The JSON shape mailune-capi sends over its C ABI.
+serde = { workspace = true }
 thiserror = { workspace = true }
 # Proc-macro mode: the exported surface is the Rust code itself, no UDL file.
 uniffi = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
 
 [lints]
 workspace = true

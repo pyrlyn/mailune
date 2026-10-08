@@ -1,0 +1,1 @@
+option('capi_dir', type: 'string', value: '', description: 'Directory holding the libmailune_capi cargo built (<target>/debug)')

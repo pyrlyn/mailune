@@ -11,6 +11,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | java | mise (`desktop/android/mise.toml`) | Runs Gradle for the Android shell | https://openjdk.org |
 | gradle | mise (`desktop/android/mise.toml`) | Builds and tests `desktop/android` | https://github.com/gradle/gradle |
 | kotlin | mise (`desktop/android/mise.toml`) | Kotlin compiler for the Android shell | https://github.com/JetBrains/kotlin |
+| meson | system | Builds and runs the Vala test of `mailune-capi` | https://github.com/mesonbuild/meson |
+| vala | system (with GLib, GObject and json-glib) | Compiles `crates/mailune-capi/tests/capi.vala` against the VAPI | https://gitlab.gnome.org/GNOME/vala |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -38,6 +40,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
+| libc | local | https://github.com/rust-lang/libc | `mailune-capi`: `malloc`ed answers GLib can `g_free` |
+| cbindgen | local (dev) | https://github.com/mozilla/cbindgen | `mailune-capi`: header drift test |
 
 Gradle (`desktop/android`):
 

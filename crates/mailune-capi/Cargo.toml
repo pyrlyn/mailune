@@ -1,0 +1,28 @@
+[package]
+name = "mailune-capi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "mailune-ffi behind a C ABI with JSON records, for the Vala shell no UniFFI generator reaches"
+
+[lib]
+# The shared library the Vala shell loads.
+crate-type = ["cdylib"]
+
+[dependencies]
+libc = { workspace = true }
+# Every call goes through mailune-ffi, so the C ABI and the UniFFI bindings
+# run the same code and only the wire format differs.
+mailune-ffi = { path = "../mailune-ffi" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+cbindgen = { workspace = true }
+mailune-ffi = { path = "../mailune-ffi", features = ["schema"] }
+schemars = { workspace = true }
+
+[lints]
+workspace = true

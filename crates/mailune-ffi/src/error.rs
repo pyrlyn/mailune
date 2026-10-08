@@ -5,7 +5,9 @@
 //! the messages it raises.
 
 /// Failure crossing the binding.
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, uniffi::Error)]
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, uniffi::Error, serde::Serialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum MailuneError {
     /// The host (keychain, network, platform) failed. Raised by a foreign
     /// implementation too, so its text must not carry a secret.

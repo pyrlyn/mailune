@@ -104,7 +104,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -887,14 +886,6 @@ Depends on: E2.
 Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
 
 Execution plan: `.github/workflows/web.yml` only.
-
-### B6. C ABI
-
-Depends on: B1. The shared abi-drift crate is not in this repo.
-
-Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
-
-Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
 
 ### E10. WASM JMAP calls
 

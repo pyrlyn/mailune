@@ -573,3 +573,13 @@ Done when: a Gradle JVM test round-trips one record. cargo-ndk and UniFFI are no
 Execution plan: `desktop/android` only. A Gradle build (Kotlin JVM 2.4.20, Gradle 9.8.0 and Java 27 from `desktop/android/mise.toml`, as cox `plugins/` does, so Rust-only contributors install nothing) with one `core` module. `Address` mirrors the B2 record and its converter writes the UniFFI buffer layout; a JUnit test round-trips it. Generated bindings replace the hand-written converter once uniffi-bindgen runs. No Android SDK, no cargo-ndk. Verify with `gradle test` in `desktop/android`.
 
 What landed: A Gradle build in `desktop/android` (Kotlin JVM 2.4.20, Gradle 9.8.0, Java 27 from its own `mise.toml`, bytecode level 17) with a `core` module. `Address` mirrors the B2 record and `FfiConverterAddress` writes the RustBuffer layout; four JUnit tests round-trip it, and a Rust test in `mailune-ffi` checks uniffi writes the same bytes. cargo-ndk and uniffi-bindgen are not run and the Android SDK is not installed.
+
+### B6. C ABI
+
+Depends on: B1. The shared abi-drift crate is not in this repo.
+
+Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
+
+Execution plan: new crate `mailune-capi`, the C ABI for the Vala shell, shaped like ketch-capi. One opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, so both bindings run the same code; records cross as JSON in an `{"ok"}` / `{"error"}` envelope (serde derives added to the `mailune-ffi` records, JSON Schema behind its `schema` feature). Answers are `malloc`ed (libc) so `g_free` frees them; every export catches panics and is one expression, and the syn test in `mailune-cli` now walks `mailune-capi` `no_mangle` functions too. Commit `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with a Vala test, and `schema/payloads.schema.json`; drift tests regenerate the header with the cbindgen library and the schema from the records. valac is not installed, so the Meson test is not run here.
+
+What landed: New crate `mailune-capi`: one opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, records as contract JSON in an `ok`/`error` envelope, `malloc`ed answers, a panic guard in `respond`. Committed `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with `tests/capi.vala`, and `schema/payloads.schema.json`; drift tests regenerate the header and the schema of the records and fail on any difference. The forward-only syn test now covers `no_mangle` exports in `mailune-capi`. A C program linked against the cdylib was run by hand; valac is not installed, so the Meson test was not run.

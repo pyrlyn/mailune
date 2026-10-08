@@ -4,12 +4,17 @@
 //! how they change. The price is a conversion per record, both ways where the
 //! foreign side sends the value back. Ids cross as strings: providers spell
 //! them differently and the contract does not interpret them either.
+//!
+//! The serde derives give the JSON that `mailune-capi` carries over its C
+//! ABI. It is the contract's JSON too (snake_case, externally tagged), so a
+//! fake core that replays contract scenarios speaks it unchanged.
 
 use mailune_app::Views;
 use mailune_protocol as proto;
 
 /// Someone a message is from, to or copied to.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct Address {
     /// Display name when the header had one.
     pub name: Option<String>,
@@ -18,7 +23,9 @@ pub struct Address {
 }
 
 /// Triage tab.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "snake_case")]
 pub enum Category {
     /// Primary.
     Primary,
@@ -31,7 +38,8 @@ pub enum Category {
 }
 
 /// One row in the thread list.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ThreadRow {
     /// Conversation id.
     pub id: String,
@@ -70,7 +78,9 @@ pub struct ThreadRow {
 }
 
 /// A fact the UI renders.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "snake_case")]
 pub enum Event {
     /// A sentence the UI shows as a notice.
     Notice {
@@ -85,7 +95,8 @@ pub enum Event {
 }
 
 /// The composer draft.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ComposerDraft {
     /// Recipient address, as the notice wrote it.
     pub to: String,
@@ -96,7 +107,8 @@ pub struct ComposerDraft {
 }
 
 /// Settings the UI is showing.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct Settings {
     /// Language code; English is `en`.
     pub language: String,
@@ -105,7 +117,8 @@ pub struct Settings {
 }
 
 /// Everything a shell renders, read in one call.
-#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ViewState {
     /// Thread list rows in list order.
     pub list: Vec<ThreadRow>,
@@ -320,6 +333,17 @@ mod tests {
         assert_eq!(
             buf,
             [1, 0, 0, 0, 2, 0xC3, 0x89, 0, 0, 0, 3, b'a', b'@', b'b']
+        );
+    }
+
+    #[test]
+    fn the_record_json_is_the_contract_json() {
+        let event = proto::Event::Snapshot {
+            threads: vec![row("t1")],
+        };
+        assert_eq!(
+            serde_json::to_value(Event::from(event.clone())).unwrap(),
+            serde_json::to_value(event).unwrap()
         );
     }
 
