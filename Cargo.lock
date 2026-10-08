@@ -466,6 +466,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-smtp"
+version = "0.1.0"
+dependencies = [
+ "thiserror",
+]
+
+[[package]]
 name = "mailune-testkit"
 version = "0.1.0"
 dependencies = [
