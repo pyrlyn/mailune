@@ -42,3 +42,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | axum | local | https://github.com/tokio-rs/axum | Push relay webhook handlers |
 | tokio | local | https://github.com/tokio-rs/tokio | In-memory axum test runtime |
 | tower | local | https://github.com/tower-rs/tower | In-memory axum request |
+| cbindgen | local | https://github.com/mozilla/cbindgen | C header for `mailune-capi`, checked by the drift test |
