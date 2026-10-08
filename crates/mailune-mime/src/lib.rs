@@ -9,6 +9,7 @@ mod message;
 mod parse;
 mod quirks;
 mod remote;
+mod unsubscribe;
 
 pub use build::{Attachment, Outbound, build};
 pub use link::{LinkCheck, inspect_link};
@@ -19,6 +20,7 @@ pub use quirks::{
     quirks,
 };
 pub use remote::{RemoteContent, inspect_url};
+pub use unsubscribe::{Unsubscribe, parse_list_unsubscribe};
 
 /// Failure from parsing or building one message.
 #[derive(Debug, thiserror::Error)]
