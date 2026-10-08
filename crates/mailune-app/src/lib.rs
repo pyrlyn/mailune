@@ -4,11 +4,13 @@
 //! Token bytes are read through [`SecretStore`] and never placed on a `Debug`
 //! or log path.
 
+mod gettext;
 mod secrets;
 mod views;
 
 use mailune_protocol::{AccountId, Secret, SecretId, SecretStore};
 
+pub use gettext::gettext;
 pub use secrets::{
     AccountConfig, AndroidSecretCall, FakeSecretStore, read_db_key, read_password, store_db_key,
     store_password,
