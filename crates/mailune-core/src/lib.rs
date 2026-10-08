@@ -4,9 +4,11 @@
 //! contract and on nothing that opens a socket, a file or a process.
 
 mod cancel;
+mod search;
 mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
+pub use search::{Date, Query, Term, parse_query};
 pub use thread::{Container, NormalizedSubject, Threadable, normalize_subject, thread_messages};
 
 /// Failure returned by the domain.
@@ -18,6 +20,12 @@ pub enum Error {
     /// A [`CancelToken`] stopped the work at a checkpoint.
     #[error("cancelled")]
     Cancelled,
+    /// A search token was not one this parser accepts.
+    #[error("bad search token: {token}")]
+    BadQuery {
+        /// The token that failed, without the rest of the query.
+        token: String,
+    },
 }
 
 /// Confirms the domain links through to the contract.
