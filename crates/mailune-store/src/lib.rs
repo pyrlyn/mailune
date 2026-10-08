@@ -18,12 +18,14 @@ mod blob;
 mod embed;
 mod fts;
 mod ops;
+mod pipeline;
 mod repo;
 mod schema;
 mod watch;
 
 pub use blob::BlobStore;
 pub use embed::Neighbour;
+pub use pipeline::{PipelineResult, ScriptedEmbedder, embed_text};
 pub use repo::{
     AccountRow, ContactRow, FlagRow, MailboxRow, MembershipRow, MessageCursor, MessagePage,
     MessageRow, PartRow, SyncStateRow, ThreadRow,
