@@ -4,3 +4,6 @@
 /desktop/macos/MailuneCore/MailuneFFI.xcframework/
 /desktop/macos/MailuneCore/Sources/MailuneCore/mailune_ffi.swift
 /desktop/macos/MailuneCore/.build/
+/desktop/macos/Mailune.xcodeproj/
+/desktop/macos/DerivedData/
+/desktop/macos/**/.build/
