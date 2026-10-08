@@ -45,4 +45,22 @@ targets:
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         ENABLE_APP_SANDBOX: NO
         ENABLE_HARDENED_RUNTIME: NO
-    scheme: {}
+  MailuneTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: MailuneTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.tests
+        GENERATE_INFOPLIST_FILE: YES
+        ARCHS: arm64
+schemes:
+  Mailune:
+    build:
+      targets:
+        Mailune: all
+        MailuneTests: [test]
+    test:
+      targets:
+        - MailuneTests

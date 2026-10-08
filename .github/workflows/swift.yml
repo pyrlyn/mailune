@@ -1,0 +1,26 @@
+name: swift
+
+# macOS arm64 only. The Xcode project is generated here and is not committed.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Generate the Xcode project
+        working-directory: desktop/macos
+        run: brew install xcodegen && xcodegen generate --spec project.yml
+
+      - name: Test
+        working-directory: desktop/macos
+        run: xcodebuild test -project Mailune.xcodeproj -scheme Mailune -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO
