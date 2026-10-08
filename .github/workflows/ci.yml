@@ -6,6 +6,11 @@ name: ci
 # arrives. That matrix is Linux x86_64, Linux aarch64, macOS aarch64
 # (`xcode-27`) and Windows x86_64. Intel macOS is not a target.
 #
+# `cross` is a second call of the same workflow. ci-rust.yml accepts a matrix
+# whose entries set `"test": false` (build instead of test). iOS, the iOS
+# simulator, Android and wasm32 are passed that way. They are not added to the
+# shared matrix, and macOS stays aarch64 only.
+#
 # Rust comes from mise.toml (1.99.0). ci-rust fails the job when rustc is
 # anything else.
 on:
@@ -52,4 +57,31 @@ jobs:
       # The local workspace check. `-D warnings` is inside ci-rust.yml, after `--`.
       test-command: cargo nextest run --workspace --locked
       # Docs-only: no work, same check names. Any other diff runs the suite.
+      skip: ${{ needs.changes.result == 'success' && needs.changes.outputs.docs_only == 'true' }}
+
+  # Build-only extras. `"test": false` is the ci-rust input for a build instead
+  # of a test run; these triples also differ from the runner host, so the
+  # reusable workflow takes its cross build path. Libraries only: mailune-cli
+  # is a host binary, and `--lib` does not link test harnesses (no Android NDK
+  # and no wasm linker on the runner). full-package-args repeats the exclude so
+  # a Cargo.toml change does not pull the binary back in.
+  cross:
+    needs: changes
+    if: ${{ !cancelled() }}
+    uses: pyrlyn/ci/.github/workflows/ci-rust.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: read
+      actions: write
+    with:
+      matrix: |
+        [
+          {"os": "xcode-27", "target": "aarch64-apple-ios", "test": false},
+          {"os": "xcode-27", "target": "aarch64-apple-ios-sim", "test": false},
+          {"os": "ubuntu-latest", "target": "aarch64-linux-android", "test": false},
+          {"os": "ubuntu-latest", "target": "wasm32-unknown-unknown", "test": false}
+        ]
+      package-args: --workspace --exclude mailune-cli
+      full-package-args: --workspace --exclude mailune-cli
+      clippy-args: --locked
+      build-command: cargo build --workspace --exclude mailune-cli --lib $FEATURE_ARGS --locked --target "$TARGET"
       skip: ${{ needs.changes.result == 'success' && needs.changes.outputs.docs_only == 'true' }}
