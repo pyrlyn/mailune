@@ -34,3 +34,11 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
+| cms | local | https://github.com/RustCrypto/formats | S/MIME CMS verify, decrypt, sign, and encrypt |
+| x509-cert | local | https://github.com/RustCrypto/formats | X.509 certificate for an S/MIME signature |
+| der | local | https://github.com/RustCrypto/formats | DER encoding of CMS signed attributes |
+| const-oid | local | https://github.com/RustCrypto/formats | CMS algorithm identifiers |
+| spki | local | https://github.com/RustCrypto/formats | Subject public key on an S/MIME certificate |
+| aes | local | https://github.com/RustCrypto/block-ciphers | AES content key for S/MIME enveloped data |
+| cbc | local | https://github.com/RustCrypto/block-modes | CBC mode for S/MIME enveloped data |
+| cipher | local | https://github.com/RustCrypto/traits | Block decrypt trait for S/MIME enveloped data |

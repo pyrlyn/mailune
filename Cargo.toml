@@ -68,6 +68,21 @@ icalendar = "0.17.14"
 pgp = { version = "0.20.0", default-features = false }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
+# mailune-smime: CMS parse and build. 0.2.3 is the stable line (0.3 is still a pre-release), checked on crates.io 2026-10-08.
+# `builder` is how a fixture is signed and enveloped. The crate does not open a socket.
+cms = { version = "0.2.3", features = ["builder"] }
+# mailune-smime: X.509 certificate the CMS signature is checked against. 0.2.5 matches cms 0.2.3. Checked on crates.io 2026-10-08.
+x509-cert = { version = "0.2.5", default-features = false, features = ["builder"] }
+# mailune-smime: DER encode of signed attributes. 0.7.7 is the der line cms 0.2.3 uses.
+der = { version = "0.7.7", features = ["alloc", "derive", "oid"] }
+# mailune-smime: CMS algorithm OIDs. 0.9.4 is the const-oid line cms 0.2.3 uses.
+const-oid = { version = "0.9.4", features = ["db"] }
+# mailune-smime: subject public key inside the certificate. 0.7.3 is the spki line x509-cert 0.2.5 uses.
+spki = "0.7.3"
+# mailune-smime: AES-CBC content encryption used by cms enveloped-data. Versions match cms 0.2.3.
+aes = "0.8.2"
+cbc = "0.1.2"
+cipher = { version = "0.4.4", features = ["alloc", "block-padding"] }
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
