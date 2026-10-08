@@ -68,6 +68,7 @@ export function ShellView({
             <li key={thread.id}>
               <button
                 type="button"
+                aria-label={thread.subject}
                 aria-pressed={thread.id === selected.id}
                 onClick={() => onSelect(thread.id)}
               >
