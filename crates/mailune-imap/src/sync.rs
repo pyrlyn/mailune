@@ -106,7 +106,7 @@ pub(crate) fn each_response(
     Ok(())
 }
 
-fn search_uids(bytes: &[u8]) -> Result<Vec<u32>, Error> {
+pub(crate) fn search_uids(bytes: &[u8]) -> Result<Vec<u32>, Error> {
     let mut uids = Vec::new();
     each_response(bytes, |response| {
         if let Response::Data(Data::Search(found)) = response {

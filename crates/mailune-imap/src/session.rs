@@ -158,6 +158,21 @@ impl<S: Read + Write> Connection<S> {
         Ok((raw, dropped))
     }
 
+    /// APPEND: the command line, then a non-synchronizing literal.
+    pub(crate) fn command_literal(&mut self, body: &str, literal: &[u8]) -> Result<String, Error> {
+        let tag = self.next_tag();
+        let head = format!("{tag} {body} {{{}+}}\r\n", literal.len());
+        self.io
+            .write_all(head.as_bytes())
+            .map_err(|_| Error::Session)?;
+        self.io.write_all(literal).map_err(|_| Error::Session)?;
+        let reply = self.read_until_tag(&tag)?;
+        if !tagged_ok(&reply, &tag) {
+            return Err(Error::Rejected);
+        }
+        Ok(reply)
+    }
+
     /// LOGIN with the username and password from [`Config`].
     pub fn login(&mut self) -> Result<(), Error> {
         let tag = self.next_tag();

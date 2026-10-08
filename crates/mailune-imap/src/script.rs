@@ -50,6 +50,10 @@ pub struct Scripted {
     /// After IDLE's reply is queued, the next read is a dropped session.
     drop_after_idle: bool,
     closed: bool,
+    /// Next uid to hand out. APPENDUID and COPYUID both come from here.
+    next_uid: u32,
+    /// An APPEND literal still being read. `{n+}` avoids a continuation round-trip.
+    literal: Option<PendingLiteral>,
 }
 
 impl Scripted {
@@ -62,6 +66,12 @@ impl Scripted {
     pub fn with_messages(uid_validity: u32, mut messages: Vec<MailboxMessage>) -> Self {
         messages.retain(|message| message.uid > 0);
         messages.sort_by_key(|message| message.uid);
+        let next_uid = messages
+            .iter()
+            .map(|message| message.uid)
+            .max()
+            .unwrap_or(0)
+            .saturating_add(1);
         Self {
             pending: Vec::new(),
             authed: false,
@@ -74,6 +84,8 @@ impl Scripted {
             idle_lines: String::new(),
             drop_after_idle: false,
             closed: false,
+            next_uid,
+            literal: None,
         }
     }
 
@@ -127,12 +139,48 @@ impl Scripted {
     pub fn ingest(&mut self, input: &[u8]) -> Vec<u8> {
         self.pending.extend_from_slice(input);
         let mut out = Vec::new();
-        while let Some(split) = self.pending.windows(2).position(|window| window == b"\r\n") {
+        loop {
+            if self.literal.is_some() {
+                let done = self.take_literal_bytes();
+                if done && let Some(pending) = self.literal.take() {
+                    out.extend_from_slice(
+                        self.finish_append(&pending.prefix, &pending.body)
+                            .as_bytes(),
+                    );
+                }
+                break;
+            }
+            let Some(split) = self.pending.windows(2).position(|window| window == b"\r\n") else {
+                break;
+            };
             let line: Vec<u8> = self.pending.drain(..=split + 1).collect();
             let text = String::from_utf8_lossy(&line[..line.len().saturating_sub(2)]);
-            out.extend_from_slice(self.respond(text.trim()).as_bytes());
+            let text = text.trim();
+            if let Some(length) = command_literal(text) {
+                self.literal = Some(PendingLiteral {
+                    remaining: length,
+                    prefix: text.to_string(),
+                    body: Vec::new(),
+                });
+                continue;
+            }
+            out.extend_from_slice(self.respond(text).as_bytes());
         }
         out
+    }
+
+    fn take_literal_bytes(&mut self) -> bool {
+        let Some(pending) = self.literal.as_mut() else {
+            return false;
+        };
+        let take = pending.remaining.min(self.pending.len());
+        if take == 0 {
+            return pending.remaining == 0;
+        }
+        let chunk: Vec<u8> = self.pending.drain(..take).collect();
+        pending.body.extend_from_slice(&chunk);
+        pending.remaining -= take;
+        pending.remaining == 0
     }
 
     fn respond(&mut self, line: &str) -> String {
@@ -174,8 +222,12 @@ impl Scripted {
             "FETCH" if self.selected && is_partial(line) => self.partial_fetch(tag, line),
             "FETCH" if self.selected && uid_command => self.uid_fetch(tag, line),
             "FETCH" if self.selected => fetch_response(tag),
+            "STORE" if self.selected && uid_command => self.uid_store(tag, line),
+            "MOVE" if self.selected && uid_command => self.uid_move(tag, line),
             "IDLE" if self.selected => self.idle(tag),
-            "SELECT" | "FETCH" | "SEARCH" | "IDLE" => format!("{tag} NO not authenticated\r\n"),
+            "SELECT" | "FETCH" | "SEARCH" | "STORE" | "MOVE" | "IDLE" => {
+                format!("{tag} NO not authenticated\r\n")
+            }
             _ => format!("{tag} BAD unknown command\r\n"),
         }
     }
@@ -302,6 +354,105 @@ impl Scripted {
         )
     }
 
+    fn uid_store(&mut self, tag: &str, line: &str) -> String {
+        let set = line.split_whitespace().nth(3).unwrap_or("");
+        let flags = flags_in_parens(line);
+        let mut out = String::new();
+        for uid in parse_set(set) {
+            let Some((seq, message)) = self
+                .messages
+                .iter_mut()
+                .enumerate()
+                .find(|(_, message)| message.uid == uid)
+            else {
+                continue;
+            };
+            message.flags.clone_from(&flags);
+            message.modseq = message.modseq.saturating_add(1);
+            let printed = if flags.is_empty() {
+                "()".to_string()
+            } else {
+                format!("({})", flags.join(" "))
+            };
+            out.push_str(&format!(
+                "* {} FETCH (UID {uid} FLAGS {printed})\r\n",
+                seq + 1
+            ));
+        }
+        out.push_str(&format!("{tag} OK STORE completed\r\n"));
+        out
+    }
+
+    fn uid_move(&mut self, tag: &str, line: &str) -> String {
+        let set = line.split_whitespace().nth(3).unwrap_or("");
+        let uids = parse_set(set);
+        let mut pairs = Vec::new();
+        for uid in uids {
+            if self.messages.iter().any(|message| message.uid == uid) {
+                let dest = self.allocate_uid();
+                pairs.push((uid, dest));
+            }
+        }
+        let mut sequences: Vec<usize> = pairs
+            .iter()
+            .filter_map(|(uid, _)| self.messages.iter().position(|message| message.uid == *uid))
+            .collect();
+        sequences.sort_unstable();
+        for seq in sequences.iter().rev() {
+            self.messages.remove(*seq);
+        }
+        let src = pairs
+            .iter()
+            .map(|(uid, _)| uid.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let dest = pairs
+            .iter()
+            .map(|(_, uid)| uid.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let mut out = format!(
+            "* OK [COPYUID {validity} {src} {dest}] Moved\r\n",
+            validity = self.uid_validity
+        );
+        for seq in sequences {
+            out.push_str(&format!("* {} EXPUNGE\r\n", seq + 1));
+        }
+        out.push_str(&format!("{tag} OK MOVE completed\r\n"));
+        out
+    }
+
+    fn allocate_uid(&mut self) -> u32 {
+        let uid = self.next_uid.max(1);
+        self.next_uid = self.next_uid.saturating_add(1);
+        uid
+    }
+
+    fn finish_append(&mut self, prefix: &str, body: &[u8]) -> String {
+        let mut parts = prefix.split_whitespace();
+        let tag = parts.next().unwrap_or("*");
+        let verb = parts.next().unwrap_or("").to_ascii_uppercase();
+        if verb != "APPEND" || !self.authed {
+            return format!("{tag} NO not authenticated\r\n");
+        }
+        let uid = self.allocate_uid();
+        let raw = String::from_utf8_lossy(body).into_owned();
+        self.messages.push(MailboxMessage {
+            uid,
+            day: 20_261_008,
+            flags: flags_in_parens(prefix),
+            from: "append@example.com".to_string(),
+            subject: subject_of(&raw),
+            raw,
+            modseq: 1,
+        });
+        self.messages.sort_by_key(|message| message.uid);
+        format!(
+            "{tag} OK [APPENDUID {validity} {uid}] APPEND completed\r\n",
+            validity = self.uid_validity
+        )
+    }
+
     fn highest_modseq(&self) -> u64 {
         let live = self.messages.iter().map(|message| message.modseq).max();
         let gone = self.vanished.iter().map(|(_, seq)| *seq).max();
@@ -413,6 +564,47 @@ fn month_index(name: &str) -> Option<u32> {
         .iter()
         .position(|month| month.eq_ignore_ascii_case(name))
         .map(|index| index as u32 + 1)
+}
+
+#[derive(Debug)]
+struct PendingLiteral {
+    remaining: usize,
+    prefix: String,
+    body: Vec<u8>,
+}
+
+fn command_literal(line: &str) -> Option<usize> {
+    let token = line.split_whitespace().next_back()?;
+    let token = token.trim_matches(|ch: char| ch == '(' || ch == ')');
+    let inner = token.strip_prefix('{')?.strip_suffix('}')?;
+    let inner = inner.strip_suffix('+').unwrap_or(inner);
+    let length: usize = inner.parse().ok()?;
+    Some(length)
+}
+
+fn flags_in_parens(line: &str) -> Vec<String> {
+    let Some(start) = line.rfind('(') else {
+        return Vec::new();
+    };
+    let Some(end) = line[start + 1..].find(')') else {
+        return Vec::new();
+    };
+    line[start + 1..start + 1 + end]
+        .split_whitespace()
+        .map(str::to_string)
+        .collect()
+}
+
+fn subject_of(raw: &str) -> String {
+    raw.lines()
+        .find_map(|line| {
+            line.trim_end_matches('\r')
+                .strip_prefix("Subject:")
+                .map(str::trim)
+        })
+        .filter(|subject| !subject.is_empty())
+        .unwrap_or("appended")
+        .to_string()
 }
 
 fn is_partial(line: &str) -> bool {

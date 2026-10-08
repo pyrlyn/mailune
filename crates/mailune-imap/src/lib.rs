@@ -6,6 +6,7 @@
 
 mod idle;
 mod list;
+mod mutate;
 mod partial;
 mod script;
 mod session;
@@ -13,6 +14,7 @@ mod sync;
 
 pub use idle::{Clock, IdleUpdate, IdleWatch, ManualClock};
 pub use list::{ListedMailbox, mailbox_role, parse_list};
+pub use mutate::{append_message, move_uid, store_flags};
 pub use partial::{binary_bytes, peek_bytes};
 pub use script::{FIXTURE, MailboxMessage, Scripted};
 pub use session::{Config, Connection, MemStream, SelectedMailbox};
