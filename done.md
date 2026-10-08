@@ -583,3 +583,13 @@ Done when: generation, an embedding vector, and JSON-structured output come from
 Execution plan: `mailune-ai` `engine.rs`: a `LocalEngine` trait (generate, embed, capability), `generate_json` that decodes untrusted JSON output, a `LocalProvider` adapter onto `Provider`, and a `ScriptedEngine` that later features and A30 replay.
 
 What landed: A `LocalEngine` trait gives generation, an embedding vector and JSON-shaped output (`generate_json`, bad output is `Error::BadOutput`). `LocalProvider` puts an engine behind the router as a local model. `ScriptedEngine` replays canned replies and embeds by word hashing; no process, no download.
+
+### A4. Model catalog and verified blobs
+
+Depends on: A3. Reuse: sha2 already in the workspace.
+
+Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, and deletes the blob. The bytes come from a trait. No network.
+
+Execution plan: `mailune-ai` `catalog.rs`: a `CatalogEntry` (capability, source, size, SHA-256), a `BlobSource` trait for the bytes, `download` that writes through the contract `Fs` and reports a `Resume` offset per chunk, `verify` that deletes a mismatched blob, and `delete`. Tests use the testkit `FakeHost` file system.
+
+What landed: A catalog entry verifies a blob by SHA-256 and size (a mismatch deletes it), `download` resumes from a recorded offset after a dropped chunk, and `delete` removes the blob. Bytes come from a `BlobSource` trait and land through the contract `Fs`; no network.

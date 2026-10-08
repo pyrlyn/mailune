@@ -4,6 +4,7 @@
 //! model. This crate does not call a network provider.
 
 mod agent;
+pub mod catalog;
 mod engine;
 mod guard;
 mod ledger;
@@ -165,6 +166,9 @@ pub enum Error {
     /// Model output did not have the shape the feature asked for.
     #[error("model output did not have the expected shape")]
     BadOutput,
+    /// A model blob had the wrong size or digest. It was deleted.
+    #[error("model blob failed verification")]
+    BadBlob,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

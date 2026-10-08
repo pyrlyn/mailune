@@ -20,7 +20,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| A4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A12 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -294,14 +293,6 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
-
-### A4. Model catalog and verified blobs
-
-Depends on: A3. Reuse: sha2 already in the workspace.
-
-Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, and deletes the blob. The bytes come from a trait. No network.
-
-Execution plan: `mailune-ai` only.
 
 ### A6. Cloud BYOK request shapes
 

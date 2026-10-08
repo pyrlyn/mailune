@@ -13,8 +13,11 @@ thiserror = { workspace = true }
 # Typed tool calls arrive as JSON from the model and from MCP clients.
 serde = { workspace = true }
 serde_json = { workspace = true }
+# Model blobs are trusted only after their SHA-256 matches the catalog.
+sha2 = { workspace = true }
 
 [dev-dependencies]
+mailune-testkit = { path = "../mailune-testkit" }
 insta = { workspace = true }
 
 [lints]
