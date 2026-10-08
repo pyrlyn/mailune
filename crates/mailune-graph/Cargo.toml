@@ -10,6 +10,7 @@ description = "Microsoft Graph mail adapter over an injected HTTP transport"
 # graph-rs-sdk is not linked (plan.md P23): it brings its own HTTP client.
 # Requests are built here and sent through the injected `Http` transport.
 [dependencies]
+base64 = { workspace = true }
 mailune-core = { path = "../mailune-core" }
 mailune-protocol = { path = "../mailune-protocol" }
 serde = { workspace = true }

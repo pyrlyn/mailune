@@ -683,3 +683,13 @@ Done when: folders, a delta query, and `$select` parse from a scripted body and 
 Execution plan: new crate `mailune-graph` without graph-rs-sdk: folders (with child folders and nextLink paging) and a per-folder `messages/delta` with `$select`, resumed from a saved delta link; a 410 restarts the folder. Server links are followed only on the Graph host. Tests upsert scripted pages through `mailune-store`.
 
 What landed: New crate `mailune-graph` (no graph-rs-sdk; requests go through the injected `Http` transport). `GraphClient::folders` walks top-level and child folders across `@odata.nextLink` pages, parents first, with roles from `wellKnownName` when Graph sends it. `delta(folder, saved_link)` runs `messages/delta?$select=...` with `Prefer: odata.maxpagesize=50`, splits `@removed` items from changed ones, and returns the delta link to save; a 410 restarts from scratch. Every server link must start with `https://graph.microsoft.com/` or the call fails with `Error::ForeignLink`, so the token never leaves the Graph host. Page and folder counts are capped. Categories become keywords. Tests upsert scripted folders and two delta rounds through `mailune-store`.
+
+### P24. Graph mutations and send
+
+Depends on: P23.
+
+Done when: move, flag or category changes, sendMail, and `$batch` run against the scripted transport. No TCP.
+
+Execution plan: `mailune-graph` only: `update_message` (PATCH isRead, flag, categories), `move_message` (returns the new id), `send_mime` (sendMail MIME form, base64 text/plain), `update_messages` through `$batch` in chunks of 20 with per-request statuses. Scripted-transport tests.
+
+What landed: `GraphClient::update_message` sends a PATCH with only the set fields of `MessagePatch { is_read, flagged, categories }`; `move_message` posts to `/move` and returns the new id Graph assigns; `send_mime` uses sendMail's MIME form (base64, `text/plain`), documented as call-after-confirmation; `update_messages` sends PATCHes through `$batch` 20 at a time and returns a `BatchOutcome` per message in request order even when responses come back shuffled. Ids are percent-encoded in paths. Reuses the workspace `base64` crate.

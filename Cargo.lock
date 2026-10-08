@@ -1690,6 +1690,7 @@ dependencies = [
 name = "mailune-graph"
 version = "0.1.0"
 dependencies = [
+ "base64 0.23.1",
  "mailune-core",
  "mailune-protocol",
  "mailune-store",
