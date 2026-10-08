@@ -64,7 +64,6 @@
 - P23. Graph mail sync
 - P24. Graph mutations and send
 - P25. Graph calendar and contacts
-- B2. UniFFI records
 - B3. Swift package
 - M1. Xcode project
 - M2. Swift design tokens

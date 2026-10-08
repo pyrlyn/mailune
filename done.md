@@ -553,3 +553,13 @@ Requested by the creator. Reuse: translate-toolkit storage classes; research/mai
 Done when: translate-toolkit is pinned in `mise.toml`; `i18n/*.po` is the single source; one command writes every native catalog and fails on broken keys, placeholders or plural forms.
 
 What landed: `"pipx:translate-toolkit" = "3.20.0"` in `mise.toml` with `i18n`, `i18n --check` and `i18n:test` tasks. `i18n/mailune.pot` plus `de`, `fr`, `ja` catalogs imported from research/mail-app (276 strings, msgctxt keys, `{0}` placeholders). `scripts/i18n.py` writes `target/i18n/`: Apple `Localizable.strings` and `.stringsdict`, Android `strings.xml`, Windows `.resw` (plurals as `<key>_<tag>`), Linux `.mo`, web i18next v4 JSON. Gettext plural forms are spread over CLDR tags; placeholders become `%n$@`, `%n$s`, `{n}` or `{{n}}` (`{{count}}` in plurals).
+
+### B2. UniFFI records
+
+Depends on: B1, F6. Reuse: ketch-ffi and cox-ffi.
+
+Done when: records, errors, one async function, and a callback interface compile, and each export forwards one call.
+
+Execution plan: new crate `mailune-ffi` (uniffi 0.32.2 in proc-macro mode, as ketch-ffi and cox-ffi). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the four view models with `From` conversions; `MailuneError` is the one error enum. `HostSecrets` is a foreign trait that becomes the protocol `SecretStore`; the async export `has_token` forwards to a new `mailune_app::has_token`. `MailuneCore` wraps `Views` and exports `fold` and `state`. Every export body is one expression; the existing syn test walks the crate. Verify with nextest, clippy, fmt.
+
+What landed: New crate `mailune-ffi` (uniffi 0.32.2, proc-macro mode). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the view models; `MailuneError` is the one error enum; the foreign trait `HostSecrets` becomes the protocol `SecretStore`; the async export `has_token` forwards to the new `mailune_app::has_token`; `MailuneCore` exports `fold` and `state`. Every export is one expression, checked by the existing syn test. No bindgen binary yet; B3 adds it.

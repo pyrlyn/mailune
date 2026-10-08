@@ -34,3 +34,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
+| uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |

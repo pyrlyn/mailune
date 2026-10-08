@@ -70,7 +70,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P23 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
 | P24 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| B2 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -697,14 +696,6 @@ Depends on: P23.
 Done when: availability and contact autocomplete parse from a scripted body. No TCP.
 
 Execution plan: `mailune-graph` only.
-
-### B2. UniFFI records
-
-Depends on: B1, F6. Reuse: ketch-ffi and cox-ffi.
-
-Done when: records, errors, one async function, and a callback interface compile, and each export forwards one call.
-
-Execution plan: new crate `mailune-ffi`. Commit on `batch7-imap`. Read `crates/mailune-cli/tests/conventions.rs` before writing an export.
 
 ### B3. Swift package
 

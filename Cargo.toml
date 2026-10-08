@@ -64,6 +64,8 @@ imap-codec = "1.0.0"
 icalendar = "0.17.14"
 # mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.
 pgp = { version = "0.20.0", default-features = false }
+# mailune-ffi: Swift, Kotlin and C# bindings from proc-macros. 0.32.2 is the line ketch-ffi and cox-ffi use.
+uniffi = "0.32.2"
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 
