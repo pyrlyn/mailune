@@ -10,6 +10,7 @@ mod cloud;
 mod compose;
 mod digest;
 mod engine;
+mod eval;
 mod guard;
 mod ledger;
 mod phishing;
@@ -38,6 +39,7 @@ pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
     generate_json, hash_embedding,
 };
+pub use eval::{Cassette, EvalCall, EvalResult, replay, run_cassettes, token_f1};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use phishing::{
@@ -202,6 +204,9 @@ pub enum Error {
     /// A cloud provider answered with an error. Only its error type is kept.
     #[error("cloud provider error: {0}")]
     Cloud(String),
+    /// Evaluation cassettes no longer match their recording. Names them.
+    #[error("evaluation drifted: {0}")]
+    Drift(String),
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

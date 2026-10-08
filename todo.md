@@ -16,7 +16,6 @@
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
 - A13. Smart reply suggestions
 - A23. Language detection
-- A30. Evaluation cassettes
 - C3. Autocrypt headers
 - C4. S/MIME verify and decrypt
 - C5. S/MIME sign and encrypt

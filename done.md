@@ -693,3 +693,13 @@ Done when: auth results, link flags, and a scripted model verdict combine into o
 Execution plan: Mirror DKIM/SPF/DMARC outcomes and link flags as plain inputs in mailune-ai (no mime dependency), add a phishing-verdict template under a new Phishing feature, parse a strict JSON verdict, combine into weighted reasons and a risk level. The model may only raise risk.
 
 What landed: `phishing.rs`: `combine` and `assess_phishing` turn auth outcomes, link flags and a scripted `{"verdict":...}` reply into one `Assessment` (risk, score, reasons). A malformed reply is ignored, and a "safe" verdict cannot lower a risk the facts set.
+
+### A30. Evaluation cassettes
+
+Depends on: T5. Reuse: the synthetic mailbox only as fixtures you write yourself. Do not extract `llm-testkit`.
+
+Done when: a cassette replays a feature call and a metric fails the run when the output drifts.
+
+Execution plan: Add eval.rs to mailune-ai: a JSON cassette records the call, input, prompt SHA-256, model reply and expected output; replay runs the real feature through ScriptedEngine; a token-F1 metric and a prompt-digest check fail the run with Error::Drift. Fixtures are hand-written in crates/mailune-ai/cassettes.
+
+What landed: `eval.rs` and `cassettes/features.json`: five cassettes (short summary, rewrite, shorten, proofread, rule from a sentence) replay through the real feature code with `ScriptedEngine`. `run_cassettes` returns `Error::Drift` naming each cassette whose prompt digest changed, whose token-F1 fell below its `min_score`, or whose reply no longer parses. No model, no network.
