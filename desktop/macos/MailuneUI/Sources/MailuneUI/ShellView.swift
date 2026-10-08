@@ -23,12 +23,16 @@ public struct ShellView: View {
             ThreadList(selected: $selected)
                 .navigationSplitViewColumnWidth(min: 220, ideal: 280)
         } detail: {
-            Text(selected.isEmpty ? "No thread" : "\(selected.count) selected")
-                .font(MailuneType.title)
-                .foregroundStyle(MailuneColor.ink)
-                .padding(MailuneSpace.m)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .background(MailuneColor.canvas)
+            if let id = selected.first, selected.count == 1, let message = MessageFixtures.message(forThread: id) {
+                ReaderView(message: message)
+            } else {
+                Text(selected.isEmpty ? "No thread" : "\(selected.count) selected")
+                    .font(MailuneType.title)
+                    .foregroundStyle(MailuneColor.ink)
+                    .padding(MailuneSpace.m)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .background(MailuneColor.canvas)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {

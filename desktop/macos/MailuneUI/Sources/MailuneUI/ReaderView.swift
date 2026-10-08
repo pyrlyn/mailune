@@ -1,0 +1,46 @@
+import MailuneModel
+import SwiftUI
+
+/// Renders one message as text. Quotes start collapsed. There is no web view,
+/// so remote content and JavaScript cannot run.
+public struct ReaderView: View {
+    private let message: MailMessage
+    @State private var quotesCollapsed = true
+
+    public init(message: MailMessage) {
+        self.message = message
+    }
+
+    public var body: some View {
+        let presentation = ReaderPresentation(message: message, quotesCollapsed: quotesCollapsed)
+        VStack(alignment: .leading, spacing: MailuneSpace.m) {
+            HStack {
+                Text(message.subject)
+                    .font(MailuneType.title)
+                    .foregroundStyle(MailuneColor.ink)
+                Text(presentation.badge)
+                    .font(MailuneType.body)
+                    .padding(.horizontal, MailuneSpace.s)
+                    .background(MailuneColor.accent.opacity(0.15), in: Capsule())
+                    .accessibilityLabel("Security \(presentation.badge)")
+            }
+            Text(presentation.text)
+                .font(MailuneType.body)
+                .foregroundStyle(MailuneColor.ink)
+            Button(quotesCollapsed ? "Show quote" : "Hide quote") {
+                quotesCollapsed.toggle()
+            }
+            .font(MailuneType.body)
+            Text(presentation.attachmentName)
+                .font(MailuneType.body)
+                .accessibilityLabel("Attachment \(presentation.attachmentName)")
+            Text("Remote content off")
+                .font(MailuneType.body)
+            Text("JavaScript off")
+                .font(MailuneType.body)
+        }
+        .padding(MailuneSpace.m)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(MailuneColor.canvas)
+    }
+}
