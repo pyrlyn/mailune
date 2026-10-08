@@ -18,7 +18,7 @@ pub use lock::{AppLock, BiometricRequest};
 pub use notify::{Decision, NoticePolicy, QuietHours};
 pub use queue::{IdempotencyKey, Op, Queue, When};
 pub use schedule::{Hold, Power, SyncAccount, SyncPlan, plan, plan_for};
-pub use search::{Date, Query, Term, parse_query};
+pub use search::{Date, Query, SearchDoc, Term, fuse, parse_query};
 pub use thread::{Container, NormalizedSubject, Threadable, normalize_subject, thread_messages};
 
 /// Failure returned by the domain.

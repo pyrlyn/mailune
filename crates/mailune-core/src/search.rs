@@ -1,7 +1,9 @@
-//! Search query parser.
+//! Search query parser and reciprocal rank fusion.
 //!
 //! Field tokens are the lowercase keys from the search language. Anything else
 //! with a colon is an error, so a typo is not silently treated as text.
+//! Fusion ranks two id lists and still applies those filters. It does not
+//! open a database.
 
 use crate::Error;
 
@@ -152,6 +154,92 @@ fn skip_ws(input: &str, index: usize) -> Option<usize> {
     }
 }
 
+/// One document fusion can keep or drop.
+///
+/// The lists being fused only carry ids. The filters need these fields.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SearchDoc {
+    /// Id shared with the ranked lists.
+    pub id: String,
+    /// `from:` haystack.
+    pub from: String,
+    /// `to:` haystacks.
+    pub to: Vec<String>,
+    /// `has:attachment`.
+    pub has_attachment: bool,
+    /// Calendar day compared with `before:`.
+    pub on: Date,
+    /// `is:unread`.
+    pub unread: bool,
+    /// `label:` values.
+    pub labels: Vec<String>,
+    /// Free-text haystack: subject, addresses, and body.
+    pub text: String,
+}
+
+/// Reciprocal rank fusion constant from the retrieval design.
+const RRF_K: f64 = 60.0;
+
+/// Fuses `lexical` and `vector` with reciprocal rank fusion at k = 60.
+///
+/// Rank is the 1-based first occurrence in a list. A document that fails
+/// `query` is dropped, including when the query is empty of field tokens and
+/// only free-text terms remain. An id with no [`SearchDoc`] is dropped.
+/// Higher score comes first. Equal scores break ties by id.
+pub fn fuse(
+    lexical: &[String],
+    vector: &[String],
+    query: &Query,
+    docs: &[SearchDoc],
+) -> Vec<String> {
+    let mut scores: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
+    for list in [lexical, vector] {
+        let mut seen = std::collections::HashSet::new();
+        for (index, id) in list.iter().enumerate() {
+            if !seen.insert(id) {
+                continue;
+            }
+            let Some(doc) = docs.iter().find(|doc| &doc.id == id) else {
+                continue;
+            };
+            if !matches_doc(doc, query) {
+                continue;
+            }
+            let Ok(rank) = u32::try_from(index + 1) else {
+                continue;
+            };
+            let rank = f64::from(rank);
+            *scores.entry(id.clone()).or_default() += 1.0 / (RRF_K + rank);
+        }
+    }
+    let mut ranked: Vec<(String, f64)> = scores.into_iter().collect();
+    ranked.sort_by(|left, right| {
+        right
+            .1
+            .total_cmp(&left.1)
+            .then_with(|| left.0.cmp(&right.0))
+    });
+    ranked.into_iter().map(|(id, _)| id).collect()
+}
+
+fn matches_doc(doc: &SearchDoc, query: &Query) -> bool {
+    query.terms.iter().all(|term| match term {
+        Term::From(value) => contains(&doc.from, value),
+        Term::To(value) => doc.to.iter().any(|addr| contains(addr, value)),
+        Term::HasAttachment => doc.has_attachment,
+        Term::Before(date) => {
+            (doc.on.year, doc.on.month, doc.on.day) < (date.year, date.month, date.day)
+        }
+        Term::Unread => doc.unread,
+        Term::Label(value) => doc.labels.iter().any(|label| contains(label, value)),
+        Term::Text(value) => contains(&doc.text, value),
+    })
+}
+
+fn contains(haystack: &str, needle: &str) -> bool {
+    haystack.to_lowercase().contains(&needle.to_lowercase())
+}
+
 fn bad(token: &str) -> Error {
     Error::BadQuery {
         token: token.to_string(),
@@ -205,5 +293,60 @@ mod tests {
             );
         }
         assert!(parse_query("").unwrap().terms.is_empty());
+    }
+
+    fn doc(id: &str, unread: bool, text: &str) -> super::SearchDoc {
+        super::SearchDoc {
+            id: id.to_string(),
+            from: "ada@example.com".into(),
+            to: vec!["bob@example.com".into()],
+            has_attachment: false,
+            on: Date {
+                year: 2024,
+                month: 1,
+                day: 2,
+            },
+            unread,
+            labels: vec!["work".into()],
+            text: text.to_string(),
+        }
+    }
+
+    #[test]
+    fn fusion_uses_reciprocal_rank_and_query_filters() {
+        let docs = vec![
+            doc("a", false, "hello"),
+            doc("b", true, "hello"),
+            doc("c", true, "hello"),
+            doc("d", true, "other"),
+        ];
+        let lexical = ["a", "b", "c"].map(str::to_string);
+        let vector = ["b", "d"].map(str::to_string);
+        let open = parse_query("").unwrap();
+        assert_eq!(
+            super::fuse(&lexical, &vector, &open, &docs),
+            vec![
+                "b".to_string(),
+                "a".to_string(),
+                "d".to_string(),
+                "c".to_string()
+            ]
+        );
+        let filtered = parse_query("is:unread hello").unwrap();
+        assert_eq!(
+            super::fuse(&lexical, &vector, &filtered, &docs),
+            vec!["b".to_string(), "c".to_string()]
+        );
+
+        let mut rich = doc("b", true, "hello");
+        rich.has_attachment = true;
+        let lexical = vec!["b".to_string()];
+        let query =
+            parse_query("from:ada to:bob has:attachment before:2024-06-01 label:work hello")
+                .unwrap();
+        assert_eq!(
+            super::fuse(&lexical, &[], &query, &[rich]),
+            vec!["b".to_string()]
+        );
     }
 }
