@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config",
+  "description": "Root of `config.toml` and `.mailune.toml`.",
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "description": "Accounts named in this file. Tokens stay in the secret store.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Account"
+      }
+    },
+    "listen": {
+      "description": "Address the server binds. Not a credential.",
+      "type": "string",
+      "default": "127.0.0.1:4173"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Account": {
+      "description": "One account. The host is a server name, never a password.",
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "IMAP or JMAP host.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Stable account id.",
+          "type": "string"
+        },
+        "privacy": {
+          "description": "Where mail content may be sent for AI.",
+          "$ref": "#/$defs/Privacy",
+          "default": "local-preferred"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "host"
+      ]
+    },
+    "Privacy": {
+      "description": "Privacy class for one account.",
+      "oneOf": [
+        {
+          "description": "Encrypted or otherwise local-only mail.",
+          "type": "string",
+          "const": "local-only"
+        },
+        {
+          "description": "Prefer a local model. This is the default.",
+          "type": "string",
+          "const": "local-preferred"
+        },
+        {
+          "description": "A cloud model is allowed when the feature is opted in.",
+          "type": "string",
+          "const": "cloud-allowed"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[package]
+name = "mailune-config"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Typed layered TOML config and its JSON Schema"
+
+[dependencies]
+figment = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+toml = { workspace = true }
+
+[dev-dependencies]
+# Jail only. The library dependency does not enable this feature.
+figment = { workspace = true, features = ["test"] }
+
+[lints]
+workspace = true

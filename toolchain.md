@@ -39,6 +39,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | tokio-tungstenite | local | https://github.com/snapview/tokio-tungstenite | WebSocket client for the server test |
 | futures-util | local | https://github.com/rust-lang/futures-rs | Send and receive on the test WebSocket |
 | whisper-rs | local | https://codeberg.org/tazz4843/whisper-rs | Local speech-to-text for the composer |
+| figment | local | https://github.com/SergioBenitez/Figment | Layered TOML load for typed config |
+| toml | local | https://github.com/toml-rs/toml | Unknown config keys keep their source line |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
