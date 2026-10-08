@@ -9,6 +9,7 @@ public struct ShellView: View {
     @State private var query = ""
     @State private var showSettings = false
     @State private var showComposer = false
+    @State private var showSearch = false
     @State private var settingsStore = FakePreferencesStore()
 
     public init() {}
@@ -37,6 +38,9 @@ public struct ShellView: View {
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
+                Button("Search") { showSearch = true }
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Button("Compose") { showComposer = true }
             }
             ToolbarItem(placement: .primaryAction) {
@@ -46,6 +50,9 @@ public struct ShellView: View {
                 Button("Commands") { palette = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
+        }
+        .sheet(isPresented: $showSearch) {
+            SearchView()
         }
         .sheet(isPresented: $showComposer) {
             ComposerView()
