@@ -4,8 +4,10 @@
 //! model. This crate does not call a network provider.
 
 mod platform;
+mod redact;
 
 pub use platform::{PlatformBridge, map_capability};
+pub use redact::redact_for_cloud;
 
 use std::fmt;
 use std::future::Future;
