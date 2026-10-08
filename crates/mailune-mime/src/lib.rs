@@ -6,6 +6,7 @@
 mod auth;
 mod build;
 mod calendar;
+mod chunk;
 mod contacts;
 mod export;
 mod extract;
@@ -22,6 +23,7 @@ pub use auth::{
 };
 pub use build::{Attachment, Outbound, build};
 pub use calendar::{Invite, InviteKind, parse_invite};
+pub use chunk::{TextChunk, chunk_plain};
 pub use contacts::{RankedContact, Sighting, rank_contacts};
 pub use export::{write_eml, write_mbox};
 pub use extract::{Fact, FactKind, extract_facts};
