@@ -1,6 +1,6 @@
 # Mailune
 
-GitHub: not created yet.
+GitHub: https://github.com/pyrlyn/mailune
 
 A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, Microsoft Graph, sync, storage and search, AI orchestration, crypto) behind native SwiftUI, WinUI 3, GTK4/Vala and Jetpack Compose shells and a web client. See `research.md` and `docs/architecture.md`.
 
