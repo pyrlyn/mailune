@@ -7,6 +7,7 @@ mod agent;
 mod attachment;
 pub mod catalog;
 mod cloud;
+mod compose;
 mod digest;
 mod engine;
 mod guard;
@@ -28,6 +29,7 @@ pub use agent::{
 };
 pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
 pub use cloud::{CloudApi, CloudRequest, KeyHeader, build_request, parse_response};
+pub use compose::{ComposeAction, Tone, assist};
 pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
@@ -53,6 +55,8 @@ pub enum Feature {
     Summarize,
     /// A draft reply.
     DraftReply,
+    /// Draft, rewrite, tone, shorten or proofread in the composer.
+    Compose,
 }
 
 /// Where a feature may run.

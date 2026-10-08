@@ -21,7 +21,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A14 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A15 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -294,14 +293,6 @@ Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit t
 Depends on: A11. Reuse: the scripted engine.
 
 Done when: a thread yields three reply suggestions.
-
-Execution plan: `mailune-ai` only.
-
-### A14. Compose assist
-
-Depends on: A10. Reuse: the prompt registry.
-
-Done when: draft, rewrite, tone, shorten, and proofread each return text from the scripted engine.
 
 Execution plan: `mailune-ai` only.
 

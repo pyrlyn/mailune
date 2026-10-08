@@ -643,3 +643,13 @@ Done when: a design names a confidential-compute provider behind that router. En
 Execution plan: Design doc `docs/hosted-ai.md` only; the creator deferred the paid tier. Name a confidential-compute provider with a primary source, place it behind the privacy router as a `Hosted` kind that needs `CloudAllowed`, keep encrypted mail local-only, and specify attestation before any request.
 
 What landed: The design in `docs/hosted-ai.md` names Azure confidential GPU VMs (`NCCads_H100_v5`, a TEE that spans CPU and H100 GPU; source checked 2026-10-08) behind the existing router as a `Hosted` kind. The kind needs `CloudAllowed`, encrypted mail is forced local-only, and redaction and the ledger apply. Attestation is checked against pinned values and fails closed. No code; the adapter comes after the design.
+
+### A14. Compose assist
+
+Depends on: A10. Reuse: the prompt registry.
+
+Done when: draft, rewrite, tone, shorten, and proofread each return text from the scripted engine.
+
+Execution plan: `mailune-ai` `compose.rs`: a `Feature::Compose`, five versioned templates in the registry snapshot, and `assist(provider, action, text, privacy)`. The tone is a closed enum, never free text in the prompt.
+
+What landed: Draft, rewrite, tone (formal, friendly, direct), shorten and proofread each run through their own versioned template under the new `Feature::Compose` and return trimmed text from the scripted engine. An empty reply is `BadOutput`. Nothing is sent.
