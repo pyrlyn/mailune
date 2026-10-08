@@ -31,9 +31,9 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A30 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| C3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| C3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| C4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| C5 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P8 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
@@ -49,14 +49,14 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| T4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A27 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A28 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | A29 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| E1 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -70,7 +70,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P23 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
 | P24 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| B2 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -96,7 +96,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| R8 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -105,7 +105,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| B6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -146,7 +146,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | W11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | W12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| B4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | D1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | D2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | D3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -174,11 +174,11 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
-| B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
+| B10 | in progress | P3 | 3 | 0% | Claude / opus-5.5 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
-| P33 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
-| P34 | in progress | P3 | 5 | 0% | Cursor / grok 4.7 |
+| B11 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
+| P33 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
+| P34 | in progress | P3 | 5 | 0% | Claude / opus-5.5 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
