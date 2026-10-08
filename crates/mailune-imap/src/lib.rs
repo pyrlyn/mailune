@@ -4,16 +4,18 @@
 //! a mailbox name. The session drives any `Read + Write` stream; tests use the
 //! scripted server over bytes the caller already holds. Nothing here connects.
 
+mod idle;
 mod incremental;
 mod list;
 mod script;
 mod session;
 mod sync;
 
+pub use idle::{Backoff, IdleEvent, IdleWatch, Tick, parse_idle_line};
 pub use incremental::{Delta, FlagChange, Resync, SyncState};
 pub use list::{ListedMailbox, mailbox_role, parse_list};
 pub use script::{FIXTURE, ScriptMailbox, ScriptMessage, Scripted};
-pub use session::{Config, Connection, MemStream};
+pub use session::{Config, Connection, MemStream, SharedServer};
 pub use sync::{MessageMeta, Selected, SyncBatch, Window};
 
 /// Failure while reading one IMAP response or driving a session.

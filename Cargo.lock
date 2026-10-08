@@ -1661,6 +1661,7 @@ dependencies = [
  "imap-codec",
  "mailune-mime",
  "mailune-protocol",
+ "mailune-testkit",
  "thiserror 2.0.21",
 ]
 

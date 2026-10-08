@@ -14,5 +14,8 @@ mailune-mime = { path = "../mailune-mime" }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
+[dev-dependencies]
+mailune-testkit = { path = "../mailune-testkit" }
+
 [lints]
 workspace = true

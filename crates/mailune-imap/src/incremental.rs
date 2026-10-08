@@ -200,11 +200,11 @@ fn flag_changes(reply: &str) -> Result<Vec<FlagChange>, Error> {
         .collect()
 }
 
-fn after<'a>(line: &'a str, marker: &str) -> Option<&'a str> {
+pub(crate) fn after<'a>(line: &'a str, marker: &str) -> Option<&'a str> {
     line.find(marker).map(|at| &line[at + marker.len()..])
 }
 
-fn leading_number(text: &str) -> Option<u64> {
+pub(crate) fn leading_number(text: &str) -> Option<u64> {
     let end = text
         .find(|c: char| !c.is_ascii_digit())
         .unwrap_or(text.len());

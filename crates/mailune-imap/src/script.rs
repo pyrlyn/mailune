@@ -78,6 +78,11 @@ pub struct Scripted {
     mailboxes: BTreeMap<String, ScriptMailbox>,
     modseq: u64,
     qresync: bool,
+    idling: Option<String>,
+    pushed: Vec<u8>,
+    generation: u64,
+    dropped: bool,
+    refuse: u32,
 }
 
 impl Scripted {
@@ -91,6 +96,11 @@ impl Scripted {
             mailboxes: BTreeMap::new(),
             modseq: 0,
             qresync: false,
+            idling: None,
+            pushed: Vec::new(),
+            generation: 0,
+            dropped: false,
+            refuse: 0,
         };
         server.create("INBOX", 1);
         let today = NaiveDate::from_ymd_opt(2026, 10, 8).unwrap_or_default();
@@ -134,6 +144,8 @@ impl Scripted {
             message_id: format!("<{uid}.{}@script>", target.uidvalidity),
             attachment: attachment.map(String::from),
         });
+        let exists = target.messages.len();
+        self.push(mailbox, format!("* {exists} EXISTS\r\n"));
         Some(uid)
     }
 
@@ -150,6 +162,14 @@ impl Scripted {
         };
         message.flags = flags.iter().map(|flag| flag.to_string()).collect();
         message.modseq = modseq;
+        let update = format!("UID {uid} FLAGS ({})", message.flags.join(" "));
+        let seq = self
+            .mailboxes
+            .get(mailbox)
+            .and_then(|target| target.messages.iter().position(|m| m.uid == uid));
+        if let Some(seq) = seq {
+            self.push(mailbox, format!("* {} FETCH ({update})\r\n", seq + 1));
+        }
         true
     }
 
@@ -160,13 +180,58 @@ impl Scripted {
         let Some(target) = self.mailboxes.get_mut(mailbox) else {
             return false;
         };
-        let before = target.messages.len();
-        target.messages.retain(|message| message.uid != uid);
-        let removed = target.messages.len() < before;
-        if removed {
-            target.vanished.push((uid, modseq));
+        let Some(seq) = target.messages.iter().position(|m| m.uid == uid) else {
+            return false;
+        };
+        target.messages.remove(seq);
+        target.vanished.push((uid, modseq));
+        self.push(mailbox, format!("* {} EXPUNGE\r\n", seq + 1));
+        true
+    }
+
+    /// Kills the current connection, as a network drop would.
+    pub fn drop_connection(&mut self) {
+        self.dropped = true;
+    }
+
+    /// Answers the next `count` connections with BYE instead of a greeting.
+    pub fn refuse_next(&mut self, count: u32) {
+        self.refuse = count;
+    }
+
+    /// Starts a new connection: session state is cleared, mailboxes stay.
+    /// Returns the greeting, or a BYE while refusing.
+    pub(crate) fn reconnect(&mut self) -> (u64, &'static str) {
+        self.pending.clear();
+        self.authed = false;
+        self.selected = None;
+        self.qresync = false;
+        self.idling = None;
+        self.pushed.clear();
+        self.dropped = false;
+        self.generation += 1;
+        if self.refuse > 0 {
+            self.refuse -= 1;
+            self.dropped = true;
+            return (self.generation, "* BYE try later\r\n");
         }
-        removed
+        (self.generation, self.greeting())
+    }
+
+    /// Whether connection `generation` is still up.
+    pub(crate) fn alive(&self, generation: u64) -> bool {
+        generation == self.generation && !self.dropped
+    }
+
+    /// Untagged updates queued for an idling client.
+    pub(crate) fn take_pushed(&mut self) -> Vec<u8> {
+        std::mem::take(&mut self.pushed)
+    }
+
+    fn push(&mut self, mailbox: &str, update: String) {
+        if self.idling.is_some() && self.selected.as_deref() == Some(mailbox) {
+            self.pushed.extend_from_slice(update.as_bytes());
+        }
     }
 
     /// A mailbox, for tests that change it between sessions.
@@ -205,7 +270,18 @@ impl Scripted {
         let tag = parts.next().unwrap_or("*");
         let verb = parts.next().unwrap_or("").to_ascii_uppercase();
         let args = parts.next().unwrap_or("");
+        if let Some(idle_tag) = self.idling.take() {
+            return if line.eq_ignore_ascii_case("DONE") {
+                format!("{idle_tag} OK IDLE terminated\r\n")
+            } else {
+                format!("{idle_tag} BAD expected DONE\r\n")
+            };
+        }
         match verb.as_str() {
+            "IDLE" if self.selected.is_some() => {
+                self.idling = Some(tag.to_string());
+                "+ idling\r\n".to_string()
+            }
             "CAPABILITY" => {
                 let gmail = gmail_capability();
                 let extra = self.capabilities.join(" ");

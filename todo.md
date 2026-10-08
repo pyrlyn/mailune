@@ -20,7 +20,6 @@
 - C4. S/MIME verify and decrypt
 - C5. S/MIME sign and encrypt
 - C7. DKIM ed25519, simple, and l=
-- P9. IMAP IDLE
 - P10. Lazy body fetch
 - P11. IMAP mutations
 - P12. Persist the operation queue

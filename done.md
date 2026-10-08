@@ -723,3 +723,13 @@ Done when: CONDSTORE CHANGEDSINCE and VANISHED are applied, and a server without
 Execution plan: Scripted server: ENABLE QRESYNC, per-message MODSEQ, expunge tombstones, UID FETCH (CHANGEDSINCE n [VANISHED]). Client incremental.rs: SyncState from a SyncBatch, incremental_sync picking QRESYNC, CONDSTORE plus UID diff, or full flag diff; UIDVALIDITY change resets.
 
 What landed: `incremental.rs`: `incremental_sync` uses `CHANGEDSINCE` with `VANISHED` under QRESYNC, `CHANGEDSINCE` plus a `UID SEARCH` diff under CONDSTORE alone, and a full flag fetch plus UID diff otherwise. New mail above the last known UID is fetched with metadata, and a changed UIDVALIDITY returns a reset. `SyncState::apply` folds a `Delta` in. VANISHED ranges are tested for membership and never expanded.
+
+### P9. IMAP IDLE
+
+Depends on: P7. Reuse: an injected clock. Do not sleep.
+
+Done when: IDLE updates are parsed and a dropped session backs off then reconnects on the scripted server.
+
+Execution plan: Scripted server: IDLE/DONE, pushed EXISTS/EXPUNGE/FETCH while idling, drop and refuse hooks, and a SharedServer so reconnects see the same mailboxes. Client idle.rs: idle, idle_poll, idle_done, parse_idle_line, Backoff, and IdleWatch::step that waits on the injected mailune-protocol Clock (testkit FakeHost in tests).
+
+What landed: `idle.rs`: `Connection::idle`, `idle_poll` and `idle_done` handle IDLE, and `parse_idle_line` reads EXISTS, EXPUNGE, FETCH flags and BYE. `IdleWatch::step` notices a dropped session and waits on the injected `Clock` with exponential `Backoff` (1, 2, then 4 s on the testkit fake clock, never on the thread). It then reconnects, re-selects and re-idles, and returns `Tick::Reconnected` so the caller can run an incremental sync. `SharedServer` lets reconnects reach the same scripted mailboxes.

@@ -26,7 +26,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
@@ -328,14 +327,6 @@ Depends on: the rsa-sha256 relaxed/relaxed verifier already in `mailune-mime`.
 Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify against a supplied TXT record. No network.
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
-
-### P9. IMAP IDLE
-
-Depends on: P7. Reuse: an injected clock. Do not sleep.
-
-Done when: IDLE updates are parsed and a dropped session backs off then reconnects on the scripted server.
-
-Execution plan: `mailune-imap` only.
 
 ### P10. Lazy body fetch
 
