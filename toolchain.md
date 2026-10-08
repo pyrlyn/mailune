@@ -17,7 +17,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
-| anyhow | local | https://github.com/dtolnay/anyhow | Errors in `mailune-cli` only |
+| anyhow | local | https://github.com/dtolnay/anyhow | Errors in the `mailune-cli` and `mailune-server` binaries only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge |
@@ -35,7 +35,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | ammonia | local | https://github.com/rust-ammonia/ammonia | HTML sanitizer for the message body |
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification; S/MIME signatures and key transport |
-| rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
+| rand | local | https://github.com/rust-random/rand | DKIM test keys, OpenPGP key generation, S/MIME content keys, `mailune-server` tokens |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
@@ -47,6 +47,10 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | x509-cert | local | https://github.com/RustCrypto/formats/tree/master/x509-cert | `mailune-smime`: signer and recipient certificates |
 | aes | local | https://github.com/RustCrypto/block-ciphers | `mailune-smime`: AES content cipher |
 | cbc | local | https://github.com/RustCrypto/block-modes | `mailune-smime`: CBC mode for S/MIME content |
+| axum | local | https://github.com/tokio-rs/axum | `mailune-server`: HTTP and the WebSocket upgrade |
+| tokio | local | https://github.com/tokio-rs/tokio | `mailune-server`: async runtime and TCP listener |
+| tokio-tungstenite | local (dev) | https://github.com/snapview/tokio-tungstenite | `mailune-server` tests: real WebSocket client; the line axum already uses |
+| futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
 
 Gradle (`desktop/android`):
 

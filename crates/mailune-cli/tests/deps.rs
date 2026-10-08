@@ -50,6 +50,11 @@ fn only_ffi_depends_on_uniffi() {
     assert_only_owner(&metadata(), "uniffi", "mailune-ffi");
 }
 
+#[test]
+fn only_server_depends_on_axum() {
+    assert_only_owner(&metadata(), "axum", "mailune-server");
+}
+
 /// `mailune-core` is pure. The allowlist is the contract plus `thiserror`;
 /// every other crate is treated as I/O (or as a layer above the domain).
 #[test]

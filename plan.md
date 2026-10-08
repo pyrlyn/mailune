@@ -53,7 +53,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A28 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | A29 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E1 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -553,14 +552,6 @@ Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
 Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
 
 Execution plan: `mailune-ai` only.
-
-### E1. mailune-server
-
-Depends on: B8. Reuse: `axum` from `rust.md`.
-
-Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
-
-Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
 
 ### E2. Web frontend scaffold
 

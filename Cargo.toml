@@ -78,6 +78,14 @@ x509-cert = { version = "0.2.5", default-features = false, features = ["pem"] }
 # mailune-smime: the AES-CBC content cipher of S/MIME 4.0. The 0.8/0.1 lines share cipher 0.4 with cms 0.2.
 aes = "0.8.4"
 cbc = { version = "0.1.2", features = ["alloc"] }
+# mailune-server: HTTP and WebSocket. 0.8.9 checked on crates.io 2026-10-08; only the features the server uses.
+axum = { version = "0.8.9", default-features = false, features = ["http1", "tokio", "ws"] }
+# mailune-server: the runtime axum serves on. 1.53.2 checked on crates.io 2026-10-08.
+tokio = { version = "1.53.2", features = ["macros", "net", "rt-multi-thread"] }
+# mailune-server tests: a real WebSocket client. 0.29.0 is the line axum 0.8.9 already depends on, so no second copy is built.
+tokio-tungstenite = "0.29.0"
+# mailune-server tests: Sink and Stream on the client socket. 0.3.34 checked on crates.io 2026-10-08.
+futures-util = { version = "0.3.34", default-features = false, features = ["sink"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 

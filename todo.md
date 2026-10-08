@@ -47,7 +47,6 @@
 - A28. Agent tools
 - A29. Local MCP server
 - A31. Voice dictation
-- E1. mailune-server
 - E2. Web frontend scaffold
 - E3. Web tokens and icons
 - E4. Web localisation catalogs
