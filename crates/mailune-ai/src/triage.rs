@@ -76,7 +76,7 @@ fn sender_domain(from: &str) -> Option<String> {
     }
 }
 
-fn automated(auto_submitted: Option<&str>) -> bool {
+pub(crate) fn automated(auto_submitted: Option<&str>) -> bool {
     auto_submitted
         .is_some_and(|value| !value.trim().eq_ignore_ascii_case("no") && !value.trim().is_empty())
 }

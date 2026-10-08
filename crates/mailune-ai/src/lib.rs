@@ -6,6 +6,7 @@
 mod guard;
 mod ledger;
 mod platform;
+mod priority;
 mod prompts;
 mod redact;
 mod router;
@@ -14,6 +15,7 @@ mod triage;
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use platform::{PlatformBridge, map_capability};
+pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
