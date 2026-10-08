@@ -219,4 +219,92 @@ mod tests {
         assert!(meson.contains("mailune_capi"));
         assert!(meson.contains("mailune.vapi"));
     }
+
+    #[test]
+    fn the_schema_lists_every_c_record_field() {
+        use std::collections::BTreeSet;
+
+        let schema_text =
+            std::fs::read_to_string(crate_dir().join("schema/payloads.schema.json")).unwrap();
+        let schema: serde_json::Value = serde_json::from_str(&schema_text).unwrap();
+        let mut listed = BTreeSet::new();
+        property_names(&schema, &mut listed);
+
+        let mut used = BTreeSet::new();
+        record_keys(&take(mailune_ready()), &mut used);
+        // SAFETY: NULL is the error record under test.
+        record_keys(
+            &take(unsafe { mailune_parse_query(std::ptr::null()) }),
+            &mut used,
+        );
+        let query = CString::new(
+            "from:ada to:me has:attachment before:2026-01-02 is:unread label:news hello",
+        )
+        .unwrap();
+        // SAFETY: `query` is a live NUL-terminated string.
+        record_keys(
+            &take(unsafe { mailune_parse_query(query.as_ptr()) }),
+            &mut used,
+        );
+
+        let missing: Vec<_> = used.difference(&listed).cloned().collect();
+        assert!(
+            missing.is_empty(),
+            "schema is missing C record fields: {missing:?}"
+        );
+
+        let linux = crate_dir().join("../../desktop/linux/meson.build");
+        let meson = std::fs::read_to_string(linux).unwrap();
+        assert!(
+            !meson.contains("payload.vala"),
+            "the Vala decoder must stay out of the Meson build"
+        );
+    }
+
+    fn property_names(value: &serde_json::Value, out: &mut std::collections::BTreeSet<String>) {
+        match value {
+            serde_json::Value::Object(map) => {
+                if let Some(serde_json::Value::Object(props)) = map.get("properties") {
+                    out.extend(props.keys().cloned());
+                }
+                for child in map.values() {
+                    property_names(child, out);
+                }
+            }
+            serde_json::Value::Array(items) => {
+                for item in items {
+                    property_names(item, out);
+                }
+            }
+            serde_json::Value::Null
+            | serde_json::Value::Bool(_)
+            | serde_json::Value::Number(_)
+            | serde_json::Value::String(_) => {}
+        }
+    }
+
+    fn record_keys(json: &str, out: &mut std::collections::BTreeSet<String>) {
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        collect_keys(&value, out);
+    }
+
+    fn collect_keys(value: &serde_json::Value, out: &mut std::collections::BTreeSet<String>) {
+        match value {
+            serde_json::Value::Object(map) => {
+                for (key, child) in map {
+                    out.insert(key.clone());
+                    collect_keys(child, out);
+                }
+            }
+            serde_json::Value::Array(items) => {
+                for item in items {
+                    collect_keys(item, out);
+                }
+            }
+            serde_json::Value::Null
+            | serde_json::Value::Bool(_)
+            | serde_json::Value::Number(_)
+            | serde_json::Value::String(_) => {}
+        }
+    }
 }

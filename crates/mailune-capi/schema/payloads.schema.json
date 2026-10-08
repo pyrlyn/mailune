@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "C record fields for mailune-capi JSON answers. The drift test fails when a field is missing.",
+  "title": "mailune-capi payloads",
+  "oneOf": [
+    { "$ref": "#/$defs/Ok" },
+    { "$ref": "#/$defs/Failure" }
+  ],
+  "$defs": {
+    "Ok": {
+      "type": "object",
+      "required": ["ok"],
+      "additionalProperties": false,
+      "properties": {
+        "ok": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/Query" }
+          ]
+        }
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "required": ["error"],
+      "additionalProperties": false,
+      "properties": {
+        "error": { "$ref": "#/$defs/ErrorBody" }
+      }
+    },
+    "ErrorBody": {
+      "type": "object",
+      "required": ["message"],
+      "additionalProperties": false,
+      "properties": {
+        "message": { "type": "string" }
+      }
+    },
+    "Query": {
+      "type": "object",
+      "required": ["terms"],
+      "additionalProperties": false,
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Term" }
+        }
+      }
+    },
+    "Term": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string" },
+        "value": { "type": "string" },
+        "year": { "type": "integer" },
+        "month": { "type": "integer" },
+        "day": { "type": "integer" }
+      }
+    }
+  }
+}
