@@ -14,6 +14,11 @@ struct MailuneApp: App {
                 Text(host.system)
             }
             .navigationTitle(Mailbox.inbox.title)
+            .toolbar {
+                ToolbarItem {
+                    Image("ToolbarCompose")
+                }
+            }
         }
     }
 }
