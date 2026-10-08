@@ -11,10 +11,12 @@ public struct PhoneThreadList: View {
 
     public var body: some View {
         List(state.rows(), selection: $state.selected) { item in
-            Text(item.subject)
-                .font(MailuneType.body)
-                .tag(Optional(item.id))
-                .accessibilityIdentifier("phone-thread-\(item.id)")
+            NavigationLink(value: item.id) {
+                Text(item.subject)
+                    .font(MailuneType.body)
+            }
+            .tag(Optional(item.id))
+            .accessibilityIdentifier("phone-thread-\(item.id)")
                 .swipeActions(edge: .trailing) {
                     Button("Archive") { state.archive(item.id) }
                 }

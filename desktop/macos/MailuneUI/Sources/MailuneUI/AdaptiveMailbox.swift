@@ -11,6 +11,9 @@ public struct PhoneStack: View {
         NavigationStack {
             PhoneThreadList(state: $list)
                 .navigationTitle("Inbox")
+                .navigationDestination(for: String.self) { id in
+                    PhoneReader(threadID: id)
+                }
         }
     }
 }
