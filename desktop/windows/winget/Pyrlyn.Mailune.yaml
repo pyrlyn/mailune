@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.singleton.1.6.0.schema.json
+PackageIdentifier: Pyrlyn.Mailune
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Pyrlyn
+PackageName: Mailune
+License: GPL-3.0-or-later
+ShortDescription: Local-first mail client with on-device AI
+ManifestType: singleton
+ManifestVersion: 1.6.0
+Installers:
+  # InstallerUrl and InstallerSha256 are placeholders. The release that calls
+  # windows-sign.yml replaces both. The zeros are not a digest of a package
+  # and not a certificate.
+  - Architecture: x64
+    InstallerType: msix
+    InstallerUrl: https://github.com/pyrlyn/mailune/releases/download/desktop-v0.1.0/Mailune-x64.msix
+    InstallerSha256: "0000000000000000000000000000000000000000000000000000000000000000"
+    MinimumOSVersion: 10.0.19041.0
+  - Architecture: arm64
+    InstallerType: msix
+    InstallerUrl: https://github.com/pyrlyn/mailune/releases/download/desktop-v0.1.0/Mailune-arm64.msix
+    InstallerSha256: "0000000000000000000000000000000000000000000000000000000000000000"
+    MinimumOSVersion: 10.0.19041.0

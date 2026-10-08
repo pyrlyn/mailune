@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+  <!--
+    Packaging description for one architecture layout.
+    Publisher is a placeholder subject, not a certificate. No .pfx is stored
+    in this tree. windows-sign.yml signs the packed MSIX.
+    An arm64 layout uses the same identity with ProcessorArchitecture="arm64".
+  -->
+  <Identity
+    Name="Pyrlyn.Mailune"
+    Publisher="CN=Mailune Placeholder"
+    Version="0.1.0.0"
+    ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Mailune</DisplayName>
+    <PublisherDisplayName>Pyrlyn</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-US" />
+  </Resources>
+  <Applications>
+    <Application Id="Mailune" Executable="Mailune.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Mailune"
+        Description="Local-first mail client"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
