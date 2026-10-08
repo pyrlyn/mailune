@@ -145,7 +145,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | W11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | W12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | D1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | D2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | D3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -1296,14 +1295,6 @@ Depends on: W1.
 Done when: a new workflow runs `dotnet test`. Do not edit `.github/workflows/ci.yml` and do not change required checks.
 
 Execution plan: `.github/workflows/windows.yml` only.
-
-### B4. Kotlin core
-
-Depends on: B2. `mailune-ffi` is on another branch. The Android SDK is not installed.
-
-Done when: a Gradle JVM test round-trips one record. cargo-ndk and UniFFI are not run. The commit says so. Do not install the Android SDK.
-
-Execution plan: `desktop/android` only. Commit on `batch9-store`.
 
 ### D1. Android project
 

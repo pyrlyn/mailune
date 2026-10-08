@@ -270,7 +270,7 @@ impl From<proto::SecretKind> for SecretKind {
 mod tests {
     use mailune_protocol as proto;
 
-    use super::{Category, Event, ThreadRow};
+    use super::{Address, Category, Event, ThreadRow};
 
     fn row(id: &str) -> proto::ThreadRow {
         proto::ThreadRow {
@@ -303,6 +303,24 @@ mod tests {
         assert_eq!(record.id, "t1");
         assert_eq!(record.category, Category::Social);
         assert_eq!(proto::ThreadRow::from(record), row("t1"));
+    }
+
+    /// The same bytes `desktop/android` expects in `AddressTest`, so the
+    /// hand-written Kotlin converter cannot drift from what uniffi writes.
+    #[test]
+    fn the_address_layout_is_the_one_the_kotlin_test_reads() {
+        let mut buf = Vec::new();
+        <Address as uniffi::Lower<crate::UniFfiTag>>::write(
+            Address {
+                name: Some("É".into()),
+                email: "a@b".into(),
+            },
+            &mut buf,
+        );
+        assert_eq!(
+            buf,
+            [1, 0, 0, 0, 2, 0xC3, 0x89, 0, 0, 0, 3, b'a', b'@', b'b']
+        );
     }
 
     #[test]

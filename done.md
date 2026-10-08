@@ -563,3 +563,13 @@ Done when: records, errors, one async function, and a callback interface compile
 Execution plan: new crate `mailune-ffi` (uniffi 0.32.2 in proc-macro mode, as ketch-ffi and cox-ffi). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the four view models with `From` conversions; `MailuneError` is the one error enum. `HostSecrets` is a foreign trait that becomes the protocol `SecretStore`; the async export `has_token` forwards to a new `mailune_app::has_token`. `MailuneCore` wraps `Views` and exports `fold` and `state`. Every export body is one expression; the existing syn test walks the crate. Verify with nextest, clippy, fmt.
 
 What landed: New crate `mailune-ffi` (uniffi 0.32.2, proc-macro mode). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the view models; `MailuneError` is the one error enum; the foreign trait `HostSecrets` becomes the protocol `SecretStore`; the async export `has_token` forwards to the new `mailune_app::has_token`; `MailuneCore` exports `fold` and `state`. Every export is one expression, checked by the existing syn test. No bindgen binary yet; B3 adds it.
+
+### B4. Kotlin core
+
+Depends on: B2. `mailune-ffi` is on another branch. The Android SDK is not installed.
+
+Done when: a Gradle JVM test round-trips one record. cargo-ndk and UniFFI are not run. The commit says so. Do not install the Android SDK.
+
+Execution plan: `desktop/android` only. A Gradle build (Kotlin JVM 2.4.20, Gradle 9.8.0 and Java 27 from `desktop/android/mise.toml`, as cox `plugins/` does, so Rust-only contributors install nothing) with one `core` module. `Address` mirrors the B2 record and its converter writes the UniFFI buffer layout; a JUnit test round-trips it. Generated bindings replace the hand-written converter once uniffi-bindgen runs. No Android SDK, no cargo-ndk. Verify with `gradle test` in `desktop/android`.
+
+What landed: A Gradle build in `desktop/android` (Kotlin JVM 2.4.20, Gradle 9.8.0, Java 27 from its own `mise.toml`, bytecode level 17) with a `core` module. `Address` mirrors the B2 record and `FfiConverterAddress` writes the RustBuffer layout; four JUnit tests round-trip it, and a Rust test in `mailune-ffi` checks uniffi writes the same bytes. cargo-ndk and uniffi-bindgen are not run and the Android SDK is not installed.

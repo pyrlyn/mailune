@@ -8,6 +8,9 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
+| java | mise (`desktop/android/mise.toml`) | Runs Gradle for the Android shell | https://openjdk.org |
+| gradle | mise (`desktop/android/mise.toml`) | Builds and tests `desktop/android` | https://github.com/gradle/gradle |
+| kotlin | mise (`desktop/android/mise.toml`) | Kotlin compiler for the Android shell | https://github.com/JetBrains/kotlin |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -35,3 +38,10 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
+
+Gradle (`desktop/android`):
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| org.jetbrains.kotlin.jvm | local | https://github.com/JetBrains/kotlin | Kotlin JVM plugin for the `core` module |
+| kotlin-test | local | https://github.com/JetBrains/kotlin | JUnit 5 tests for the `core` module |

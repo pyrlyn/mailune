@@ -139,7 +139,6 @@
 - W11. Windows integration
 - W12. Windows UI scenario
 - R4. Windows CI
-- B4. Kotlin core
 - D1. Android project
 - D2. Android tokens
 - D3. Android catalogues
