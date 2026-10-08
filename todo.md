@@ -37,7 +37,6 @@
 - S8. Embedding store
 - S9. Hybrid retrieval fusion
 - T4. Queue property tests
-- A19. Natural-language rules
 - A25. Phishing and scam assessment
 - A31. Voice dictation
 - E1. mailune-server

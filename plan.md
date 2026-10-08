@@ -43,7 +43,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -470,14 +469,6 @@ Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
 Done when: random ops against a model mailbox keep idempotency and undo invariants.
 
 Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
-
-### A19. Natural-language rules
-
-Depends on: A16, A9. Reuse: NEW.
-
-Done when: a sentence becomes a typed rule, and a preview lists the messages that would match before the rule is enabled. No send.
-
-Execution plan: `mailune-ai` only. Commit on `batch8-ai`.
 
 ### A25. Phishing and scam assessment
 

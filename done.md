@@ -663,3 +663,13 @@ Done when: a per-recipient style profile is learned from sent plain text and can
 Execution plan: `mailune-ai` `style.rs`: a `StyleBook` that tallies greeting, sign-off, sentence and message length and exclamation use per recipient from sent plain text (quotes and signature dropped through `redact_for_cloud`), a `StyleProfile`, and `guidance` that renders it as one line of prompt text. No model call.
 
 What landed: A per-recipient `StyleProfile` (greeting, sign-off, sentence and message length, exclamation share) is learned from sent plain text with quotes and the signature removed. `guidance` renders it back as prompt guidance. Counting only, no model call.
+
+### A19. Natural-language rules
+
+Depends on: A16, A9. Reuse: NEW.
+
+Done when: a sentence becomes a typed rule, and a preview lists the messages that would match before the rule is enabled. No send.
+
+Execution plan: `mailune-ai` `rules.rs`: a `rule-from-sentence` template under `Feature::Rules`, a closed JSON shape (`from`/`subject`/`category` conditions; archive, mark read, star and label actions; no send, forward or delete), validation, `preview` over messages, and `RulePreview::enable` as the only way to turn a rule on. Committed on this PR branch.
+
+What landed: A sentence becomes a typed `ProposedRule` through a scripted model reply that must parse into a closed shape: no send, forward or delete action, at least one condition, no extra fields. `preview` lists the matching message ids, and only `RulePreview::enable` produces an `EnabledRule`, so the person has seen the matches first.
