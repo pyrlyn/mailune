@@ -17,6 +17,7 @@ mod priority;
 mod prompts;
 mod redact;
 mod router;
+mod style;
 mod summary;
 mod triage;
 
@@ -42,6 +43,7 @@ pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use style::{StyleBook, StyleProfile, guidance};
 pub use summary::{MailText, Privacy, SummaryCache, SummaryKind, cache_key, render_thread};
 pub use triage::{TriageInput, categorize};
 

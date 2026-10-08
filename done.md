@@ -653,3 +653,13 @@ Done when: draft, rewrite, tone, shorten, and proofread each return text from th
 Execution plan: `mailune-ai` `compose.rs`: a `Feature::Compose`, five versioned templates in the registry snapshot, and `assist(provider, action, text, privacy)`. The tone is a closed enum, never free text in the prompt.
 
 What landed: Draft, rewrite, tone (formal, friendly, direct), shorten and proofread each run through their own versioned template under the new `Feature::Compose` and return trimmed text from the scripted engine. An empty reply is `BadOutput`. Nothing is sent.
+
+### A15. Style profile from sent mail
+
+Depends on: A1. Reuse: NEW.
+
+Done when: a per-recipient style profile is learned from sent plain text and can be rendered back as guidance. No model call.
+
+Execution plan: `mailune-ai` `style.rs`: a `StyleBook` that tallies greeting, sign-off, sentence and message length and exclamation use per recipient from sent plain text (quotes and signature dropped through `redact_for_cloud`), a `StyleProfile`, and `guidance` that renders it as one line of prompt text. No model call.
+
+What landed: A per-recipient `StyleProfile` (greeting, sign-off, sentence and message length, exclamation share) is learned from sent plain text with quotes and the signature removed. `guidance` renders it back as prompt guidance. Counting only, no model call.
