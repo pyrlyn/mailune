@@ -673,3 +673,13 @@ Done when: the view shows local ICS suggestions. A JMAP Calendars source is adde
 Execution plan: A22 and P25 have not landed on `main`, so this slice stands alone and leaves room for them: `mailune-app::calendar_view` turns local `text/calendar` parts (through the existing `mailune_mime::parse_invite`) into a `CalendarView` of days with suggested events. REQUESTs only; a re-sent UID replaces the older invite; unreadable or undated parts are counted and skipped; days are `YYYY-MM-DD` as written, time-zone conversion left to the shell. Fixture ICS under `crates/mailune-app/fixtures/`. No JMAP Calendars, no network. The "Done when" names local ICS suggestions only, so the task closes on that; feeding A22 and P25 into the same view belongs to those tasks.
 
 What landed: `mailune-app::calendar_view(parts)` builds a `CalendarView` (days of `CalendarEntry`: uid, title, start, end, organizer) from local ICS through `mailune_mime::parse_invite`. REQUESTs are suggestions, REPLYs are skipped, a re-sent UID replaces the older invite, all-day events sort first in their day, and unreadable or undated parts are counted in `skipped` rather than failing. Three tests over four fixture ICS files. No JMAP Calendars source and no network; A22 and P25 had not landed, so they are not wired in.
+
+### P34. Shared inboxes
+
+From ideas. Shared inboxes and comments, as in Spark and Missive, conflict with a no-server path unless they use JMAP Sharing (RFC 9670).
+
+Done when: a design shows shared inboxes and comments on RFC 9670, or records that the RFC cannot carry them.
+
+Execution plan: `docs/jmap-sharing.md`, design only. Read RFC 9670, RFC 8621 and `draft-ietf-jmap-mail-sharing-02` (sources with dates), and list the IETF JMAP drafts. Record that shared inboxes work on RFC 8621 shared accounts plus RFC 9670 Principals and ShareNotifications, with sharing management only behind the mail-sharing capability; and that RFC 9670 cannot carry comments, so comments become Emails in a shared mailbox. No Mailune server in the path, no code.
+
+What landed: `docs/jmap-sharing.md`. Shared inboxes: read through RFC 8621 shared accounts, with RFC 9670 Principals for owners and ShareNotifications for notices; the sharing editor appears only when the account has `urn:ietf:params:jmap:mail:share` (draft-ietf-jmap-mail-sharing-02) and `mayShare`; assignment and status as keywords, with keyword sharing between users marked unverified. Comments: recorded that RFC 9670 cannot carry them (no JMAP comment type in any RFC or draft), so they become Emails in a shared `Comments` mailbox threaded by `In-Reply-To`, with the costs listed. Sources cited with URLs, checked 2026-10-08. No Mailune server in the path.
