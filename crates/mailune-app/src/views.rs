@@ -91,6 +91,11 @@ impl Views {
         let Some(head) = lines.next() else {
             return;
         };
+        // Banners are not drafts. The reducer stores them; folding one here
+        // would wipe the composer.
+        if !is_view_notice(message) {
+            return;
+        };
         if let Some(id) = head.strip_prefix("open ")
             && !id.is_empty()
         {
@@ -121,6 +126,18 @@ impl Views {
             _ => {}
         }
     }
+}
+
+/// `open <id>`, `draft`, and `settings` are the notices [`Views::fold`]
+/// applies. Any other notice is a banner.
+pub(crate) fn is_view_notice(message: &str) -> bool {
+    let Some(head) = message.lines().next() else {
+        return false;
+    };
+    if let Some(id) = head.strip_prefix("open ") {
+        return !id.is_empty();
+    }
+    matches!(head, "draft" | "settings")
 }
 
 fn field(lines: &[&str], name: &str) -> String {
