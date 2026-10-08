@@ -27,3 +27,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | mail-parser | local | https://github.com/stalwartlabs/mail-parser | RFC 5322 / MIME parse |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | rand | local | https://github.com/rust-random/rand | OsRng for OpenPGP key generation |
+| libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |

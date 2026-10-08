@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
 members = ["crates/*"]
+# fuzz/ is its own cargo-fuzz workspace. Excluded so `cargo test --workspace` does not build it.
+exclude = ["fuzz"]
 # Bare `cargo run` / `cargo build` resolve against the CLI. The manifest is
 # virtual (no root package). Test and lint commands pass `--workspace`.
 default-members = ["crates/mailune-cli"]
@@ -51,6 +53,8 @@ base64 = "0.23"
 pgp = { version = "0.20.0", default-features = false }
 # mailune-crypto: OsRng for key generation. pgp 0.20 uses rand 0.8.
 rand = "0.8.8"
+# fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
+libfuzzer-sys = "0.4.13"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
