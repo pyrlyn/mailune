@@ -17,7 +17,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
-| serde | local | https://github.com/serde-rs/serde | Contract serialization |
+| serde | local | https://github.com/serde-rs/serde | Contract serialization and cloud request bodies |
 | serde_json | local | https://github.com/serde-rs/json | Schema snapshot value, scenario replay JSON, and structured model output |
 | cargo_metadata | local | https://github.com/oli-obk/cargo_metadata | Crate-boundary test over `cargo metadata` |
 | syn | local | https://github.com/dtolnay/syn | `//!` header check and forward-only FFI scaffold |

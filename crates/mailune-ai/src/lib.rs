@@ -4,6 +4,7 @@
 //! model. This crate does not call a network provider.
 
 mod catalog;
+mod cloud;
 mod engine;
 mod guard;
 mod ledger;
@@ -15,6 +16,10 @@ mod router;
 mod triage;
 
 pub use catalog::{BlobStore, Catalog};
+pub use cloud::{
+    AnthropicRequest, ChatTurn, CloudCall, OpenAiRequest, anthropic_request,
+    completion_from_anthropic, completion_from_openai, openai_request,
+};
 pub use engine::{LocalEngine, ScriptedEngine};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
@@ -153,6 +158,9 @@ pub enum Error {
     /// SHA-256 of the blob did not match the expected digest.
     #[error("model blob hash does not match")]
     HashMismatch,
+    /// A scripted cloud body was not the shape that provider returns.
+    #[error("cloud response was not usable")]
+    BadResponse,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
