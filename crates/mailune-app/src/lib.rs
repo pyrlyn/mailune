@@ -61,9 +61,10 @@ pub async fn read_token(store: &impl SecretStore, account: &AccountId) -> Result
 
 /// Log text for a token that was just read.
 ///
-/// Uses [`Secret`]'s `Debug`, which does not include [`Secret::as_bytes`].
-pub fn token_log_line(account: &AccountId, secret: &Secret) -> String {
-    format!("token for {} is {secret:?}", account.as_str())
+/// The log line is fully redacted and does not include account identifiers or
+/// any token-derived value.
+pub fn token_log_line(_account: &AccountId, _secret: &Secret) -> String {
+    "token read: redacted".to_string()
 }
 
 #[cfg(test)]
