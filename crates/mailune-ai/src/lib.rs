@@ -5,9 +5,11 @@
 
 mod platform;
 mod redact;
+mod router;
 
 pub use platform::{PlatformBridge, map_capability};
 pub use redact::redact_for_cloud;
+pub use router::{FeaturePolicy, RouteRequest, Router, probe};
 
 use std::fmt;
 use std::future::Future;
@@ -113,6 +115,15 @@ pub enum Error {
     /// A cloud call was asked for mail that must stay on the device.
     #[error("cloud is not allowed for this mail")]
     CloudForbidden,
+    /// The feature has no privacy row, so the router will not guess one.
+    #[error("no privacy policy for this feature")]
+    NoPolicy,
+    /// The prompt is larger than the feature budget.
+    #[error("prompt exceeds the feature budget")]
+    OverBudget,
+    /// No model on the fallback chain can serve this prompt.
+    #[error("no provider can serve this prompt")]
+    NoProvider,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
