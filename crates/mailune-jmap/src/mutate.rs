@@ -183,7 +183,7 @@ fn on(value: &Value) -> Result<bool, Error> {
     }
 }
 
-fn method_body(json: &str, key: &str, name: &str) -> Result<Value, Error> {
+pub(crate) fn method_body(json: &str, key: &str, name: &str) -> Result<Value, Error> {
     let doc: Value = serde_json::from_str(json).map_err(|err| Error::Json(err.to_string()))?;
     let calls = doc.get(key).and_then(Value::as_array).ok_or(Error::Body)?;
     for call in calls {
