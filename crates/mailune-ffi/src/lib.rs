@@ -21,13 +21,14 @@ pub mod records;
 
 use std::sync::{Arc, Mutex, PoisonError};
 
-use mailune_app::Views;
+use mailune_app::{Msg, Ui};
 use mailune_protocol as proto;
 
 pub use error::MailuneError;
 pub use host::HostSecrets;
 pub use records::{
-    Address, Category, ComposerDraft, Event, SecretKind, Settings, ThreadRow, ViewState,
+    Address, Category, ComposerDraft, Event, PendingAction, SecretKind, Settings, ThreadRow, UiMsg,
+    UiState, ViewState,
 };
 
 use host::ForeignSecrets;
@@ -48,23 +49,27 @@ pub fn core_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-/// The view models one shell window renders. Safe to share between threads.
+/// The shared UI state machine (`mailune_app::Ui`) one shell window renders.
+/// Safe to share between threads.
 ///
-/// The lock is held only while events fold into memory, never across I/O or
-/// a foreign call.
+/// The lock is held only while a message updates memory, never across I/O
+/// or a foreign call. Submissions the reducer queues stay in its outbox for
+/// the runtime; no export hands them to the shell.
 #[derive(Debug, Default, uniffi::Object)]
 pub struct MailuneCore {
-    views: Mutex<Views>,
+    ui: Mutex<Ui>,
 }
 
 impl MailuneCore {
-    /// Runs `apply` on the views and returns what the shell should render.
-    fn with_views(&self, apply: impl FnOnce(&mut Views)) -> ViewState {
-        // A panic inside a fold leaves plain data behind, not a broken
+    /// Applies `msg`, if any, and returns what the shell should render.
+    fn apply(&self, msg: Option<Msg>) -> UiState {
+        // A panic inside an update leaves plain data behind, not a broken
         // invariant, so a poisoned lock is still safe to read.
-        let mut views = self.views.lock().unwrap_or_else(PoisonError::into_inner);
-        apply(&mut views);
-        ViewState::from(&*views)
+        let mut ui = self.ui.lock().unwrap_or_else(PoisonError::into_inner);
+        if let Some(msg) = msg {
+            ui.update(msg);
+        }
+        UiState::from(&*ui)
     }
 }
 
@@ -78,12 +83,23 @@ impl MailuneCore {
 
     /// Applies `events` in order and returns the state to render.
     pub fn fold(&self, events: Vec<Event>) -> ViewState {
-        self.with_views(|views| views.fold(&events.into_iter().map(Into::into).collect::<Vec<_>>()))
+        self.apply(Some(UiMsg::Core { events }.into())).view
     }
 
-    /// The state to render now.
+    /// The view models to render now.
     pub fn state(&self) -> ViewState {
-        self.with_views(|_| ())
+        self.apply(None).view
+    }
+
+    /// Runs one message through the shared reducer and returns the state to
+    /// render, confirmation prompts included.
+    pub fn dispatch(&self, msg: UiMsg) -> UiState {
+        self.apply(Some(msg.into()))
+    }
+
+    /// The whole UI state to render now.
+    pub fn ui_state(&self) -> UiState {
+        self.apply(None)
     }
 }
 
@@ -95,8 +111,8 @@ mod tests {
     use std::task::{Context, Poll, Waker};
 
     use super::{
-        Address, Category, Event, HostSecrets, MailuneCore, MailuneError, SecretKind, ThreadRow,
-        core_version, has_token,
+        Address, Category, ComposerDraft, Event, HostSecrets, MailuneCore, MailuneError,
+        PendingAction, SecretKind, ThreadRow, UiMsg, core_version, has_token,
     };
 
     fn drive<T>(future: impl Future<Output = T>) -> T {
@@ -220,6 +236,39 @@ mod tests {
         assert_eq!(state.open.map(|open| open.id), Some("t2".to_string()));
         assert_eq!(state.settings.language, "fr");
         assert_eq!(core.state().settings.plan, "plus");
+    }
+
+    #[test]
+    fn a_shell_sees_the_send_confirmation_from_the_shared_reducer() {
+        let core = MailuneCore::new();
+        core.dispatch(UiMsg::ComposeNew);
+        core.dispatch(UiMsg::EditDraft {
+            draft: ComposerDraft {
+                to: "ada@example.com".into(),
+                subject: "Hi".into(),
+                body: "Hello".into(),
+            },
+        });
+        let asked = core.dispatch(UiMsg::Send);
+        assert_eq!(asked.pending, Some(PendingAction::Send));
+        assert!(asked.composing);
+        let sent = core.dispatch(UiMsg::Confirm);
+        assert_eq!(sent.pending, None);
+        assert!(!sent.composing);
+        let deleting = core.dispatch(UiMsg::Delete {
+            threads: vec!["t1".into()],
+        });
+        assert_eq!(
+            deleting.pending,
+            Some(PendingAction::Delete {
+                threads: vec!["t1".into()]
+            })
+        );
+        assert_eq!(
+            core.dispatch(UiMsg::Search { query: "q".into() }).query,
+            "q"
+        );
+        assert_eq!(core.ui_state().query, "q");
     }
 
     #[test]

@@ -172,7 +172,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| B11 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
 | P33 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
 | P34 | in progress | P3 | 5 | 0% | Claude / opus-5.5 |
 
@@ -1509,14 +1508,6 @@ From ideas. The in-SQLite KNN is S8.
 Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
 
 Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
-
-### B11. Shared view-model core
-
-From ideas. A Crux-style pure UI core in Rust, with `mailune-app` view models as a reducer.
-
-Done when: every shell can render the same state machine from that reducer.
-
-Execution plan: a pure reducer in `mailune-app` on `batch8-ai`. Stay under 500 lines of code.
 
 ### P33. Calendar view
 

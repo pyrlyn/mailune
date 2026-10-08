@@ -189,6 +189,41 @@
         }
       ]
     },
+    "PendingAction": {
+      "description": "The confirmation a shell must show.",
+      "oneOf": [
+        {
+          "const": "send",
+          "description": "Send the composer draft.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Move these conversations to Trash.",
+          "properties": {
+            "delete": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "delete"
+          ],
+          "type": "object"
+        }
+      ]
+    },
     "Settings": {
       "description": "Settings the UI is showing.",
       "properties": {
@@ -305,6 +340,211 @@
       ],
       "type": "object"
     },
+    "UiMsg": {
+      "description": "Something the user did, or something the core said: the input of the\nshared reducer (`mailune_app::Msg`).",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "Events from the core.",
+          "properties": {
+            "core": {
+              "properties": {
+                "events": {
+                  "description": "Events in order.",
+                  "items": {
+                    "$ref": "#/$defs/Event"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "events"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "core"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user opened a row.",
+          "properties": {
+            "select": {
+              "properties": {
+                "thread": {
+                  "description": "Conversation id.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "thread"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "select"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "compose_new",
+          "description": "The user opened an empty composer.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user edited the composer.",
+          "properties": {
+            "edit_draft": {
+              "properties": {
+                "draft": {
+                  "$ref": "#/$defs/ComposerDraft",
+                  "description": "The composer as it is now."
+                }
+              },
+              "required": [
+                "draft"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "edit_draft"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "close_composer",
+          "description": "The user closed the composer; the draft is saved, not sent.",
+          "type": "string"
+        },
+        {
+          "const": "send",
+          "description": "The user pressed send. Nothing leaves until `Confirm`.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user asked to delete conversations. Nothing leaves until `Confirm`.",
+          "properties": {
+            "delete": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "delete"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user archived conversations.",
+          "properties": {
+            "archive": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "archive"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "confirm",
+          "description": "The user confirmed the pending action.",
+          "type": "string"
+        },
+        {
+          "const": "cancel",
+          "description": "The user dismissed the pending action.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user ran a search.",
+          "properties": {
+            "search": {
+              "properties": {
+                "query": {
+                  "description": "The query string.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "search"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "UiState": {
+      "description": "Everything the shared reducer says a shell renders.",
+      "properties": {
+        "composing": {
+          "description": "The composer is on screen.",
+          "type": "boolean"
+        },
+        "pending": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PendingAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The confirmation to show, if any."
+        },
+        "query": {
+          "description": "The last search query.",
+          "type": "string"
+        },
+        "view": {
+          "$ref": "#/$defs/ViewState",
+          "description": "The view models."
+        }
+      },
+      "required": [
+        "view",
+        "composing",
+        "query"
+      ],
+      "type": "object"
+    },
     "ViewState": {
       "description": "Everything a shell renders, read in one call.",
       "properties": {
@@ -344,7 +584,7 @@
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "The envelope every mailune-capi call returns. `ok` holds the value named in that function's comment in include/mailune.h; `mailune_core_fold` takes a JSON array of `Event`.",
+  "description": "The envelope every mailune-capi call returns. `ok` holds the value named in that function's comment in include/mailune.h; `mailune_core_fold` takes a JSON array of `Event`, `mailune_core_dispatch` one `UiMsg`.",
   "oneOf": [
     {
       "additionalProperties": false,

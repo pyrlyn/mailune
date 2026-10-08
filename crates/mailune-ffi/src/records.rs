@@ -9,7 +9,7 @@
 //! ABI. It is the contract's JSON too (snake_case, externally tagged), so a
 //! fake core that replays contract scenarios speaks it unchanged.
 
-use mailune_app::Views;
+use mailune_app::{Msg, Pending, Ui, Views};
 use mailune_protocol as proto;
 
 /// Someone a message is from, to or copied to.
@@ -128,6 +128,82 @@ pub struct ViewState {
     pub composer: ComposerDraft,
     /// Settings.
     pub settings: Settings,
+}
+
+/// Something the user did, or something the core said: the input of the
+/// shared reducer (`mailune_app::Msg`).
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "snake_case")]
+pub enum UiMsg {
+    /// Events from the core.
+    Core {
+        /// Events in order.
+        events: Vec<Event>,
+    },
+    /// The user opened a row.
+    Select {
+        /// Conversation id.
+        thread: String,
+    },
+    /// The user opened an empty composer.
+    ComposeNew,
+    /// The user edited the composer.
+    EditDraft {
+        /// The composer as it is now.
+        draft: ComposerDraft,
+    },
+    /// The user closed the composer; the draft is saved, not sent.
+    CloseComposer,
+    /// The user pressed send. Nothing leaves until `Confirm`.
+    Send,
+    /// The user asked to delete conversations. Nothing leaves until `Confirm`.
+    Delete {
+        /// Conversation ids.
+        threads: Vec<String>,
+    },
+    /// The user archived conversations.
+    Archive {
+        /// Conversation ids.
+        threads: Vec<String>,
+    },
+    /// The user confirmed the pending action.
+    Confirm,
+    /// The user dismissed the pending action.
+    Cancel,
+    /// The user ran a search.
+    Search {
+        /// The query string.
+        query: String,
+    },
+}
+
+/// The confirmation a shell must show.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "snake_case")]
+pub enum PendingAction {
+    /// Send the composer draft.
+    Send,
+    /// Move these conversations to Trash.
+    Delete {
+        /// Conversation ids.
+        threads: Vec<String>,
+    },
+}
+
+/// Everything the shared reducer says a shell renders.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub struct UiState {
+    /// The view models.
+    pub view: ViewState,
+    /// The composer is on screen.
+    pub composing: bool,
+    /// The confirmation to show, if any.
+    pub pending: Option<PendingAction>,
+    /// The last search query.
+    pub query: String,
 }
 
 /// Which secret the host keychain is asked about.
@@ -265,6 +341,54 @@ impl From<&Views> for ViewState {
                 language: views.settings.language.clone(),
                 plan: views.settings.plan.clone(),
             },
+        }
+    }
+}
+
+fn thread_ids(threads: Vec<String>) -> Vec<proto::ThreadId> {
+    threads.into_iter().map(proto::ThreadId::new).collect()
+}
+
+impl From<UiMsg> for Msg {
+    fn from(msg: UiMsg) -> Self {
+        match msg {
+            UiMsg::Core { events } => Self::Core(events.into_iter().map(Into::into).collect()),
+            UiMsg::Select { thread } => Self::Select(proto::ThreadId::new(thread)),
+            UiMsg::ComposeNew => Self::ComposeNew,
+            UiMsg::EditDraft { draft } => Self::EditDraft(mailune_app::ComposerDraft {
+                to: draft.to,
+                subject: draft.subject,
+                body: draft.body,
+            }),
+            UiMsg::CloseComposer => Self::CloseComposer,
+            UiMsg::Send => Self::Send,
+            UiMsg::Delete { threads } => Self::Delete(thread_ids(threads)),
+            UiMsg::Archive { threads } => Self::Archive(thread_ids(threads)),
+            UiMsg::Confirm => Self::Confirm,
+            UiMsg::Cancel => Self::Cancel,
+            UiMsg::Search { query } => Self::Search(query),
+        }
+    }
+}
+
+impl From<&Pending> for PendingAction {
+    fn from(pending: &Pending) -> Self {
+        match pending {
+            Pending::Send => Self::Send,
+            Pending::Delete(threads) => Self::Delete {
+                threads: threads.iter().map(|id| id.as_str().to_string()).collect(),
+            },
+        }
+    }
+}
+
+impl From<&Ui> for UiState {
+    fn from(ui: &Ui) -> Self {
+        Self {
+            view: ViewState::from(&ui.views),
+            composing: ui.composing,
+            pending: ui.pending.as_ref().map(Into::into),
+            query: ui.query.clone(),
         }
     }
 }

@@ -27,5 +27,10 @@ namespace Mailune {
         /* `ok` is a `ViewState`. */
         [CCode (cname = "mailune_core_state")]
         public string state ();
+
+        /* `msg` is one JSON `UiMsg` for the shared reducer; `ok` is a
+         * `UiState`. */
+        [CCode (cname = "mailune_core_dispatch")]
+        public string dispatch (string msg);
     }
 }

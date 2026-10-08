@@ -42,5 +42,12 @@ int main (string[] args) {
         assert (ok_of (core.state ()).get_array_member ("list").get_length () == 1);
     });
 
+    Test.add_func ("/capi/dispatch", () => {
+        var core = new Mailune.Core ();
+        core.dispatch ("\"compose_new\"");
+        core.dispatch ("""{"edit_draft": {"draft": {"to": "ada@example.com", "subject": "Hi", "body": "Hello"}}}""");
+        assert (ok_of (core.dispatch ("\"send\"")).get_string_member ("pending") == "send");
+    });
+
     return Test.run ();
 }

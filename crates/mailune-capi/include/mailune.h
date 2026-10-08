@@ -58,6 +58,15 @@ char *mailune_core_fold(const struct MailuneCore *core, const char *events);
 // `core` came from `mailune_core_new` and is not freed yet.
 char *mailune_core_state(const struct MailuneCore *core);
 
+// Run `msg`, one JSON `UiMsg`, through the shared reducer every shell
+// renders. `ok`: the `UiState` to render, confirmation prompts included.
+//
+// # Safety
+//
+// `core` came from `mailune_core_new` and is not freed yet; `msg` is a
+// NUL-terminated string.
+char *mailune_core_dispatch(const struct MailuneCore *core, const char *msg);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus

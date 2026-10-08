@@ -167,12 +167,14 @@ mod tests {
         generator.subschema_for::<super::ErrorBody>();
         generator.subschema_for::<mailune_ffi::Event>();
         generator.subschema_for::<mailune_ffi::ViewState>();
+        generator.subschema_for::<mailune_ffi::UiMsg>();
+        generator.subschema_for::<mailune_ffi::UiState>();
         let defs = generator.take_definitions(true);
         let schema = json!({
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "$comment": "Generated from the Rust records by `MAILUNE_BLESS=1 cargo nextest run -p mailune-capi`. Do not edit.",
             "title": "mailune-capi payloads",
-            "description": "The envelope every mailune-capi call returns. `ok` holds the value named in that function's comment in include/mailune.h; `mailune_core_fold` takes a JSON array of `Event`.",
+            "description": "The envelope every mailune-capi call returns. `ok` holds the value named in that function's comment in include/mailune.h; `mailune_core_fold` takes a JSON array of `Event`, `mailune_core_dispatch` one `UiMsg`.",
             "oneOf": [
                 {"type": "object", "required": ["ok"], "properties": {"ok": true}, "additionalProperties": false},
                 {"type": "object", "required": ["error"], "properties": {"error": {"$ref": "#/$defs/ErrorBody"}}, "additionalProperties": false},

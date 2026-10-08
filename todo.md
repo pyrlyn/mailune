@@ -166,6 +166,5 @@
 - A33. Paid hosted AI tier
 - P27. EWS for on-premises Exchange
 - S14. usearch for vectors
-- B11. Shared view-model core
 - P33. Calendar view
 - P34. Shared inboxes

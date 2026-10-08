@@ -18,7 +18,7 @@ use std::ffi::{CStr, c_char};
 use std::ptr;
 use std::sync::Arc;
 
-use mailune_ffi::{Event, MailuneError, ViewState};
+use mailune_ffi::{Event, MailuneError, UiMsg, UiState, ViewState};
 
 use crate::{invalid, respond};
 
@@ -63,6 +63,20 @@ unsafe fn fold(
     // SAFETY: this function's contract is `json_arg`'s.
     let events: Vec<Event> = unsafe { json_arg(events, "events") }?;
     Ok(this(core)?.fold(events))
+}
+
+/// `dispatch`, with its argument read from C.
+///
+/// # Safety
+///
+/// As [`json_arg`] for `msg`.
+unsafe fn dispatch(
+    core: Option<&MailuneCore>,
+    msg: *const c_char,
+) -> Result<UiState, MailuneError> {
+    // SAFETY: this function's contract is `json_arg`'s.
+    let msg: UiMsg = unsafe { json_arg(msg, "msg") }?;
+    Ok(this(core)?.dispatch(msg))
 }
 
 /// `json` copied into `malloc`ed memory, so either `mailune_string_free` or
@@ -145,6 +159,22 @@ pub unsafe extern "C" fn mailune_core_state(core: Option<&MailuneCore>) -> *mut 
     answer(respond(|| Ok(this(core)?.state())))
 }
 
+/// Run `msg`, one JSON `UiMsg`, through the shared reducer every shell
+/// renders. `ok`: the `UiState` to render, confirmation prompts included.
+///
+/// # Safety
+///
+/// `core` came from `mailune_core_new` and is not freed yet; `msg` is a
+/// NUL-terminated string.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mailune_core_dispatch(
+    core: Option<&MailuneCore>,
+    msg: *const c_char,
+) -> *mut c_char {
+    // SAFETY: this function's contract is `dispatch`'s.
+    answer(respond(|| unsafe { dispatch(core, msg) }))
+}
+
 #[cfg(test)]
 mod tests {
     use std::ffi::{CStr, CString, c_char};
@@ -152,8 +182,8 @@ mod tests {
     use serde_json::{Value, json};
 
     use super::{
-        mailune_core_fold, mailune_core_free, mailune_core_new, mailune_core_state,
-        mailune_string_free, mailune_version,
+        mailune_core_dispatch, mailune_core_fold, mailune_core_free, mailune_core_new,
+        mailune_core_state, mailune_string_free, mailune_version,
     };
 
     /// Reads and frees an answer, as a C caller would.
@@ -202,6 +232,25 @@ mod tests {
         // SAFETY: `core` is live.
         let state = take(unsafe { mailune_core_state(Some(&core)) });
         assert_eq!(state["ok"]["list"][0]["id"], "t1");
+        // SAFETY: `core` came from `mailune_core_new` and nothing uses it now.
+        unsafe { mailune_core_free(Some(core)) };
+    }
+
+    #[test]
+    fn a_vala_shell_gets_the_same_confirmation_prompt() {
+        let core = mailune_core_new();
+        let send = |msg: Value| {
+            let msg = CString::new(msg.to_string()).unwrap();
+            // SAFETY: `core` is live and `msg` is a C string for the call.
+            take(unsafe { mailune_core_dispatch(Some(&core), msg.as_ptr()) })
+        };
+        send(json!("compose_new"));
+        send(
+            json!({"edit_draft": {"draft": {"to": "ada@example.com", "subject": "Hi", "body": "Hello"}}}),
+        );
+        assert_eq!(send(json!("send"))["ok"]["pending"], "send");
+        assert_eq!(send(json!("cancel"))["ok"]["pending"], Value::Null);
+        assert_eq!(send(json!({"bogus": 1}))["error"]["type"], "core");
         // SAFETY: `core` came from `mailune_core_new` and nothing uses it now.
         unsafe { mailune_core_free(Some(core)) };
     }

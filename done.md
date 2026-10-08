@@ -593,3 +593,13 @@ Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the 
 Execution plan: `docs/boltffi.md`. Facts from crates.io, the BoltFFI README and docs, and the Crux repository, each with its URL and the 2026-10-08 check date; a comparison against `mailune-ffi` and `mailune-capi`; a decision and triggers to revisit. Do not replace UniFFI.
 
 What landed: `docs/boltffi.md` compares BoltFFI 0.31.0 with the UniFFI 0.32.2 bindings (B2) and the C ABI (B6), with primary sources checked on 2026-10-08. Decision: no switch now. The native C# target is BoltFFI's real gain; the vendor speed numbers are marked unverified and do not matter for coarse calls; the C target is experimental and sync-only; minor releases break every few weeks. Triggers to revisit are listed.
+
+### B11. Shared view-model core
+
+From ideas. A Crux-style pure UI core in Rust, with `mailune-app` view models as a reducer.
+
+Done when: every shell can render the same state machine from that reducer.
+
+Execution plan: a pure reducer in `mailune-app` (`reducer.rs`), Crux-style: `Ui` holds the B1 `Views` plus UI-only state (composer open, pending confirmation, query); `Ui::update(Msg)` changes state and queues typed `Submission`s in an outbox the runtime drains; send and delete only leave after `Confirm`. Shells reach the same machine through `mailune-ffi` (`MailuneCore::dispatch` → `UiState`, Swift/Kotlin/C#) and `mailune-capi` (`mailune_core_dispatch`, JSON, Vala); the header and payload schema are re-blessed. No I/O. Under 500 lines of code.
+
+What landed: `mailune_app::Ui` is a pure Crux-style reducer: `Msg` in, state plus an outbox of typed `Submission`s out, with the B1 `Views` folded from `Msg::Core`. Send and delete wait for `Confirm`; archive, search and select go straight to the outbox; closing the composer saves the draft. Swift, Kotlin and C# reach it through `MailuneCore::dispatch` / `ui_state` in `mailune-ffi`, and Vala through `mailune_core_dispatch` in `mailune-capi` (header and payload schema re-blessed). The web shell will reach it through `mailune-server` once that forwards a dispatch method; that is not wired in this task.
