@@ -21,6 +21,9 @@ serde_json = { workspace = true }
 
 [dev-dependencies]
 cargo_metadata = { workspace = true }
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
+proptest = { workspace = true }
 syn = { workspace = true }
 
 [lints]

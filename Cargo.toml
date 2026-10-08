@@ -32,6 +32,9 @@ anyhow = "1"
 clap = { version = "4.6", features = ["derive"] }
 # mailune-cli tests: the dependency-direction check reads `cargo metadata`.
 cargo_metadata = "0.23.1"
+# mailune-cli tests: property tests of the in-memory queue. 1.11.0 checked on crates.io 2026-10-08.
+# Not a mailune-core dependency: that crate's dev-dependencies are part of the boundary check.
+proptest = "1.11.0"
 # mailune-cli tests: parse Rust sources for the forward-only FFI scaffold.
 # 3.0.6 checked on crates.io 2026-10-08. Parsing only; default features stay off.
 syn = { version = "3.0.6", default-features = false, features = ["full", "parsing"] }
