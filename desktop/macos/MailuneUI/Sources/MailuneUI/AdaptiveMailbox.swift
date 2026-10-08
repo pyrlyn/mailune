@@ -4,6 +4,7 @@ import SwiftUI
 /// A single column. This is the phone layout.
 public struct PhoneStack: View {
     @State private var list = PhoneListState()
+    @State private var showComposer = false
 
     public init() {}
 
@@ -11,9 +12,15 @@ public struct PhoneStack: View {
         NavigationStack {
             PhoneThreadList(state: $list)
                 .navigationTitle("Inbox")
+                .toolbar {
+                    Button("Compose") { showComposer = true }
+                }
                 .navigationDestination(for: String.self) { id in
                     PhoneReader(threadID: id)
                 }
+        }
+        .sheet(isPresented: $showComposer) {
+            PhoneComposer()
         }
     }
 }
