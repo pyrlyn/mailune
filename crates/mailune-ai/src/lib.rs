@@ -3,6 +3,7 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod engine;
 mod guard;
 mod ledger;
 mod platform;
@@ -12,6 +13,7 @@ mod redact;
 mod router;
 mod triage;
 
+pub use engine::{LocalEngine, ScriptedEngine};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use platform::{PlatformBridge, map_capability};
@@ -140,6 +142,9 @@ pub enum Error {
     /// No published template has that id and version.
     #[error("unknown prompt template")]
     UnknownPrompt,
+    /// A scripted local engine was asked for an input it was not given.
+    #[error("the local engine has no script for this input")]
+    Unscripted,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

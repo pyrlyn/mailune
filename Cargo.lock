@@ -1483,6 +1483,7 @@ version = "0.1.0"
 dependencies = [
  "insta",
  "mailune-protocol",
+ "serde_json",
  "thiserror 2.0.21",
 ]
 
