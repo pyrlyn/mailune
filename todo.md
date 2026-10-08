@@ -70,7 +70,6 @@
 - M19. macOS AI surfaces
 - R3. Swift CI
 - P32. Relay client
-- A20. Ask with citations
 - T6. Performance budgets
 - B9. WASM subset
 - R8. Integration compose file

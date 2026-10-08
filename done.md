@@ -733,3 +733,13 @@ Done when: text is chunked, two scripted embedders are scored, and the winner's 
 Execution plan: `mailune-store` only: an `Embedder` trait, `Store::embed_best` scores each candidate by mean reciprocal rank on labelled probes, skips a broken engine, and stores the winner's vectors through `put_embedding`. The test chunks text with `mailune-mime`'s `chunk_plain` (dev-dependency only) and scores two scripted embedders.
 
 What landed: `mailune-store` gains an `Embedder` trait (model name, `embed(texts)`) and `Store::embed_best(account, chunks, probes, candidates)`: each candidate embeds the chunks and the probe queries, is scored by mean reciprocal rank of each probe's relevant chunk (ties share the worst rank, so an embedder that cannot tell chunks apart scores low), and the best one's vectors are stored under its model name. A candidate that fails, returns the wrong count, mixes dimensions or sends a non-finite value is skipped and listed in `Choice::skipped`; none usable is `Error::NoEmbedder`. The test chunks bodies with `mailune-mime`'s `chunk_plain` (dev-dependency only; the store does not depend on mime), scores a word-hash embedder against a flat one and a broken one, and finds the right message through `nearest`. No model download; `mailune-ai` and `mailune-mime` untouched.
+
+### A20. Ask with citations
+
+Depends on: S9, A32. The router lives in `mailune-ai`, which another agent is editing.
+
+Done when: a question returns an answer whose citations point at retrieved ids. No cloud model.
+
+Execution plan: `mailune-core` only: an `Answerer` trait and `ask(question, fused hits, limit, text lookup, answerer)` that passes the top passages to the answerer and keeps only citations of retrieved ids; no passage or no valid citation is an error, not an unsourced answer. Tests use `fuse` output and scripted answerers.
+
+What landed: `mailune-core` gains `ask(question, hits, limit, text, answerer)` and an `Answerer` trait (the router in `mailune-ai` can implement it; `mailune-ai` untouched). The first `limit` fused hits that have text become `Passage`s; with none the answerer is not called (`Error::NothingRetrieved`). The draft's citations are filtered to retrieved ids, deduplicated, in citation order; an empty draft or one citing nothing retrieved is `Error::Uncited`, and a model failure is `Error::Answerer`. Tests run `fuse` output through scripted answerers that cite an invented id, a duplicate and an unretrieved hit. No cloud model.

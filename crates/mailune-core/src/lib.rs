@@ -3,6 +3,7 @@
 //! I/O stays behind traits in `mailune-protocol`. This crate depends on the
 //! contract and on nothing that opens a socket, a file or a process.
 
+mod ask;
 mod cancel;
 mod date;
 mod followup;
@@ -14,6 +15,7 @@ mod schedule;
 mod search;
 mod thread;
 
+pub use ask::{Answer, Answerer, Draft, Passage, ask};
 pub use cancel::{CancelToken, Progress, run_loop};
 pub use date::{format_rfc3339_utc, parse_rfc3339};
 pub use followup::{Exchange, awaiting_reply};
@@ -55,6 +57,15 @@ pub enum Error {
     /// Send was asked for while the app is locked.
     #[error("app is locked")]
     Locked,
+    /// Ask found no retrieved message with text to answer from.
+    #[error("nothing retrieved to answer from")]
+    NothingRetrieved,
+    /// The answer cited no retrieved message, so it is not shown.
+    #[error("answer cites no retrieved message")]
+    Uncited,
+    /// The answering model failed.
+    #[error("answerer failed: {0}")]
+    Answerer(String),
 }
 
 /// Confirms the domain links through to the contract.

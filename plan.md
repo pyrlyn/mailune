@@ -76,7 +76,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B9 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -647,14 +646,6 @@ Depends on: P31, P16.
 Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
 
 Execution plan: `mailune-push` only.
-
-### A20. Ask with citations
-
-Depends on: S9, A32. The router lives in `mailune-ai`, which another agent is editing.
-
-Done when: a question returns an answer whose citations point at retrieved ids. No cloud model.
-
-Execution plan: `mailune-core` only. Do not edit `mailune-ai`.
 
 ### T6. Performance budgets
 
