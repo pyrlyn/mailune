@@ -4,11 +4,13 @@
 //! contract and on nothing that opens a socket, a file or a process.
 
 mod cancel;
+mod lock;
 mod queue;
 mod search;
 mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
+pub use lock::{AppLock, BiometricRequest};
 pub use queue::{IdempotencyKey, Op, Queue};
 pub use search::{Date, Query, Term, parse_query};
 pub use thread::{Container, NormalizedSubject, Threadable, normalize_subject, thread_messages};
@@ -37,6 +39,9 @@ pub enum Error {
     /// The queue has no operation with that identity.
     #[error("unknown operation")]
     UnknownOp,
+    /// Send was asked for while the app is locked.
+    #[error("app is locked")]
+    Locked,
 }
 
 /// Confirms the domain links through to the contract.
