@@ -6,6 +6,7 @@
 mod cancel;
 mod followup;
 mod lock;
+mod notify;
 mod queue;
 mod schedule;
 mod search;
@@ -14,6 +15,7 @@ mod thread;
 pub use cancel::{CancelToken, Progress, run_loop};
 pub use followup::{Exchange, awaiting_reply};
 pub use lock::{AppLock, BiometricRequest};
+pub use notify::{Decision, NoticePolicy, QuietHours};
 pub use queue::{IdempotencyKey, Op, Queue, When};
 pub use schedule::{Hold, Power, SyncAccount, SyncPlan, plan, plan_for};
 pub use search::{Date, Query, Term, parse_query};
