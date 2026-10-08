@@ -3,6 +3,7 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod attachment;
 mod catalog;
 mod cloud;
 mod compose;
@@ -24,6 +25,7 @@ mod style;
 mod summary;
 mod triage;
 
+pub use attachment::summarize_attachment;
 pub use catalog::{BlobStore, Catalog};
 pub use cloud::{
     AnthropicRequest, ChatTurn, CloudCall, OpenAiRequest, anthropic_request,
@@ -191,6 +193,9 @@ pub enum Error {
     /// The scripted verdict was not benign, suspicious, or scam.
     #[error("the model verdict was not usable")]
     BadVerdict,
+    /// The attachment is not plain text this crate can summarize.
+    #[error("attachment is not plain text")]
+    NotTextAttachment,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
