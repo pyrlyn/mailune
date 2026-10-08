@@ -1,0 +1,6 @@
+widget InboxWidget
+widget-subject See you at the dock
+share app.mailune.share.Send
+share-subject See you at the dock
+mailto mailto
+mailto-subject See you at the dock
