@@ -1,0 +1,28 @@
+//! IMAP mailbox roles and an in-memory scripted server.
+//!
+//! `imap-codec` 1.0.0 parses LIST. SPECIAL-USE attributes win over a
+//! mailbox name. The scripted server speaks greeting, CAPABILITY, LOGIN,
+//! SELECT, and one FETCH over bytes the caller already holds. Nothing
+//! here connects.
+
+mod list;
+mod script;
+mod session;
+
+pub use list::{ListedMailbox, mailbox_role, parse_list};
+pub use script::{FIXTURE, Scripted};
+pub use session::{Config, Connection, MemStream};
+
+/// Failure while reading one IMAP response or driving a session.
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    /// The bytes are not a complete IMAP response.
+    #[error("imap response could not be read")]
+    Response,
+    /// The in-memory stream ended before the tagged reply.
+    #[error("the imap session stopped")]
+    Session,
+    /// The server answered NO or BAD.
+    #[error("the server refused the command")]
+    Rejected,
+}

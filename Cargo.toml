@@ -47,6 +47,19 @@ quick-xml = "0.42.0"
 sha2 = "0.11"
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
+# mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.
+ammonia = "4.2.1"
+# mailune-mime: plain text from the sanitized HTML fragment. 0.17.1 checked on crates.io 2026-10-08.
+html2text = "0.17.1"
+# mailune-mime: DKIM rsa-sha256. 0.9.10 is the stable line (0.10 is still a release candidate), checked on crates.io 2026-10-08.
+# The sha2 feature re-exports the digest the verifier hashes with.
+rsa = { version = "0.9.10", features = ["sha2"] }
+# mailune-mime tests: generate a DKIM key. 0.8 matches rsa 0.9's rand_core. 0.8.8 checked on crates.io 2026-10-08.
+rand = "0.8.8"
+# mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
+imap-codec = "1.0.0"
+# mailune-mime: RFC 5545 parse. 0.17.14 checked on crates.io 2026-10-08.
+icalendar = "0.17.14"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
