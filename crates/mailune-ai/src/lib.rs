@@ -3,6 +3,10 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod platform;
+
+pub use platform::{PlatformBridge, map_capability};
+
 use std::fmt;
 use std::future::Future;
 
