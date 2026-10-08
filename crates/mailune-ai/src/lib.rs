@@ -8,6 +8,7 @@ mod cloud;
 mod compose;
 mod digest;
 mod engine;
+mod eval;
 mod guard;
 mod language;
 mod ledger;
@@ -29,6 +30,7 @@ pub use cloud::{
 pub use compose::{ComposeOp, assist};
 pub use digest::{DigestMessage, digest};
 pub use engine::{LocalEngine, ScriptedEngine};
+pub use eval::{Cassette, exact_match, replay};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use language::{Language, detect};
 pub use ledger::{FlowRecord, Ledger, Retention};
@@ -173,6 +175,9 @@ pub enum Error {
     /// A scripted cloud body was not the shape that provider returns.
     #[error("cloud response was not usable")]
     BadResponse,
+    /// A cassette's output was not the recorded text.
+    #[error("evaluation output drifted")]
+    Drift,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
