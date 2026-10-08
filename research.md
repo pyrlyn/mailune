@@ -293,6 +293,21 @@ Checked 2026-10-08 unless a line says otherwise. Every fact carries its primary 
 - https://jmap.io/software/index.html
 - https://github.com/stalwartlabs/stalwart
 
+## EWS survey (P27)
+
+Checked 2026-10-08.
+
+- **Exchange Online stays on Graph.** Microsoft starts disabling EWS in Exchange Online in October 2026 and turns it off fully in April 2027. Mailune reaches Exchange Online only through Microsoft Graph; EWS is for on-premises Exchange Server.
+- **`ews` 0.1.2 (thunderbird/ews-rs).** Released 2026-10-06 under MPL-2.0. It holds typed EWS operations (SyncFolderHierarchy, SyncFolderItems, GetItem, CreateItem, MoveItem, UpdateItem, DeleteItem and others) and their SOAP (de)serialization. It has no HTTP client: requests are bytes in and bytes out, so it runs over Mailune's injected transport. Dependencies: quick-xml 0.41, serde, serde_path_to_error, thiserror 1, time 0.3, xml_struct, ews_proc_macros.
+- **Verdict: reuse it.** Mailune links `ews` unmodified from crates.io in a new `mailune-ews` crate and writes only the transport glue and the mapping onto protocol types. MPL-2.0 is file-level copyleft; using the crate unmodified keeps Mailune's own files under its own licenses.
+- **Known gap.** `Envelope::from_xml_document` in 0.1.2 calls `expect` when a non-fault response has no SOAP header, so a hostile server could panic the parser. `mailune-ews` refuses such a document before parsing.
+
+**Sources**
+- https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-ews-exchange-online
+- https://crates.io/api/v1/crates/ews (version 0.1.2, license, release date)
+- https://crates.io/api/v1/crates/ews/0.1.2/dependencies
+- https://github.com/thunderbird/ews-rs (README; `src/types/soap.rs` in the 0.1.2 crate)
+
 ## Platform AI
 
 - **Apple.** Foundation Models framework on OS 26 and later.

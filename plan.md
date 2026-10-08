@@ -158,7 +158,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
-| P27 | in progress | P2 | 5 | 0% | Claude / opus-5.5 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
@@ -1386,14 +1385,6 @@ Depends on: A6, A7. Reuse: the existing privacy router.
 Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
 
 Execution plan: design doc on `batch8-ai`. Encrypted mail never goes to a cloud model. Do not send mail.
-
-### P27. EWS for on-premises Exchange
-
-Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing a client.
-
-Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
-
-Execution plan: survey, then a client behind an injected transport on `batch9-store`. No sockets. Exchange Online stays on Graph.
 
 ### B10. BoltFFI survey
 

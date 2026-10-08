@@ -703,3 +703,13 @@ Done when: availability and contact autocomplete parse from a scripted body. No 
 Execution plan: `mailune-graph` only: `schedule` (calendar/getSchedule, UTC via `Prefer: outlook.timezone`, slots from availabilityView, busy blocks from scheduleItems) and `autocomplete` (People API `$search`). A UTC formatter joins `parse_rfc3339` in `mailune-core`. Scripted-body tests.
 
 What landed: `GraphClient::schedule(emails, start, end, interval)` posts `calendar/getSchedule` with `Prefer: outlook.timezone="UTC"` and returns a `Schedule` per address: `slots` from `availabilityView` (free, tentative, busy, out of office, working elsewhere), `busy` blocks from `scheduleItems` (a block in another zone is dropped rather than guessed), and the error Graph gives for a calendar it cannot read. `autocomplete(prefix, limit)` searches the People API and returns each scored address, most relevant first; quotes and backslashes are stripped from the term. `mailune-core` gains `format_rfc3339_utc`, the inverse of `parse_rfc3339`.
+
+### P27. EWS for on-premises Exchange
+
+Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing a client.
+
+Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
+
+Execution plan: survey `ews` (thunderbird/ews-rs) with cited sources in `research.md`; it has no HTTP client, so reuse it. New crate `mailune-ews`: `SyncFolderItems` over the injected `Http` transport, mapped onto protocol types; Exchange Online endpoints refused. Scripted SOAP tests upsert through `mailune-store`.
+
+What landed: Survey in `research.md` ("EWS survey (P27)", sources checked 2026-10-08): `ews` 0.1.2 from thunderbird/ews-rs is typed EWS operations plus SOAP (de)serialization with no HTTP client, so it is reused unmodified; Exchange Online stays on Graph because Microsoft disables EWS there from October 2026. New crate `mailune-ews`: `EwsClient::new` refuses non-https endpoints, user info in the URL, and Exchange Online hosts; `sync_folder(folder, state, max)` sends `SyncFolderItems` through the injected `Http` transport and returns created/updated messages, deletions, read-flag changes, the next sync state, and whether the range is complete. A stale state is `Error::Response { code }`; SOAP faults on HTTP 500 are parsed. `ews` 0.1.2 panics on a non-fault document with no SOAP header, so such a document is refused before parsing. Bearer auth only (hybrid modern auth); NTLM and Basic are not supported.

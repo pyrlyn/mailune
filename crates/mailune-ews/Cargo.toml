@@ -1,0 +1,22 @@
+[package]
+name = "mailune-ews"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Exchange Web Services adapter for on-premises Exchange over an injected HTTP transport"
+
+[dependencies]
+ews = { workspace = true }
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+mailune-store = { path = "../mailune-store" }
+mailune-testkit = { path = "../mailune-testkit" }
+tempfile = { workspace = true }
+
+[lints]
+workspace = true
