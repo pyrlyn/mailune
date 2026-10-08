@@ -1,0 +1,44 @@
+name: linux
+
+# Meson C test for desktop/linux. Vala stays off: gtk is false and valac is
+# not installed. This job is separate from ci.yml and is not a required check.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  c-test:
+    name: meson
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Rust
+        run: rustup toolchain install 1.99.0 --profile minimal && rustup default 1.99.0
+
+      - name: Meson
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends meson ninja-build gcc
+
+      - name: Build the C ABI
+        run: cargo build -p mailune-capi --locked
+
+      - name: C test
+        run: |
+          meson setup build desktop/linux -Dcapi_dir="$PWD/target/debug" -Dgtk=false
+          meson test -C build link
