@@ -40,15 +40,15 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P12 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
+| S1 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| S2 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| S3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| S4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S8 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| S9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -61,15 +61,15 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P17 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
+| P17 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P21 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
-| P22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P23 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
-| P24 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| P20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| P21 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
+| P22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| P23 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
+| P24 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| P25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -90,12 +90,12 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P31 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P31 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A32 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A32 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| A20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
+| B9 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -106,7 +106,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| E10 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -173,7 +173,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
-| P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
+| P27 | in progress | P2 | 5 | 0% | Claude / opus-5.5 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
