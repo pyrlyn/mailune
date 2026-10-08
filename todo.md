@@ -15,7 +15,6 @@
 - X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
 - A6. Cloud BYOK request shapes
-- A11. Thread summary cache
 - A12. Daily digest
 - A13. Smart reply suggestions
 - A14. Compose assist

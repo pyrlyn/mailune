@@ -21,7 +21,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | A6 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
-| A11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A12 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A14 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -299,14 +298,6 @@ Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit t
 Depends on: A1. Reuse: the privacy router. The llm-* crates are not in this repo yet; do not depend on them.
 
 Done when: an OpenAI-compatible request and an Anthropic request are built from a prompt, and a scripted response becomes a typed result. No HTTP.
-
-Execution plan: `mailune-ai` only.
-
-### A11. Thread summary cache
-
-Depends on: A3, A10. Reuse: the prompt registry and the scripted engine.
-
-Done when: short, detailed, and action-item summaries are cached by content hash.
 
 Execution plan: `mailune-ai` only.
 

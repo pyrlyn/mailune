@@ -593,3 +593,13 @@ Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, 
 Execution plan: `mailune-ai` `catalog.rs`: a `CatalogEntry` (capability, source, size, SHA-256), a `BlobSource` trait for the bytes, `download` that writes through the contract `Fs` and reports a `Resume` offset per chunk, `verify` that deletes a mismatched blob, and `delete`. Tests use the testkit `FakeHost` file system.
 
 What landed: A catalog entry verifies a blob by SHA-256 and size (a mismatch deletes it), `download` resumes from a recorded offset after a dropped chunk, and `delete` removes the blob. Bytes come from a `BlobSource` trait and land through the contract `Fs`; no network.
+
+### A11. Thread summary cache
+
+Depends on: A3, A10. Reuse: the prompt registry and the scripted engine.
+
+Done when: short, detailed, and action-item summaries are cached by content hash.
+
+Execution plan: `mailune-ai` `summary.rs`: three versioned templates (`summarize-short`, `summarize-detailed`, `action-items`) in the registry snapshot, and a `SummaryCache` keyed by SHA-256 over template id, version and the rendered thread. Calls go through any `Provider`; tests use the scripted engine.
+
+What landed: Short, detailed and action-item summaries come from three new registry templates and are cached by a SHA-256 content hash that includes the template version. A repeat costs no model call, an edited thread misses, and a failed call caches nothing.
