@@ -171,6 +171,7 @@ impl Scripted {
             }
             "SELECT" if self.authed => self.select(tag),
             "SEARCH" if self.selected && uid_command => self.search(tag, &rest),
+            "FETCH" if self.selected && is_partial(line) => self.partial_fetch(tag, line),
             "FETCH" if self.selected && uid_command => self.uid_fetch(tag, line),
             "FETCH" if self.selected => fetch_response(tag),
             "IDLE" if self.selected => self.idle(tag),
@@ -257,6 +258,48 @@ impl Scripted {
         }
         out.push_str(&format!("{tag} OK FETCH completed\r\n"));
         out
+    }
+
+    fn partial_fetch(&self, tag: &str, line: &str) -> String {
+        let uid_command = line.to_ascii_uppercase().contains(" UID ");
+        let number = line
+            .split_whitespace()
+            .nth(if uid_command { 3 } else { 2 })
+            .and_then(|token| token.parse::<u32>().ok());
+        let Some(number) = number else {
+            return format!("{tag} BAD missing message\r\n");
+        };
+        let found = if uid_command {
+            self.messages
+                .iter()
+                .enumerate()
+                .find(|(_, message)| message.uid == number)
+        } else {
+            number.checked_sub(1).and_then(|index| {
+                self.messages
+                    .get(index as usize)
+                    .map(|message| (index as usize, message))
+            })
+        };
+        let Some((seq, message)) = found else {
+            return format!("{tag} NO no such message\r\n");
+        };
+        let section = partial_section(line);
+        let (offset, length) = partial_range(line).unwrap_or((0, usize::MAX));
+        let bytes = section_bytes(message, &section);
+        let start = offset.min(bytes.len());
+        let end = start.saturating_add(length).min(bytes.len());
+        let slice = &bytes[start..end];
+        let token = if line.to_ascii_uppercase().contains("BINARY") {
+            "BINARY"
+        } else {
+            "BODY"
+        };
+        format!(
+            "* {sequence} FETCH ({token}[{section}]<{start}> {{{len}}}\r\n{slice})\r\n{tag} OK FETCH completed\r\n",
+            sequence = seq + 1,
+            len = slice.len(),
+        )
     }
 
     fn highest_modseq(&self) -> u64 {
@@ -370,6 +413,42 @@ fn month_index(name: &str) -> Option<u32> {
         .iter()
         .position(|month| month.eq_ignore_ascii_case(name))
         .map(|index| index as u32 + 1)
+}
+
+fn is_partial(line: &str) -> bool {
+    let upper = line.to_ascii_uppercase();
+    upper.contains("BODY.PEEK") || upper.contains("BINARY")
+}
+
+fn partial_section(line: &str) -> String {
+    let Some(start) = line.find('[') else {
+        return String::new();
+    };
+    let Some(end) = line[start + 1..].find(']') else {
+        return String::new();
+    };
+    line[start + 1..start + 1 + end].to_string()
+}
+
+fn partial_range(line: &str) -> Option<(usize, usize)> {
+    let start = line.find('<')?;
+    let end = line[start + 1..].find('>')? + start + 1;
+    let (offset, length) = line[start + 1..end].split_once('.')?;
+    Some((offset.parse().ok()?, length.parse().ok()?))
+}
+
+fn section_bytes<'a>(message: &'a MailboxMessage, section: &str) -> &'a str {
+    let upper = section.to_ascii_uppercase();
+    if upper.is_empty() {
+        return message.raw.as_str();
+    }
+    if upper == "TEXT" || upper == "1" {
+        return message
+            .raw
+            .split_once("\r\n\r\n")
+            .map_or("", |(_, body)| body);
+    }
+    ""
 }
 
 fn changed_since(line: &str) -> Option<u64> {

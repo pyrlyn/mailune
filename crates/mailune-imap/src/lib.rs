@@ -6,12 +6,14 @@
 
 mod idle;
 mod list;
+mod partial;
 mod script;
 mod session;
 mod sync;
 
 pub use idle::{Clock, IdleUpdate, IdleWatch, ManualClock};
 pub use list::{ListedMailbox, mailbox_role, parse_list};
+pub use partial::{binary_bytes, peek_bytes};
 pub use script::{FIXTURE, MailboxMessage, Scripted};
 pub use session::{Config, Connection, MemStream, SelectedMailbox};
 pub use sync::{DayWindow, SyncBatch, SyncedMessage, UidDelta, incremental_sync, initial_sync};
