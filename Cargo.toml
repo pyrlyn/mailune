@@ -66,6 +66,11 @@ icalendar = "0.17.14"
 pgp = { version = "0.20.0", default-features = false }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
+# mailune-mcp: local MCP server. 3.5.1 checked on crates.io 2026-10-08.
+# Default features stay off. `server` is the in-process tool surface; tests add `client`.
+rmcp = { version = "3.5.1", default-features = false, features = ["server"] }
+# mailune-mcp tests: in-memory duplex instead of a socket. 1.53.2 matches aulo, checked 2026-10-08.
+tokio = { version = "1.53.2", default-features = false }
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
