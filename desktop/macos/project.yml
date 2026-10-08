@@ -108,6 +108,116 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: MailuneIOS
         ARCHS: arm64
+  MailuneShare:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Extensions/Shared
+      - path: Extensions/Share
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.share
+        PRODUCT_NAME: MailuneShare
+        GENERATE_INFOPLIST_FILE: NO
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+        SUPPORTS_MACCATALYST: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+        APPLICATION_EXTENSION_API_ONLY: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        SKIP_INSTALL: YES
+    info:
+      path: Extensions/Share/Info.plist
+      properties:
+        CFBundleDisplayName: Mailune Share
+        NSExtension:
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+  MailuneNotification:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Extensions/Shared
+      - path: Extensions/Notification
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.notification
+        PRODUCT_NAME: MailuneNotification
+        GENERATE_INFOPLIST_FILE: NO
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+        SUPPORTS_MACCATALYST: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+        APPLICATION_EXTENSION_API_ONLY: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        SKIP_INSTALL: YES
+    info:
+      path: Extensions/Notification/Info.plist
+      properties:
+        CFBundleDisplayName: Mailune Notification
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
+  MailuneWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Extensions/Shared
+      - path: Extensions/Widget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.widget
+        PRODUCT_NAME: MailuneWidget
+        GENERATE_INFOPLIST_FILE: NO
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+        SUPPORTS_MACCATALYST: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+        APPLICATION_EXTENSION_API_ONLY: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        SKIP_INSTALL: YES
+    info:
+      path: Extensions/Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Mailune Widget
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+  MailuneIOSExtensionTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Extensions/Shared
+      - path: Extensions/Share/ShareMail.swift
+      - path: Extensions/Notification/NotificationPreview.swift
+      - path: Extensions/Widget/WidgetMail.swift
+      - path: ExtensionTests
+    dependencies:
+      - target: MailuneIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.extensiontests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: MailuneIOS
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MailuneIOS.app/MailuneIOS"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
 schemes:
   Mailune:
     build:
@@ -127,3 +237,14 @@ schemes:
     test:
       targets:
         - MailuneIOSUITests
+  MailuneIOSExtensions:
+    build:
+      targets:
+        MailuneShare: all
+        MailuneNotification: all
+        MailuneWidget: all
+        MailuneIOS: [build]
+        MailuneIOSExtensionTests: [test]
+    test:
+      targets:
+        - MailuneIOSExtensionTests
