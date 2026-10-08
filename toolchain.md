@@ -14,7 +14,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | anyhow | local | https://github.com/dtolnay/anyhow | Errors in `mailune-cli` only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
-| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge |
+| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
@@ -31,6 +31,9 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
 | rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
+| chrono | local | https://github.com/chronotope/chrono | IMAP SEARCH SINCE dates for the sync window |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
+| rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime; `mailune-mcp` tests over an in-memory duplex |

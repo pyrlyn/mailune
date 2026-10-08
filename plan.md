@@ -20,26 +20,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| A3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A15 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A30 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P8 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| P9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -50,11 +37,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A27 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A28 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| A29 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -172,7 +154,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
@@ -298,46 +279,6 @@ Done when: Two-connection test sees writes from another process. Workspace check
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
 
-### A3. Local engine adapter
-
-Depends on: A1. Reuse: a scripted engine, not a real model runtime.
-
-Done when: generation, an embedding vector, and JSON-structured output come from a trait the test implements. No process and no download.
-
-Execution plan: `mailune-ai` only.
-
-### A4. Model catalog and verified blobs
-
-Depends on: A3. Reuse: sha2 already in the workspace.
-
-Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, and deletes the blob. The bytes come from a trait. No network.
-
-Execution plan: `mailune-ai` only.
-
-### A6. Cloud BYOK request shapes
-
-Depends on: A1. Reuse: the privacy router. The llm-* crates are not in this repo yet; do not depend on them.
-
-Done when: an OpenAI-compatible request and an Anthropic request are built from a prompt, and a scripted response becomes a typed result. No HTTP.
-
-Execution plan: `mailune-ai` only.
-
-### A11. Thread summary cache
-
-Depends on: A3, A10. Reuse: the prompt registry and the scripted engine.
-
-Done when: short, detailed, and action-item summaries are cached by content hash.
-
-Execution plan: `mailune-ai` only.
-
-### A12. Daily digest
-
-Depends on: A11. Reuse: the summary cache.
-
-Done when: a digest covers messages since a given instant and skips older ones.
-
-Execution plan: `mailune-ai` only.
-
 ### A13. Smart reply suggestions
 
 Depends on: A11. Reuse: the scripted engine.
@@ -346,43 +287,11 @@ Done when: a thread yields three reply suggestions.
 
 Execution plan: `mailune-ai` only.
 
-### A14. Compose assist
-
-Depends on: A10. Reuse: the prompt registry.
-
-Done when: draft, rewrite, tone, shorten, and proofread each return text from the scripted engine.
-
-Execution plan: `mailune-ai` only.
-
-### A15. Style profile from sent mail
-
-Depends on: A1. Reuse: NEW.
-
-Done when: a per-recipient style profile is learned from sent plain text and can be rendered back as guidance. No model call.
-
-Execution plan: `mailune-ai` only.
-
-### A22. Scheduling extraction
-
-Depends on: P26. Reuse: `icalendar` already in the workspace. Do not add `jiff` unless a date cannot be expressed with the types already in the tree.
-
-Done when: a fixture sentence with a date and a time becomes an ICS suggestion. No SMTP and no calendar server.
-
-Execution plan: `mailune-mime` only, next to the calendar module.
-
 ### A23. Language detection
 
 Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
 
 Done when: a message is labelled with a language. No translation call.
-
-Execution plan: `mailune-ai` only.
-
-### A30. Evaluation cassettes
-
-Depends on: T5. Reuse: the synthetic mailbox only as fixtures you write yourself. Do not extract `llm-testkit`.
-
-Done when: a cassette replays a feature call and a metric fails the run when the output drifts.
 
 Execution plan: `mailune-ai` only.
 
@@ -418,43 +327,11 @@ Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
 
-### P7. IMAP initial sync
-
-Depends on: P6. Reuse: the in-memory IMAP server in `mailune-imap`.
-
-Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYSTRUCTURE in batches, and applies a day window. No store write and no TCP.
-
-Execution plan: `mailune-imap` only.
-
-### P8. IMAP incremental sync
-
-Depends on: P7. Reuse: the same session.
-
-Done when: CONDSTORE CHANGEDSINCE and VANISHED are applied, and a server without QRESYNC falls back to a diff of uid sets.
-
-Execution plan: `mailune-imap` only.
-
-### P9. IMAP IDLE
-
-Depends on: P7. Reuse: an injected clock. Do not sleep.
-
-Done when: IDLE updates are parsed and a dropped session backs off then reconnects on the scripted server.
-
-Execution plan: `mailune-imap` only.
-
 ### P10. Lazy body fetch
 
 Depends on: P7. Reuse: imap-codec.
 
 Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
-
-Execution plan: `mailune-imap` only.
-
-### P11. IMAP mutations
-
-Depends on: P7. Reuse: the scripted server.
-
-Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
 
 Execution plan: `mailune-imap` only.
 
@@ -537,46 +414,6 @@ Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
 Done when: random ops against a model mailbox keep idempotency and undo invariants.
 
 Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
-
-### A19. Natural-language rules
-
-Depends on: A16, A9. Reuse: NEW.
-
-Done when: a sentence becomes a typed rule, and a preview lists the messages that would match before the rule is enabled. No send.
-
-Execution plan: `mailune-ai` only. Commit on `batch8-ai`.
-
-### A25. Phishing and scam assessment
-
-Depends on: C8, A2. The rsa-sha256 verifier is already on this branch.
-
-Done when: auth results, link flags, and a scripted model verdict combine into one assessment. No network.
-
-Execution plan: `mailune-ai` only. Do not edit `mailune-mime`.
-
-### A27. Attachment summarisation
-
-Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; otherwise plain text only, named in the commit.
-
-Done when: a text attachment becomes a summary through the scripted engine. No network.
-
-Execution plan: `mailune-ai` only.
-
-### A28. Agent tools
-
-Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.
-
-Done when: a tool call has a scope, a preview, an undo record, and an audit line. The policy still fails closed. No send without the existing confirmation flag.
-
-Execution plan: `mailune-ai` only. Stay under 500 lines of production code.
-
-### A29. Local MCP server
-
-Depends on: A28. Reuse: `rmcp` from `rust.md`.
-
-Done when: a read-only tool is exposed and a send tool stays behind the in-app approval flag. No network listener in tests.
-
-Execution plan: new crate `mailune-mcp`. One forwarded call per export.
 
 ### A31. Voice dictation
 
@@ -1513,14 +1350,6 @@ Depends on: W1, R11. Reuse: the R11 signing workflow.
 Done when: an MSIX is signed and a winget manifest installs it. Signing waits on R11.
 
 Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
-
-### A33. Paid hosted AI tier
-
-Depends on: A6, A7. Reuse: the existing privacy router.
-
-Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
-
-Execution plan: design doc on `batch8-ai`. Encrypted mail never goes to a cloud model. Do not send mail.
 
 ### P27. EWS for on-premises Exchange
 
