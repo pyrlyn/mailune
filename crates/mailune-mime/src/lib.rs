@@ -5,6 +5,7 @@
 
 mod auth;
 mod build;
+mod calendar;
 mod contacts;
 mod html;
 mod link;
@@ -18,6 +19,7 @@ pub use auth::{
     AuthBadge, AuthResult, DkimDns, DkimVerdict, MethodBadge, authentication_badge, verify_dkim,
 };
 pub use build::{Attachment, Outbound, build};
+pub use calendar::{Invite, InviteKind, parse_invite};
 pub use contacts::{RankedContact, Sighting, rank_contacts};
 pub use html::{SanitizedHtml, sanitize_html};
 pub use link::{LinkCheck, inspect_link};
@@ -45,4 +47,7 @@ pub enum Error {
     /// The Authentication-Results header had no server id.
     #[error("authentication-results could not be read")]
     AuthenticationResults,
+    /// The bytes were not a REQUEST or REPLY invite.
+    #[error("the calendar invite could not be read")]
+    Calendar,
 }
