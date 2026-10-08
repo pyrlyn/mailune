@@ -623,3 +623,13 @@ Done when: a text attachment becomes a summary through the scripted engine. No n
 Execution plan: `mailune-ai` `attachment.rs`: plain text only, since `rust.md` lists no maintained document extractor. `text/*` (not HTML) is decoded as UTF-8, capped at 16 KiB on a char boundary, and summarized through a new `summarize-attachment` template via `SummaryCache::complete`.
 
 What landed: A text attachment becomes a cached summary through the scripted engine and a new `summarize-attachment` template. Plain text only: `rust.md` has no maintained extractor, so PDF, office formats, raw HTML and non-UTF-8 bodies return `Error::Unsupported`. Text is capped at 16 KiB.
+
+### A6. Cloud BYOK request shapes
+
+Depends on: A1. Reuse: the privacy router. The llm-* crates are not in this repo yet; do not depend on them.
+
+Done when: an OpenAI-compatible request and an Anthropic request are built from a prompt, and a scripted response becomes a typed result. No HTTP.
+
+Execution plan: `mailune-ai` `cloud.rs`, no llm-* dependency (those crates are not published in packages/crates yet). `build_request` runs `allow_cloud` and `redact_for_cloud` first, then shapes an OpenAI-compatible or Anthropic Messages body; the key is never in the shape, only which header carries it. `parse_response` turns scripted bodies into `Completion` or a typed error.
+
+What landed: OpenAI-compatible and Anthropic request shapes are built from a `Prompt` after the privacy check and redaction; encrypted, local-only and local-preferred mail return `CloudForbidden`. The key is not in the shape, only the header that carries it. Scripted responses become `Completion::Text`; an error body keeps only its error type. No HTTP, no llm-* dependency yet.

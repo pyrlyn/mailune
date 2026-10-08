@@ -6,6 +6,7 @@
 mod agent;
 mod attachment;
 pub mod catalog;
+mod cloud;
 mod digest;
 mod engine;
 mod guard;
@@ -26,6 +27,7 @@ pub use agent::{
     UndoRecord, needs_confirmation, parse_call,
 };
 pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
+pub use cloud::{CloudApi, CloudRequest, KeyHeader, build_request, parse_response};
 pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
@@ -178,6 +180,9 @@ pub enum Error {
     /// The input is of a kind this feature does not read.
     #[error("unsupported input for this feature")]
     Unsupported,
+    /// A cloud provider answered with an error. Only its error type is kept.
+    #[error("cloud provider error: {0}")]
+    Cloud(String),
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
