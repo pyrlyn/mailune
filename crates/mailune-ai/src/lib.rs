@@ -12,6 +12,7 @@ mod eval;
 mod guard;
 mod language;
 mod ledger;
+mod phishing;
 mod platform;
 mod priority;
 mod prompts;
@@ -35,6 +36,7 @@ pub use eval::{Cassette, exact_match, replay};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use language::{Language, detect};
 pub use ledger::{FlowRecord, Ledger, Retention};
+pub use phishing::{Assessment, AuthFacts, AuthValue, LinkFlag, Risk, assess_message};
 pub use platform::{PlatformBridge, map_capability};
 pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
@@ -186,6 +188,9 @@ pub enum Error {
     /// A rule must not send mail.
     #[error("a rule cannot send mail")]
     RuleCannotSend,
+    /// The scripted verdict was not benign, suspicious, or scam.
+    #[error("the model verdict was not usable")]
+    BadVerdict,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
