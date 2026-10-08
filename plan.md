@@ -31,7 +31,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A30 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| C5 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P8 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
@@ -378,14 +377,6 @@ Depends on: T5. Reuse: the synthetic mailbox only as fixtures you write yourself
 Done when: a cassette replays a feature call and a metric fails the run when the output drifts.
 
 Execution plan: `mailune-ai` only.
-
-### C5. S/MIME sign and encrypt
-
-Depends on: C4. Reuse: the same crate.
-
-Done when: a fixture signs and encrypts, and C4 verifies and decrypts it.
-
-Execution plan: `mailune-smime` only.
 
 ### C7. DKIM ed25519, simple, and l=
 

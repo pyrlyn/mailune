@@ -15,10 +15,12 @@
 //! transport, and AES-CBC content encryption. Anything else is
 //! [`Error::Unsupported`], never a silent pass.
 
+mod build;
 mod cert;
 mod decrypt;
 mod verify;
 
+pub use build::{Signature, encrypt, sign};
 pub use cert::{Certificate, PrivateKey};
 pub use decrypt::decrypt;
 pub use verify::{Verified, verify};
@@ -47,9 +49,12 @@ pub enum Error {
     /// The content could not be decrypted with the supplied key.
     #[error("the message could not be decrypted")]
     Decrypt,
-    /// The key or certificate could not be read.
+    /// The key or certificate could not be read, or they do not belong together.
     #[error("the key or certificate could not be read")]
     Key,
+    /// The CMS builder could not assemble the structure.
+    #[error("the S/MIME data could not be built")]
+    Build,
 }
 
 impl From<x509_cert::der::Error> for Error {

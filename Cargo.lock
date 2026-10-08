@@ -1787,6 +1787,7 @@ dependencies = [
  "aes",
  "cbc",
  "cms",
+ "rand",
  "rsa",
  "thiserror 2.0.21",
  "x509-cert",

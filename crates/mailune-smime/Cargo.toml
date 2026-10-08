@@ -11,6 +11,7 @@ description = "S/MIME: CMS verify, decrypt, sign and encrypt"
 aes = { workspace = true }
 cbc = { workspace = true }
 cms = { workspace = true }
+rand = { workspace = true }
 rsa = { workspace = true }
 thiserror = { workspace = true }
 x509-cert = { workspace = true }
