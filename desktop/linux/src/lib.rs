@@ -6,8 +6,10 @@
 //! in process. It does not open a socket.
 
 mod host;
+mod shell;
 
 pub use host::LinuxHost;
+pub use shell::{Shell, load_shell};
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -28,6 +30,9 @@ pub enum Error {
     /// The English file or a selected file could not be read.
     #[error("catalogue could not be read")]
     Read,
+    /// A UI description is missing a required name.
+    #[error("ui description is incomplete")]
+    Description,
 }
 
 impl Catalogue {
