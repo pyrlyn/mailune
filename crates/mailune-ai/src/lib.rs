@@ -5,6 +5,7 @@
 
 mod catalog;
 mod cloud;
+mod digest;
 mod engine;
 mod guard;
 mod ledger;
@@ -21,6 +22,7 @@ pub use cloud::{
     AnthropicRequest, ChatTurn, CloudCall, OpenAiRequest, anthropic_request,
     completion_from_anthropic, completion_from_openai, openai_request,
 };
+pub use digest::{DigestMessage, digest};
 pub use engine::{LocalEngine, ScriptedEngine};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
