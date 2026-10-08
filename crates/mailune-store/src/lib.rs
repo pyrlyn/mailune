@@ -15,6 +15,7 @@ use diesel::sql_types::Text;
 use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 
 mod blob;
+mod budget;
 mod embed;
 mod fts;
 mod ops;
@@ -24,6 +25,7 @@ mod schema;
 mod watch;
 
 pub use blob::BlobStore;
+pub use budget::Budget;
 pub use embed::Neighbour;
 pub use pipeline::{PipelineResult, ScriptedEmbedder, embed_text};
 pub use repo::{
