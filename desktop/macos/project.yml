@@ -55,12 +55,27 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.tests
         GENERATE_INFOPLIST_FILE: YES
         ARCHS: arm64
+  MailuneUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: MailuneUITests
+    dependencies:
+      - target: Mailune
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Mailune
+        ARCHS: arm64
 schemes:
   Mailune:
     build:
       targets:
         Mailune: all
         MailuneTests: [test]
+        MailuneUITests: [test]
     test:
       targets:
         - MailuneTests
+        - MailuneUITests

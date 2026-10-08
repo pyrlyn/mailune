@@ -32,6 +32,7 @@ public struct ThreadList: View {
                     Text(item.subject)
                         .font(MailuneType.body)
                         .foregroundStyle(MailuneColor.ink)
+                        .accessibilityIdentifier("thread-\(item.id)")
                 }
                 .tag(item.id)
                 .swipeActions(edge: .trailing) {

@@ -37,6 +37,7 @@ public struct ShellView: View {
                     .background(MailuneColor.canvas)
             }
         }
+        .frame(minWidth: 880, minHeight: 520)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add account") { showOnboarding = true }
