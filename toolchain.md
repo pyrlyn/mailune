@@ -38,3 +38,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | diesel | local | https://github.com/diesel-rs/diesel | SQLite access in `mailune-store` |
 | diesel_migrations | local | https://github.com/diesel-rs/diesel | Embedded schema migrations in `mailune-store` |
 | libsqlite3-sys | local | https://github.com/rusqlite/rusqlite | Bundled SQLCipher for `mailune-store` |
+| divan | local | https://github.com/nvzqz/divan | Insert, page, and search benches in `mailune-store` |

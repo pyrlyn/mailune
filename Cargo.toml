@@ -78,6 +78,9 @@ diesel_migrations = { version = "2.3.2", features = ["sqlite"] }
 # mailune-store: SQLCipher compiled into the binary so the caller key is applied in-process.
 # 0.38.2 checked on crates.io 2026-10-08. Inside diesel 2.3's libsqlite3-sys range.
 libsqlite3-sys = { version = "0.38.2", features = ["bundled-sqlcipher"] }
+# mailune-store benches: insert, page, and search. 0.1.21 checked on crates.io 2026-10-08.
+# Default features pull a CLI; the harness only needs the library.
+divan = { version = "0.1.21", default-features = false }
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.

@@ -322,4 +322,51 @@ mod tests {
         assert!(!text.contains("key-b"));
         let _ = std::fs::remove_dir_all(&dir);
     }
+
+    #[test]
+    fn a_handful_of_rows_insert_page_and_search() {
+        use crate::{AccountRow, MessageRow, ThreadRow};
+
+        let dir = scratch_dir();
+        let mut store = Store::open(&dir.join("mail.db"), b"key").unwrap();
+        store
+            .upsert_account(&AccountRow {
+                id: "a".into(),
+                email: "a@example.com".into(),
+            })
+            .unwrap();
+        store
+            .upsert_thread(&ThreadRow {
+                id: "t".into(),
+                account_id: "a".into(),
+                subject: "Hello".into(),
+            })
+            .unwrap();
+        for i in 0..4_i64 {
+            let id = format!("m{i}");
+            store
+                .upsert_message(&MessageRow {
+                    id: id.clone(),
+                    account_id: "a".into(),
+                    thread_id: "t".into(),
+                    subject: "Hello".into(),
+                    from_email: "ada@example.com".into(),
+                    to_emails: "me@example.com".into(),
+                    stamp: "2026-03-01T12:00:00Z".into(),
+                    received_at: i,
+                })
+                .unwrap();
+            store
+                .index_message(&id, "Hello", "ada@example.com", "dock")
+                .unwrap();
+        }
+        let page = store.page_messages(None, 2).unwrap();
+        assert_eq!(page.messages.len(), 2);
+        assert!(page.next.is_some());
+        let next = page.next.unwrap();
+        let rest = store.page_messages(Some(&next), 2).unwrap();
+        assert_eq!(rest.messages.len(), 2);
+        assert_eq!(store.search_text("dock").unwrap().len(), 4);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
