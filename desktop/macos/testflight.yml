@@ -1,0 +1,28 @@
+# Caller description for the iOS TestFlight pipeline.
+# This file is not under .github/workflows, so Actions does not run it.
+# It does not archive, upload, or notarise.
+#
+# A dispatch workflow would pin and call:
+#   pyrlyn/ci/.github/workflows/ios-testflight.yml
+# That reusable workflow is not in pyrlyn/ci as of 2026-10-08 (the tree has
+# release-apple-desktop.yml, which notarises a macOS DMG). Do not call that
+# one from here.
+#
+# Inputs the caller would pass:
+#   version: workflow_dispatch input, X.Y.Z
+#   working-directory: desktop/macos
+#   scheme: MailuneIOS
+#   bundle-id: app.mailune.ios
+#   destination: generic/platform=iOS
+# secrets: inherit, once the reusable workflow exists. This description
+# stores none.
+
+name: testflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: App version X.Y.Z
+        required: true
+        type: string
