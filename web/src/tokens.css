@@ -1,0 +1,35 @@
+:root {
+  --color-ink: #1c1917;
+  --color-paper: #faf7f2;
+  --color-accent: #0f6e56;
+  --font-sans: "Iowan Old Style", Palatino, serif;
+  --font-size-body: 1rem;
+  --font-size-title: 1.5rem;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+}
+
+main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+h1 {
+  margin: 0;
+  font-size: var(--font-size-title);
+  font-weight: 500;
+}
+
+.icon {
+  color: var(--color-accent);
+}

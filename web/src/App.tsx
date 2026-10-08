@@ -1,3 +1,10 @@
+import { InboxIcon } from "./InboxIcon";
+
 export function App() {
-  return <h1>Mailune</h1>;
+  return (
+    <main>
+      <InboxIcon />
+      <h1>Mailune</h1>
+    </main>
+  );
 }
