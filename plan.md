@@ -164,7 +164,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A33 | in progress | P2 | 3 | 0% | Claude / opus-5.5 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
@@ -1441,14 +1440,6 @@ Depends on: W1, R11. Reuse: the R11 signing workflow.
 Done when: an MSIX is signed and a winget manifest installs it. Signing waits on R11.
 
 Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
-
-### A33. Paid hosted AI tier
-
-Depends on: A6, A7. Reuse: the existing privacy router.
-
-Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
-
-Execution plan: design doc on `batch8-ai`. Encrypted mail never goes to a cloud model. Do not send mail.
 
 ### P27. EWS for on-premises Exchange
 

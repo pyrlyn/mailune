@@ -633,3 +633,13 @@ Done when: an OpenAI-compatible request and an Anthropic request are built from 
 Execution plan: `mailune-ai` `cloud.rs`, no llm-* dependency (those crates are not published in packages/crates yet). `build_request` runs `allow_cloud` and `redact_for_cloud` first, then shapes an OpenAI-compatible or Anthropic Messages body; the key is never in the shape, only which header carries it. `parse_response` turns scripted bodies into `Completion` or a typed error.
 
 What landed: OpenAI-compatible and Anthropic request shapes are built from a `Prompt` after the privacy check and redaction; encrypted, local-only and local-preferred mail return `CloudForbidden`. The key is not in the shape, only the header that carries it. Scripted responses become `Completion::Text`; an error body keeps only its error type. No HTTP, no llm-* dependency yet.
+
+### A33. Paid hosted AI tier
+
+Depends on: A6, A7. Reuse: the existing privacy router.
+
+Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
+
+Execution plan: Design doc `docs/hosted-ai.md` only; the creator deferred the paid tier. Name a confidential-compute provider with a primary source, place it behind the privacy router as a `Hosted` kind that needs `CloudAllowed`, keep encrypted mail local-only, and specify attestation before any request.
+
+What landed: The design in `docs/hosted-ai.md` names Azure confidential GPU VMs (`NCCads_H100_v5`, a TEE that spans CPU and H100 GPU; source checked 2026-10-08) behind the existing router as a `Hosted` kind. The kind needs `CloudAllowed`, encrypted mail is forced local-only, and redaction and the ledger apply. Attestation is checked against pinned values and fails closed. No code; the adapter comes after the design.
