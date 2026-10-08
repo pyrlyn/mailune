@@ -1,2 +1,12 @@
 [tools]
 rust = { version = "1.99.0", components = "rustfmt,clippy" } # one Rust version for local work and CI
+"pipx:translate-toolkit" = "3.20.0" # i18n/*.po → native catalogs (scripts/i18n.py)
+
+# translate-toolkit is a pipx tool, so its Python is the one inside that venv.
+[tasks.i18n]
+description = "Convert i18n/*.po into native catalogs under target/i18n (--check: validate only)"
+run = 'exec "$(dirname "$(realpath "$(mise which pocompile)")")/python" -I scripts/i18n.py'
+
+[tasks."i18n:test"]
+description = "Test scripts/i18n.py"
+run = 'exec "$(dirname "$(realpath "$(mise which pocompile)")")/python" -I scripts/test_i18n.py'
