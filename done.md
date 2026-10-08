@@ -713,3 +713,13 @@ Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYST
 Execution plan: Extend the scripted server with mailboxes (UIDVALIDITY, UIDNEXT, HIGHESTMODSEQ, UID SEARCH SINCE, UID FETCH of UID, FLAGS, ENVELOPE and BODYSTRUCTURE as one-line replies). Add Connection::over, select and initial_sync in a new sync.rs; decode FETCH with imap-codec; window dates via chrono, which imap-codec already links.
 
 What landed: `sync.rs`: `Connection::select` records UIDVALIDITY, UIDNEXT and HIGHESTMODSEQ. `initial_sync` searches `UID SEARCH SINCE` for the day window, then fetches UID, FLAGS, ENVELOPE and BODYSTRUCTURE in batches, decoded by imap-codec, into a `SyncBatch` of `MessageMeta`. No store write, no TCP. The scripted server gained mailboxes and those commands. chrono is the one new direct dependency, already linked through imap-codec.
+
+### P8. IMAP incremental sync
+
+Depends on: P7. Reuse: the same session.
+
+Done when: CONDSTORE CHANGEDSINCE and VANISHED are applied, and a server without QRESYNC falls back to a diff of uid sets.
+
+Execution plan: Scripted server: ENABLE QRESYNC, per-message MODSEQ, expunge tombstones, UID FETCH (CHANGEDSINCE n [VANISHED]). Client incremental.rs: SyncState from a SyncBatch, incremental_sync picking QRESYNC, CONDSTORE plus UID diff, or full flag diff; UIDVALIDITY change resets.
+
+What landed: `incremental.rs`: `incremental_sync` uses `CHANGEDSINCE` with `VANISHED` under QRESYNC, `CHANGEDSINCE` plus a `UID SEARCH` diff under CONDSTORE alone, and a full flag fetch plus UID diff otherwise. New mail above the last known UID is fetched with metadata, and a changed UIDVALIDITY returns a reset. `SyncState::apply` folds a `Delta` in. VANISHED ranges are tested for membership and never expanded.

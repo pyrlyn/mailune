@@ -206,7 +206,27 @@ pub(crate) fn uid_set(uids: &[u32]) -> String {
         .join(",")
 }
 
-fn fetch_metadata(reply: &str) -> Result<Vec<MessageMeta>, Error> {
+/// Whether `uid` is in a sequence set such as `1:3,7,9:*`. `*` is `max`.
+/// Tests membership without expanding, so a server-sent `1:4294967295`
+/// costs nothing.
+pub(crate) fn in_set(set: &str, uid: u32, max: u32) -> bool {
+    let bound = |text: &str| {
+        if text == "*" {
+            Some(max)
+        } else {
+            text.parse::<u32>().ok()
+        }
+    };
+    set.split(',').any(|range| match range.split_once(':') {
+        Some((low, high)) => match (bound(low), bound(high)) {
+            (Some(low), Some(high)) => (low.min(high)..=low.max(high)).contains(&uid),
+            _ => false,
+        },
+        None => bound(range) == Some(uid),
+    })
+}
+
+pub(crate) fn fetch_metadata(reply: &str) -> Result<Vec<MessageMeta>, Error> {
     let codec = ResponseCodec::new();
     let mut messages = Vec::new();
     for line in reply.lines().filter(|line| line.contains(" FETCH (")) {
@@ -297,7 +317,7 @@ fn leaves(structure: &BodyStructure<'_>) -> usize {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use std::time::{Duration, SystemTime};
 
     use chrono::NaiveDate;

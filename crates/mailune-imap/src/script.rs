@@ -15,6 +15,8 @@ use std::collections::BTreeMap;
 use chrono::NaiveDate;
 use mailune_mime::{Provider, quirks};
 
+use crate::sync::{in_set, uid_set};
+
 /// The one message FETCH returns. CRLF, as on the wire.
 pub const FIXTURE: &str = "From: ana@example.com\r\nSubject: Hi\r\n\r\nHello\r\n";
 
@@ -51,6 +53,8 @@ pub struct ScriptMailbox {
     pub uidnext: u32,
     /// Messages in UID order. The position plus one is the sequence number.
     pub messages: Vec<ScriptMessage>,
+    /// Expunged UIDs and the modseq of their expunge, for VANISHED.
+    pub vanished: Vec<(u32, u64)>,
 }
 
 impl ScriptMailbox {
@@ -59,6 +63,7 @@ impl ScriptMailbox {
             uidvalidity,
             uidnext: 1,
             messages: Vec::new(),
+            vanished: Vec::new(),
         }
     }
 }
@@ -72,6 +77,7 @@ pub struct Scripted {
     capabilities: Vec<String>,
     mailboxes: BTreeMap<String, ScriptMailbox>,
     modseq: u64,
+    qresync: bool,
 }
 
 impl Scripted {
@@ -84,6 +90,7 @@ impl Scripted {
             capabilities: DEFAULT_CAPABILITIES.map(String::from).to_vec(),
             mailboxes: BTreeMap::new(),
             modseq: 0,
+            qresync: false,
         };
         server.create("INBOX", 1);
         let today = NaiveDate::from_ymd_opt(2026, 10, 8).unwrap_or_default();
@@ -128,6 +135,38 @@ impl Scripted {
             attachment: attachment.map(String::from),
         });
         Some(uid)
+    }
+
+    /// Replaces the flags of one message, as another client would.
+    pub fn set_flags(&mut self, mailbox: &str, uid: u32, flags: &[&str]) -> bool {
+        self.modseq += 1;
+        let modseq = self.modseq;
+        let message = self
+            .mailboxes
+            .get_mut(mailbox)
+            .and_then(|target| target.messages.iter_mut().find(|m| m.uid == uid));
+        let Some(message) = message else {
+            return false;
+        };
+        message.flags = flags.iter().map(|flag| flag.to_string()).collect();
+        message.modseq = modseq;
+        true
+    }
+
+    /// Removes one message, as another client's EXPUNGE would.
+    pub fn expunge(&mut self, mailbox: &str, uid: u32) -> bool {
+        self.modseq += 1;
+        let modseq = self.modseq;
+        let Some(target) = self.mailboxes.get_mut(mailbox) else {
+            return false;
+        };
+        let before = target.messages.len();
+        target.messages.retain(|message| message.uid != uid);
+        let removed = target.messages.len() < before;
+        if removed {
+            target.vanished.push((uid, modseq));
+        }
+        removed
     }
 
     /// A mailbox, for tests that change it between sessions.
@@ -178,6 +217,11 @@ impl Scripted {
                 self.authed = true;
                 format!("{tag} OK LOGIN completed\r\n")
             }
+            "ENABLE" if self.authed => {
+                self.qresync = self.has("QRESYNC") && args.to_ascii_uppercase().contains("QRESYNC");
+                let enabled = if self.qresync { " QRESYNC" } else { "" };
+                format!("* ENABLED{enabled}\r\n{tag} OK ENABLE completed\r\n")
+            }
             "SELECT" if self.authed => self.select(tag, args),
             "FETCH" if self.selected.is_some() => fetch_response(tag),
             "UID" if self.selected.is_some() => self.uid(tag, args),
@@ -219,7 +263,10 @@ impl Scripted {
         };
         match verb.to_ascii_uppercase().as_str() {
             "SEARCH" => format!("{}{tag} OK SEARCH completed\r\n", search(mailbox, rest)),
-            "FETCH" => format!("{}{tag} OK FETCH completed\r\n", uid_fetch(mailbox, rest)),
+            "FETCH" => format!(
+                "{}{tag} OK FETCH completed\r\n",
+                uid_fetch(mailbox, rest, self.qresync)
+            ),
             _ => format!("{tag} BAD unknown UID command\r\n"),
         }
     }
@@ -270,17 +317,37 @@ fn search(mailbox: &ScriptMailbox, criteria: &str) -> String {
     }
 }
 
-/// `UID FETCH <set> (<items>)`. UID and FLAGS always come back.
-fn uid_fetch(mailbox: &ScriptMailbox, args: &str) -> String {
+/// `UID FETCH <set> (<items>) [(CHANGEDSINCE n [VANISHED])]`. UID and FLAGS
+/// always come back; MODSEQ comes back with CHANGEDSINCE.
+fn uid_fetch(mailbox: &ScriptMailbox, args: &str, qresync: bool) -> String {
     let (set, items) = args.split_once(' ').unwrap_or((args, ""));
     let items = items.to_ascii_uppercase();
+    let changed_since: Option<u64> = items.split_once("CHANGEDSINCE ").and_then(|(_, rest)| {
+        rest.split(|c: char| !c.is_ascii_digit())
+            .next()
+            .and_then(|digits| digits.parse().ok())
+    });
     let max = mailbox.messages.last().map_or(0, |message| message.uid);
     let mut out = String::new();
+    if let Some(since) = changed_since.filter(|_| qresync && items.contains("VANISHED")) {
+        let gone: Vec<u32> = mailbox
+            .vanished
+            .iter()
+            .filter(|(uid, modseq)| *modseq > since && in_set(set, *uid, u32::MAX))
+            .map(|(uid, _)| *uid)
+            .collect();
+        if !gone.is_empty() {
+            out.push_str(&format!("* VANISHED (EARLIER) {}\r\n", uid_set(&gone)));
+        }
+    }
     for (index, message) in mailbox.messages.iter().enumerate() {
-        if !in_set(set, message.uid, max) {
+        if !in_set(set, message.uid, max) || changed_since.is_some_and(|n| message.modseq <= n) {
             continue;
         }
         let mut fields = format!("UID {} FLAGS ({})", message.uid, message.flags.join(" "));
+        if changed_since.is_some() {
+            fields.push_str(&format!(" MODSEQ ({})", message.modseq));
+        }
         if items.contains("ENVELOPE") {
             fields.push_str(&format!(" ENVELOPE {}", envelope(message)));
         }
@@ -290,24 +357,6 @@ fn uid_fetch(mailbox: &ScriptMailbox, args: &str) -> String {
         out.push_str(&format!("* {} FETCH ({fields})\r\n", index + 1));
     }
     out
-}
-
-/// Whether `uid` is in a sequence set such as `1:3,7,9:*`.
-pub(crate) fn in_set(set: &str, uid: u32, max: u32) -> bool {
-    let bound = |text: &str| {
-        if text == "*" {
-            Some(max)
-        } else {
-            text.parse::<u32>().ok()
-        }
-    };
-    set.split(',').any(|range| match range.split_once(':') {
-        Some((low, high)) => match (bound(low), bound(high)) {
-            (Some(low), Some(high)) => (low.min(high)..=low.max(high)).contains(&uid),
-            _ => false,
-        },
-        None => bound(range) == Some(uid),
-    })
 }
 
 fn quoted(text: &str) -> String {
@@ -343,7 +392,8 @@ mod tests {
     use imap_codec::imap_types::fetch::MessageDataItem;
     use imap_codec::imap_types::response::{Data, Response};
 
-    use super::{FIXTURE, Scripted, in_set};
+    use super::{FIXTURE, Scripted};
+    use crate::sync::in_set;
 
     #[test]
     fn greeting_capability_login_select_and_fetch() {
