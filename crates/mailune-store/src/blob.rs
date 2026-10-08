@@ -235,9 +235,14 @@ fn parse_hex(text: &str) -> Option<[u8; 32]> {
 #[cfg(test)]
 mod tests {
     use super::BlobHash;
+    use aes_gcm::aead::rand_core::{OsRng, RngCore};
     use crate::{Error, Store};
 
-    const KEY: [u8; 32] = [9; 32];
+    fn key() -> [u8; 32] {
+        let mut key = [0u8; 32];
+        OsRng.fill_bytes(&mut key);
+        key
+    }
     // AES-GCM adds a 16-byte tag to each sealed blob.
     const TAG: u64 = 16;
 
@@ -250,7 +255,8 @@ mod tests {
     #[test]
     fn the_same_bytes_share_one_address_and_round_trip() {
         let (_dir, mut store) = store();
-        let mut blobs = store.blobs(&KEY, 1 << 20).unwrap();
+        let key = key();
+        let mut blobs = store.blobs(&key, 1 << 20).unwrap();
         let first = blobs.put(b"hello body").unwrap();
         let second = blobs.put(b"hello body").unwrap();
         assert_eq!(first, second);
