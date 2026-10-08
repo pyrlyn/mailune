@@ -75,7 +75,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P31 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A32 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -641,14 +640,6 @@ Depends on: M7.
 Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
 
 Execution plan: `desktop/macos` only.
-
-### P31. Push relay
-
-Depends on: P21, P23. Reuse: `axum`.
-
-Done when: a Gmail or Graph webhook becomes an empty wake. A body that carries a token, subject, or mail text is refused. The relay stores no token and no mail.
-
-Execution plan: new crate `mailune-push`. Commit on `batch9-store`. No real APNs or FCM.
 
 ### P32. Relay client
 

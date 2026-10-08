@@ -41,3 +41,6 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | tempfile | local | https://github.com/Stebalien/tempfile | Scratch directories for store tests |
 | aes-gcm | local | https://github.com/RustCrypto/AEADs | Seals blob-store bodies with a caller-supplied key |
 | ews | local | https://github.com/thunderbird/ews-rs | Typed EWS operations and SOAP for on-premises Exchange (MPL-2.0, unmodified) |
+| axum | local | https://github.com/tokio-rs/axum | Push relay webhook router |
+| tokio | local (dev) | https://github.com/tokio-rs/tokio | Runtime for the push relay's in-process router tests |
+| tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |

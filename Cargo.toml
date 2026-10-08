@@ -49,6 +49,11 @@ quick-xml = "0.42.0"
 sha2 = "0.11"
 # mailune-ews: typed EWS operations and SOAP (de)serialization, no HTTP client.
 ews = "0.1.2"
+# mailune-push: the relay's webhook router. Serving features are added by the binary.
+axum = { version = "0.8.9", default-features = false, features = ["query"] }
+# mailune-push tests drive the router in process with `oneshot`; no socket.
+tokio = "1.53.2"
+tower = "0.5.3"
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
 # mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.

@@ -69,7 +69,6 @@
 - M16. macOS accessibility
 - M19. macOS AI surfaces
 - R3. Swift CI
-- P31. Push relay
 - P32. Relay client
 - A32. Embedding pipeline
 - A20. Ask with citations
