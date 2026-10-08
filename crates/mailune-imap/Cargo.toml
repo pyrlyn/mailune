@@ -8,7 +8,8 @@ publish = false
 description = "IMAP mailbox roles and a scripted session"
 
 [dependencies]
-imap-codec = { workspace = true }
+imap-codec = { workspace = true, features = ["quirk_rectify_numbers"] }
+mailune-mime = { path = "../mailune-mime" }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
