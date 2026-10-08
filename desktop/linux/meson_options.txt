@@ -1,0 +1,2 @@
+option('capi_dir', type: 'string', value: '', description: 'Directory of the cargo-built libmailune_capi')
+option('gtk', type: 'boolean', value: false, description: 'Build the Vala GTK shell')
