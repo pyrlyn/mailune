@@ -35,3 +35,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | Local MCP server for read-only tools and gated send |
 | tokio | local | https://github.com/tokio-rs/tokio | In-memory duplex for the MCP server test |
+| whisper-rs | local | https://codeberg.org/tazz4843/whisper-rs | Local speech-to-text for the composer |

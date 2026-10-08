@@ -25,6 +25,7 @@ mod rules;
 mod style;
 mod summary;
 mod triage;
+mod voice;
 
 pub use agent::{AgentCall, AuditLine, AuditLog, Scope, ToolPreview, UndoRecord, prepare};
 pub use attachment::summarize_attachment;
@@ -51,6 +52,7 @@ pub use rules::{Rule, RuleAction, RuleMessage, parse_rule, preview};
 pub use style::StyleBook;
 pub use summary::{SummaryCache, SummaryKind, summarize};
 pub use triage::{TriageInput, categorize};
+pub use voice::{Recognizer, ScriptedRecognizer, dictate, dictate_whisper};
 
 use std::fmt;
 use std::future::Future;
@@ -198,6 +200,9 @@ pub enum Error {
     /// The attachment is not plain text this crate can summarize.
     #[error("attachment is not plain text")]
     NotTextAttachment,
+    /// Whisper could not turn the buffer into text. The buffer is not included.
+    #[error("dictation failed")]
+    DictateFailed,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
