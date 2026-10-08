@@ -14,3 +14,33 @@
 - X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 - X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
+- A3. Local engine adapter
+- A4. Model catalog and verified blobs
+- A6. Cloud BYOK request shapes
+- A11. Thread summary cache
+- A12. Daily digest
+- A13. Smart reply suggestions
+- A14. Compose assist
+- A15. Style profile from sent mail
+- A22. Scheduling extraction
+- A23. Language detection
+- A30. Evaluation cassettes
+- C3. Autocrypt headers
+- C4. S/MIME verify and decrypt
+- C5. S/MIME sign and encrypt
+- C7. DKIM ed25519, simple, and l=
+- P7. IMAP initial sync
+- P8. IMAP incremental sync
+- P9. IMAP IDLE
+- P10. Lazy body fetch
+- P11. IMAP mutations
+- P12. Persist the operation queue
+- S1. mailune-store
+- S2. Schema v1 migrations
+- S3. Repository API
+- S4. Blob store
+- S5. FTS5 index
+- S7. Change feed
+- S8. Embedding store
+- S9. Hybrid retrieval fusion
+- T4. Queue property tests

@@ -20,6 +20,36 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | todo | P0 | 2 | 0% | |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | todo | P0 | 2 | 0% | |
+| A3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| A14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A15 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| A30 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| C3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| P7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P8 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
+| P9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
+| S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
@@ -114,3 +144,243 @@ Already landed: `docs/text-sanitize.md` records that the crate is not on crates.
 Depends on: nothing. Reuse: cox-store src/watch.rs.
 
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+### A3. Local engine adapter
+
+Depends on: A1. Reuse: a scripted engine, not a real model runtime.
+
+Done when: generation, an embedding vector, and JSON-structured output come from a trait the test implements. No process and no download.
+
+Execution plan: `mailune-ai` only.
+
+### A4. Model catalog and verified blobs
+
+Depends on: A3. Reuse: sha2 already in the workspace.
+
+Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, and deletes the blob. The bytes come from a trait. No network.
+
+Execution plan: `mailune-ai` only.
+
+### A6. Cloud BYOK request shapes
+
+Depends on: A1. Reuse: the privacy router. The llm-* crates are not in this repo yet; do not depend on them.
+
+Done when: an OpenAI-compatible request and an Anthropic request are built from a prompt, and a scripted response becomes a typed result. No HTTP.
+
+Execution plan: `mailune-ai` only.
+
+### A11. Thread summary cache
+
+Depends on: A3, A10. Reuse: the prompt registry and the scripted engine.
+
+Done when: short, detailed, and action-item summaries are cached by content hash.
+
+Execution plan: `mailune-ai` only.
+
+### A12. Daily digest
+
+Depends on: A11. Reuse: the summary cache.
+
+Done when: a digest covers messages since a given instant and skips older ones.
+
+Execution plan: `mailune-ai` only.
+
+### A13. Smart reply suggestions
+
+Depends on: A11. Reuse: the scripted engine.
+
+Done when: a thread yields three reply suggestions.
+
+Execution plan: `mailune-ai` only.
+
+### A14. Compose assist
+
+Depends on: A10. Reuse: the prompt registry.
+
+Done when: draft, rewrite, tone, shorten, and proofread each return text from the scripted engine.
+
+Execution plan: `mailune-ai` only.
+
+### A15. Style profile from sent mail
+
+Depends on: A1. Reuse: NEW.
+
+Done when: a per-recipient style profile is learned from sent plain text and can be rendered back as guidance. No model call.
+
+Execution plan: `mailune-ai` only.
+
+### A22. Scheduling extraction
+
+Depends on: P26. Reuse: `icalendar` already in the workspace. Do not add `jiff` unless a date cannot be expressed with the types already in the tree.
+
+Done when: a fixture sentence with a date and a time becomes an ICS suggestion. No SMTP and no calendar server.
+
+Execution plan: `mailune-mime` only, next to the calendar module.
+
+### A23. Language detection
+
+Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
+
+Done when: a message is labelled with a language. No translation call.
+
+Execution plan: `mailune-ai` only.
+
+### A30. Evaluation cassettes
+
+Depends on: T5. Reuse: the synthetic mailbox only as fixtures you write yourself. Do not extract `llm-testkit`.
+
+Done when: a cassette replays a feature call and a metric fails the run when the output drifts.
+
+Execution plan: `mailune-ai` only.
+
+### C3. Autocrypt headers
+
+Depends on: C2. Reuse: the OpenPGP key type only if `mailune-crypto` can be called without editing it. Prefer a header codec in `mailune-mime`.
+
+Done when: an Autocrypt header is parsed and gossip keys are collected from a message. No WKD network lookup.
+
+Execution plan: `mailune-mime` only.
+
+### C4. S/MIME verify and decrypt
+
+Depends on: P1. Reuse: a maintained `cms` and `x509-cert` if they fit.
+
+Done when: a fixture verifies a signature and decrypts with a supplied key. No keychain.
+
+Execution plan: new crate `mailune-smime`.
+
+### C5. S/MIME sign and encrypt
+
+Depends on: C4. Reuse: the same crate.
+
+Done when: a fixture signs and encrypts, and C4 verifies and decrypts it.
+
+Execution plan: `mailune-smime` only.
+
+### C7. DKIM ed25519, simple, and l=
+
+Depends on: the rsa-sha256 relaxed/relaxed verifier already in `mailune-mime`.
+
+Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify against a supplied TXT record. No network.
+
+Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
+
+### P7. IMAP initial sync
+
+Depends on: P6. Reuse: the in-memory IMAP server in `mailune-imap`.
+
+Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYSTRUCTURE in batches, and applies a day window. No store write and no TCP.
+
+Execution plan: `mailune-imap` only.
+
+### P8. IMAP incremental sync
+
+Depends on: P7. Reuse: the same session.
+
+Done when: CONDSTORE CHANGEDSINCE and VANISHED are applied, and a server without QRESYNC falls back to a diff of uid sets.
+
+Execution plan: `mailune-imap` only.
+
+### P9. IMAP IDLE
+
+Depends on: P7. Reuse: an injected clock. Do not sleep.
+
+Done when: IDLE updates are parsed and a dropped session backs off then reconnects on the scripted server.
+
+Execution plan: `mailune-imap` only.
+
+### P10. Lazy body fetch
+
+Depends on: P7. Reuse: imap-codec.
+
+Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
+
+Execution plan: `mailune-imap` only.
+
+### P11. IMAP mutations
+
+Depends on: P7. Reuse: the scripted server.
+
+Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
+
+Execution plan: `mailune-imap` only.
+
+### P12. Persist the operation queue
+
+Depends on: the in-memory queue in `mailune-core` and S2.
+
+Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
+
+Execution plan: a load/save API on `mailune-store`, called by a test. Do not edit the queue's decision rules except to expose the pending set if it is still private.
+
+### S1. mailune-store
+
+Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.
+
+Done when: a file-backed SQLite database opens with WAL and a key argument. The key is a byte slice from the caller, never logged. If SQLCipher does not compile here, use bundled SQLite and say why in the commit message.
+
+Execution plan: new crate `mailune-store`. No network and no keychain.
+
+### S2. Schema v1 migrations
+
+Depends on: S1. Reuse: Diesel migrations.
+
+Done when: embedded migrations create accounts, mailboxes, messages, memberships, threads, parts, flags, sync_state, ops, and contacts.
+
+Execution plan: `mailune-store` only. No raw SQL outside migration files.
+
+### S3. Repository API
+
+Depends on: S2. Reuse: Diesel's typed DSL.
+
+Done when: upserts, a thread query, cursor paging, and counts go through the typed DSL.
+
+Execution plan: `mailune-store` only.
+
+### S4. Blob store
+
+Depends on: S1. Reuse: `sha2` already in the workspace.
+
+Done when: bodies are content-addressed, encrypted with a caller-supplied key, and evicted when a quota is exceeded.
+
+Execution plan: `mailune-store` only.
+
+### S5. FTS5 index
+
+Depends on: S3. Reuse: FTS5.
+
+Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
+
+Execution plan: `mailune-store` only.
+
+### S7. Change feed
+
+Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+
+Done when: a second connection in the same process observes a write as a typed invalidation.
+
+Execution plan: `mailune-store` only.
+
+### S8. Embedding store
+
+Depends on: S3. Reuse: cosine in Rust. Do not use sqlite-vec.
+
+Done when: vectors stored in SQLite return the nearest neighbours by cosine.
+
+Execution plan: `mailune-store` only.
+
+### S9. Hybrid retrieval fusion
+
+Depends on: S6. Reuse: the search parser already in `mailune-core`.
+
+Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
+
+Execution plan: `mailune-core` only. Do not depend on `mailune-store`.
+
+### T4. Queue property tests
+
+Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
+
+Done when: random ops against a model mailbox keep idempotency and undo invariants.
+
+Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
