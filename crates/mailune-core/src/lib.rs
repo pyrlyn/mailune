@@ -4,6 +4,7 @@
 //! contract and on nothing that opens a socket, a file or a process.
 
 mod cancel;
+mod date;
 mod followup;
 mod fusion;
 mod lock;
@@ -14,6 +15,7 @@ mod search;
 mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
+pub use date::parse_rfc3339;
 pub use followup::{Exchange, awaiting_reply};
 pub use fusion::{Candidate, Fused, RRF_K, fuse};
 pub use lock::{AppLock, BiometricRequest};

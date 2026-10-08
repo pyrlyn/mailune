@@ -1,0 +1,26 @@
+[package]
+name = "mailune-jmap"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "JMAP mail adapter over an injected HTTP transport"
+
+# jmap-client is not linked: 0.4.3 always depends on reqwest and sends its
+# own requests, so it cannot run over the injected `Http` transport.
+[dependencies]
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+mailune-fixture = { path = "../mailune-fixture" }
+mailune-store = { path = "../mailune-store" }
+mailune-testkit = { path = "../mailune-testkit" }
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

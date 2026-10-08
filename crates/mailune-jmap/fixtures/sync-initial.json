@@ -1,0 +1,31 @@
+{
+  "methodResponses": [
+    ["Mailbox/get", {
+      "accountId": "acc-1", "state": "mb-1", "notFound": [],
+      "list": [
+        { "id": "mb-inbox", "name": "Inbox", "parentId": null, "role": "inbox" },
+        { "id": "mb-archive", "name": "Archive", "parentId": null, "role": "archive" }
+      ]
+    }, "c0"],
+    ["Email/query", {
+      "accountId": "acc-1", "queryState": "q-1", "canCalculateChanges": true,
+      "position": 0, "ids": ["m2", "m1"], "total": 2
+    }, "c1"],
+    ["Email/get", {
+      "accountId": "acc-1", "state": "e-1", "notFound": [],
+      "list": [
+        { "id": "m2", "threadId": "t1", "mailboxIds": { "mb-inbox": true },
+          "keywords": {}, "from": [{ "name": "Ada", "email": "ada@example.com" }],
+          "to": [{ "name": null, "email": "me@example.com" }], "cc": [],
+          "subject": "Re: Dock", "preview": "Tomorrow works",
+          "receivedAt": "2026-03-02T09:00:00Z", "hasAttachment": true },
+        { "id": "m1", "threadId": "t1", "mailboxIds": { "mb-inbox": true },
+          "keywords": { "$seen": true }, "from": [{ "name": "Me", "email": "me@example.com" }],
+          "to": [{ "name": "Ada", "email": "ada@example.com" }], "cc": [],
+          "subject": "Dock", "preview": "Can we meet?",
+          "receivedAt": "2026-03-01T12:00:00Z", "hasAttachment": false }
+      ]
+    }, "c2"]
+  ],
+  "sessionState": "sess-1"
+}

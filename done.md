@@ -623,3 +623,13 @@ Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the fil
 Execution plan: `fusion.rs` in `mailune-core`: `fuse(lexical, semantic, query)` sums `1/(60 + rank)` per list, then applies the parser's field terms (from, to, has, is, label, before) to each candidate's fields. No store dependency.
 
 What landed: `mailune_core::fuse` fuses a lexical and a semantic ranked list with reciprocal rank fusion at `RRF_K = 60` (a repeated id counts once per list), then keeps only candidates that pass the parsed query's field terms; free-text terms are left to the retrievers. Ties break by message id. No database and no store dependency.
+
+### P17. JMAP read sync
+
+Depends on: S3, P12. Reuse: the JMAP fixtures in `mailune-fixture`.
+
+Done when: session, Mailbox/Email/Thread get, `/changes`, and `/query` parse from a scripted body and upsert through the existing repository. No TCP.
+
+Execution plan: an `Http` transport trait in `mailune-protocol` and a `ScriptedHttp` fake in `mailune-testkit`; new crate `mailune-jmap` with the request envelope, session, Mailbox/Email/Thread get, `/changes`, `/query`, and a one-request sync step. A test upserts the scripted batches through `mailune-store` (dev-dependency only). jmap-client is not linked.
+
+What landed: New crate `mailune-jmap`. `mailune-protocol` gains an `Http` transport trait (`HttpRequest` redacts `Authorization` from `Debug`) and `mailune-testkit` a `ScriptedHttp` fake; `mailune-core` gains `parse_rfc3339` for `receivedAt`. `JmapClient` loads the session, gets mailboxes, emails and threads, runs `Email/query` and `Email/changes`, and `sync` does one step in a single request with result references, falling back to a full listing on `cannotCalculateChanges`. A test applies two scripted steps to `mailune-store` through the repository and resumes from the saved state. jmap-client 0.4.3 is not linked: reqwest is a required dependency and it sends its own requests.

@@ -48,7 +48,6 @@
 - E3. Web tokens and icons
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
-- P17. JMAP read sync
 - P18. JMAP push
 - P19. JMAP mutations and send
 - P20. JMAP MaskedEmail and Sieve

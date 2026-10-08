@@ -1,0 +1,9 @@
+{
+  "methodResponses": [
+    ["Thread/get", {
+      "accountId": "acc-1", "state": "th-1", "notFound": [],
+      "list": [{ "id": "t1", "emailIds": ["m1", "m2"] }]
+    }, "c0"]
+  ],
+  "sessionState": "sess-1"
+}

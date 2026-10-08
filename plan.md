@@ -54,7 +54,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P17 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -562,14 +561,6 @@ Depends on: S3. Reuse: `divan` from `rust.md`.
 Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
 
 Execution plan: `mailune-store` only. Commit on `batch9-store`.
-
-### P17. JMAP read sync
-
-Depends on: S3, P12. Reuse: the JMAP fixtures in `mailune-fixture`.
-
-Done when: session, Mailbox/Email/Thread get, `/changes`, and `/query` parse from a scripted body and upsert through the existing repository. No TCP.
-
-Execution plan: new crate `mailune-jmap`. Link `jmap-client` only if it accepts an injected transport. If it opens a socket, do not link it and say why in the commit.
 
 ### P18. JMAP push
 
