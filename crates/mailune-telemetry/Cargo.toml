@@ -1,0 +1,11 @@
+[package]
+name = "mailune-telemetry"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Redacts secrets in log fields. Does not export traces."
+
+[lints]
+workspace = true
