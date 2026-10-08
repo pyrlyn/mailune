@@ -583,3 +583,13 @@ Done when: upserts, a thread query, cursor paging, and counts go through the typ
 Execution plan: `repo.rs` in `mailune-store`: upserts for accounts, mailboxes and messages (memberships, keywords and the thread row in one transaction), a keyset-paged thread list per mailbox, a thread's messages, mailbox counts, and the sync cursor per scope.
 
 What landed: `Store` gains `upsert_account`, `upsert_mailbox`, `upsert_message` (memberships, keywords and the thread row refreshed in one transaction; a message that changes thread leaves no empty thread), `thread_page` with a `(latest_at, id)` keyset cursor, `thread_messages`, `mailbox_counts`, and `set_sync_state`/`sync_state`. All of it is Diesel's typed DSL; recipient lists are one JSON column.
+
+### S4. Blob store
+
+Depends on: S1. Reuse: `sha2` already in the workspace.
+
+Done when: bodies are content-addressed, encrypted with a caller-supplied key, and evicted when a quota is exceeded.
+
+Execution plan: `blob.rs` in `mailune-store` plus a `blobs` migration: SHA-256 address, AES-256-GCM (aes-gcm 0.10.3, already in the tree) with the address as associated data, LRU eviction by a use counter when the quota is passed.
+
+What landed: `Store::blobs(key, quota)` returns a `Blobs` handle. `put` addresses bytes by the SHA-256 of the plaintext, seals them with AES-256-GCM under the caller's 32-byte key (nonce from the digest, address as associated data), and evicts least-recently-used blobs until the quota fits; `get` refuses a wrong key or a swapped row with `BlobKey`. Recency is a counter, not the clock. Blobs live in a `blobs` table added by a second migration.

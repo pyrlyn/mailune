@@ -6,6 +6,8 @@
 //! pretend to encrypt.
 
 #[cfg(not(target_arch = "wasm32"))]
+mod blob;
+#[cfg(not(target_arch = "wasm32"))]
 mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
@@ -14,6 +16,8 @@ mod repo;
 #[cfg(not(target_arch = "wasm32"))]
 mod schema;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
 #[cfg(not(target_arch = "wasm32"))]
@@ -51,6 +55,13 @@ pub enum Error {
     /// A schema migration failed. The file keeps the last schema that applied.
     #[error("migration failed: {0}")]
     Migration(String),
+    /// The blob key does not open a stored blob, or its bytes do not match
+    /// their address.
+    #[error("blob cannot be opened with this key")]
+    BlobKey,
+    /// One sealed blob is larger than the whole quota.
+    #[error("blob is larger than the quota")]
+    BlobTooLarge,
     /// SQLite kept another journal mode, so readers would block the writer.
     #[error("journal mode is {mode}, not wal")]
     NotWal {

@@ -1732,11 +1732,13 @@ dependencies = [
 name = "mailune-store"
 version = "0.1.0"
 dependencies = [
+ "aes-gcm",
  "diesel",
  "diesel_migrations",
  "libsqlite3-sys",
  "mailune-protocol",
  "serde_json",
+ "sha2 0.11.0",
  "tempfile",
  "thiserror 2.0.21",
  "zeroize",

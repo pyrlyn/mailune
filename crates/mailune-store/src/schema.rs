@@ -128,3 +128,12 @@ diesel::allow_tables_to_appear_in_same_query!(
     ops,
     contacts,
 );
+
+diesel::table! {
+    blobs (hash) {
+        hash -> Text,
+        data -> Binary,
+        size -> BigInt,
+        used -> BigInt,
+    }
+}

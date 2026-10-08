@@ -14,7 +14,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | anyhow | local | https://github.com/dtolnay/anyhow | Errors in `mailune-cli` only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
-| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge |
+| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; blob-store content addresses |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
@@ -39,3 +39,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | libsqlite3-sys | local | https://github.com/rusqlite/rusqlite | Bundled SQLCipher on Apple targets, bundled SQLite elsewhere |
 | zeroize | local | https://github.com/RustCrypto/utils | Wipes the SQLCipher key text after the PRAGMA |
 | tempfile | local | https://github.com/Stebalien/tempfile | Scratch directories for store tests |
+| aes-gcm | local | https://github.com/RustCrypto/AEADs | Seals blob-store bodies with a caller-supplied key |

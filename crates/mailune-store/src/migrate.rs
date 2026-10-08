@@ -33,7 +33,12 @@ mod tests {
         drop(Store::open(&path, None).unwrap());
         let mut store = Store::open(&path, None).unwrap();
         let conn = &mut store.conn;
-        assert_eq!(conn.applied_migrations().unwrap().len(), 1);
+        let shipped = diesel::migration::MigrationSource::<diesel::sqlite::Sqlite>::migrations(
+            &super::MIGRATIONS,
+        )
+        .unwrap()
+        .len();
+        assert_eq!(conn.applied_migrations().unwrap().len(), shipped);
         let counts: [i64; 10] = [
             accounts::table.count().get_result(conn).unwrap(),
             mailboxes::table.count().get_result(conn).unwrap(),

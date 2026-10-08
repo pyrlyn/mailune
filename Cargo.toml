@@ -73,6 +73,8 @@ diesel_migrations = { version = "2.3.2", default-features = false, features = ["
 libsqlite3-sys = { version = "0.38.2", default-features = false }
 # mailune-store: wipes the SQLCipher key text after the PRAGMA. Already in the tree through rsa.
 zeroize = "1.9.1"
+# mailune-store: blob encryption. 0.10.3 is already in the tree through pgp.
+aes-gcm = { version = "0.10.3", default-features = false, features = ["aes", "alloc"] }
 # mailune-store tests: a scratch directory per test database.
 tempfile = "3.27.0"
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
