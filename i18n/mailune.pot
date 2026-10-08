@@ -1,0 +1,1114 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: mailune\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgctxt "thread.cc"
+msgid ", cc {0}"
+msgstr ""
+
+msgctxt "data.1_tb_pooled_storage"
+msgid "1 TB pooled storage"
+msgstr ""
+
+msgctxt "data.1_mailbox"
+msgid "1 mailbox"
+msgstr ""
+
+msgctxt "data.100_gb_storage"
+msgid "100 GB storage"
+msgstr ""
+
+msgctxt "data.15_gb_storage"
+msgid "15 GB storage"
+msgstr ""
+
+msgctxt "data.5_mailboxes"
+msgid "5 mailboxes"
+msgstr ""
+
+msgctxt "settings.accounts"
+msgid "ACCOUNTS"
+msgstr ""
+
+msgctxt "settings.appearance"
+msgid "APPEARANCE"
+msgstr ""
+
+msgctxt "settings.away"
+msgid "AWAY"
+msgstr ""
+
+msgctxt "settings.accent"
+msgid "Accent"
+msgstr ""
+
+msgctxt "sheets.accounts"
+msgid "Accounts"
+msgstr ""
+
+msgctxt "settings.adaptive"
+msgid "Adaptive"
+msgstr ""
+
+msgctxt "settings.adaptive_2"
+msgid "Adaptive · {0}"
+msgstr ""
+
+msgctxt "compose.add"
+msgid "Add"
+msgstr ""
+
+msgctxt "settings.add_account"
+msgid "Add account"
+msgstr ""
+
+msgctxt "sheets.add_another_account"
+msgid "Add another account"
+msgstr ""
+
+msgctxt "data.admin_console_and_sso"
+msgid "Admin console and SSO"
+msgstr ""
+
+msgctxt "search.all_conversations"
+msgid "All conversations"
+msgstr ""
+
+msgctxt "drawer.all_inboxes"
+msgid "All inboxes"
+msgstr ""
+
+msgctxt "data.all_mail"
+msgid "All mail"
+msgstr ""
+
+msgctxt "auth.already_have_an_account"
+msgid "Already have an account?"
+msgstr ""
+
+msgctxt "sheets.any_time"
+msgid "Any time"
+msgstr ""
+
+msgctxt "sheets.anyone"
+msgid "Anyone"
+msgstr ""
+
+msgctxt "settings.app_lock"
+msgid "App lock"
+msgstr ""
+
+msgctxt "sheets.apply"
+msgid "Apply"
+msgstr ""
+
+msgctxt "data.archive"
+msgid "Archive"
+msgstr ""
+
+msgctxt "data.archive_folder"
+msgid "Archive"
+msgstr ""
+
+msgctxt "data.archived"
+msgid "Archived “{0}”"
+msgstr ""
+
+msgctxt "settings.ask_before_showing_images"
+msgid "Ask before showing images"
+msgstr ""
+
+msgctxt "compose.attach_from_files_photos"
+msgid "Attach from Files, Photos or Drive"
+msgstr ""
+
+msgctxt "search.attachments"
+msgid "Attachments"
+msgstr ""
+
+msgctxt "settings.auto"
+msgid "Auto"
+msgstr ""
+
+msgctxt "settings.auto_2"
+msgid "Auto · {0}"
+msgstr ""
+
+msgctxt "settings.auto_advance"
+msgid "Auto-advance"
+msgstr ""
+
+msgctxt "kit.buttons"
+msgid "BUTTONS"
+msgstr ""
+
+msgctxt "compose.bcc"
+msgid "Bcc"
+msgstr ""
+
+msgctxt "settings.billed_monthly"
+msgid "Billed monthly"
+msgstr ""
+
+msgctxt "settings.billed_yearly"
+msgid "Billed yearly"
+msgstr ""
+
+msgctxt "compose.blind_copy"
+msgid "Blind copy"
+msgstr ""
+
+msgctxt "sheets.block_sender"
+msgid "Block sender"
+msgstr ""
+
+msgctxt "settings.blocked_senders"
+msgid "Blocked senders"
+msgstr ""
+
+msgctxt "sheets.blocked"
+msgid "Blocked {0}"
+msgstr ""
+
+msgctxt "kit.colour"
+msgid "COLOUR"
+msgstr ""
+
+msgctxt "settings.compose"
+msgid "COMPOSE"
+msgstr ""
+
+msgctxt "sheets.cancel"
+msgid "Cancel"
+msgstr ""
+
+msgctxt "compose.carbon_copy"
+msgid "Carbon copy"
+msgstr ""
+
+msgctxt "compose.cc"
+msgid "Cc"
+msgstr ""
+
+msgctxt "sheets.change_labels"
+msgid "Change labels"
+msgstr ""
+
+msgctxt "pricing.change_or_cancel_at"
+msgid "Change or cancel at any time. Every plan keeps your address."
+msgstr ""
+
+msgctxt "auth.choose_a_password"
+msgid "Choose a password"
+msgstr ""
+
+msgctxt "pricing.choose"
+msgid "Choose {0}"
+msgstr ""
+
+msgctxt "search.clear"
+msgid "Clear"
+msgstr ""
+
+msgctxt "settings.compact"
+msgid "Compact"
+msgstr ""
+
+msgctxt "pricing.compare_every_feature"
+msgid "Compare every feature"
+msgstr ""
+
+msgctxt "kit.components"
+msgid "Components"
+msgstr ""
+
+msgctxt "app.compose"
+msgid "Compose"
+msgstr ""
+
+msgctxt "compose.confidential_expires_in_7"
+msgid "Confidential · expires in 7 days, no forwarding"
+msgstr ""
+
+msgctxt "auth.continue_with_sso"
+msgid "Continue with SSO"
+msgstr ""
+
+msgctxt "auth.continue_with_a_passkey"
+msgid "Continue with a passkey"
+msgstr ""
+
+msgctxt "kit.controls"
+msgid "Controls"
+msgstr ""
+
+msgctxt "settings.conversation_view"
+msgid "Conversation view"
+msgstr ""
+
+msgctxt "settings.cozy"
+msgid "Cozy"
+msgstr ""
+
+msgctxt "auth.create_account"
+msgid "Create account"
+msgstr ""
+
+msgctxt "auth.create_an_account"
+msgid "Create an account"
+msgstr ""
+
+msgctxt "drawer.create_label"
+msgid "Create label"
+msgstr ""
+
+msgctxt "sheets.create_new_label"
+msgid "Create new label"
+msgstr ""
+
+msgctxt "auth.create_your_account"
+msgid "Create your account"
+msgstr ""
+
+msgctxt "pricing.current"
+msgid "Current"
+msgstr ""
+
+msgctxt "pricing.current_plan"
+msgid "Current plan"
+msgstr ""
+
+msgctxt "data.custom_rules_and_labels"
+msgid "Custom rules and labels"
+msgstr ""
+
+msgctxt "settings.dark"
+msgid "Dark"
+msgstr ""
+
+msgctxt "sheets.date"
+msgid "Date"
+msgstr ""
+
+msgctxt "settings.days_of_mail_to"
+msgid "Days of mail to sync"
+msgstr ""
+
+msgctxt "settings.default_reply"
+msgid "Default reply"
+msgstr ""
+
+msgctxt "data.delete"
+msgid "Delete"
+msgstr ""
+
+msgctxt "settings.density"
+msgid "Density"
+msgstr ""
+
+msgctxt "settings.desktop"
+msgid "Desktop"
+msgstr ""
+
+msgctxt "compose.discard"
+msgid "Discard"
+msgstr ""
+
+msgctxt "pricing.downgrade"
+msgid "Downgrade"
+msgstr ""
+
+msgctxt "sheets.download"
+msgid "Download"
+msgstr ""
+
+msgctxt "sheets.downloading"
+msgid "Downloading…"
+msgstr ""
+
+msgctxt "mail_list.draft"
+msgid "Draft"
+msgstr ""
+
+msgctxt "compose.draft_saved"
+msgid "Draft saved"
+msgstr ""
+
+msgctxt "data.drafts"
+msgid "Drafts"
+msgstr ""
+
+msgctxt "auth.email_address"
+msgid "Email address"
+msgstr ""
+
+msgctxt "pricing.every_plan_includes_end"
+msgid ""
+"Every plan includes end-to-end encrypted storage, two-factor authentication "
+"and a 30-day undo window."
+msgstr ""
+
+msgctxt "settings.every_token_and_component"
+msgid "Every token and component in one place"
+msgstr ""
+
+msgctxt "compose.files"
+msgid "Files"
+msgstr ""
+
+msgctxt "sheets.filter"
+msgid "Filter"
+msgstr ""
+
+msgctxt "settings.filters_and_rules"
+msgid "Filters and rules"
+msgstr ""
+
+msgctxt "data.for_one_mailbox_and"
+msgid "For one mailbox and the basics."
+msgstr ""
+
+msgctxt "data.for_people_who_live"
+msgid "For people who live in their inbox."
+msgstr ""
+
+msgctxt "auth.forgot_password"
+msgid "Forgot password?"
+msgstr ""
+
+msgctxt "thread.forward"
+msgid "Forward"
+msgstr ""
+
+msgctxt "kit.foundations"
+msgid "Foundations"
+msgstr ""
+
+msgctxt "auth.free_to_start_upgrade"
+msgid "Free to start. Upgrade whenever you outgrow it."
+msgstr ""
+
+msgctxt "sheets.from"
+msgid "From"
+msgstr ""
+
+msgctxt "compose.from"
+msgid "From {0}"
+msgstr ""
+
+msgctxt "auth.full_name"
+msgid "Full name"
+msgstr ""
+
+msgctxt "thread.fwd"
+msgid "Fwd: {0}"
+msgstr ""
+
+msgctxt "settings.gmail_outlook_imap_or"
+msgid "Gmail, Outlook, IMAP or Exchange"
+msgstr ""
+
+msgctxt "sheets.has_attachment"
+msgid "Has attachment"
+msgstr ""
+
+msgctxt "drawer.help_feedback"
+msgid "Help & feedback"
+msgstr ""
+
+msgctxt "auth.i_agree_to_the"
+msgid "I agree to the terms of service and the privacy policy."
+msgstr ""
+
+msgctxt "kit.icons"
+msgid "ICONS"
+msgstr ""
+
+msgctxt "kit.identity"
+msgid "IDENTITY"
+msgstr ""
+
+msgctxt "kit.icons_2"
+msgid "Icons"
+msgstr ""
+
+msgctxt "thread.images_blocked"
+msgid "Images blocked"
+msgstr ""
+
+msgctxt "data.important"
+msgid "Important"
+msgstr ""
+
+msgctxt "app.inbox"
+msgid "Inbox"
+msgstr ""
+
+msgctxt "auth.keep_me_signed_in"
+msgid "Keep me signed in"
+msgstr ""
+
+msgctxt "drawer.labels"
+msgid "LABELS"
+msgstr ""
+
+msgctxt "kit.layout"
+msgid "LAYOUT"
+msgstr ""
+
+msgctxt "kit.lists"
+msgid "LISTS"
+msgstr ""
+
+msgctxt "sheets.labelled"
+msgid "Labelled {0}"
+msgstr ""
+
+msgctxt "sheets.labels"
+msgid "Labels"
+msgstr ""
+
+msgctxt "settings.language"
+msgid "Language"
+msgstr ""
+
+msgctxt "sheets.later_today"
+msgid "Later today"
+msgstr ""
+
+msgctxt "settings.layout"
+msgid "Layout"
+msgstr ""
+
+msgctxt "settings.light"
+msgid "Light"
+msgstr ""
+
+msgctxt "kit.motion"
+msgid "MOTION"
+msgstr ""
+
+msgctxt "app.mail"
+msgid "Mail"
+msgstr ""
+
+msgctxt "settings.mail_notifications"
+msgid "Mail notifications"
+msgstr ""
+
+msgctxt "sheets.manage_accounts"
+msgid "Manage accounts"
+msgstr ""
+
+msgctxt "sheets.mark_as_unread"
+msgid "Mark as unread"
+msgstr ""
+
+msgctxt "sheets.mark_important"
+msgid "Mark important"
+msgstr ""
+
+msgctxt "data.mark_read_unread"
+msgid "Mark read/unread"
+msgstr ""
+
+msgctxt "sheets.marked_important"
+msgid "Marked important"
+msgstr ""
+
+msgctxt "data.marked_read"
+msgid "Marked read"
+msgstr ""
+
+msgctxt "data.marked_unread"
+msgid "Marked unread"
+msgstr ""
+
+msgctxt "sheets.monday_morning"
+msgid "Monday morning"
+msgstr ""
+
+msgctxt "pricing.monthly"
+msgid "Monthly"
+msgstr ""
+
+msgctxt "search.more"
+msgid "More"
+msgstr ""
+
+msgctxt "pricing.most_popular"
+msgid "Most popular"
+msgstr ""
+
+msgctxt "data.move_to"
+msgid "Move to"
+msgstr ""
+
+msgctxt "data.moved_to_trash"
+msgid "Moved to Trash"
+msgstr ""
+
+msgctxt "sheets.moved_to"
+msgid "Moved to {0}"
+msgstr ""
+
+msgctxt "sheets.mute_conversation"
+msgid "Mute conversation"
+msgstr ""
+
+msgctxt "sheets.muted"
+msgid "Muted"
+msgstr ""
+
+msgctxt "settings.notifications"
+msgid "NOTIFICATIONS"
+msgstr ""
+
+msgctxt "auth.new_here"
+msgid "New here?"
+msgstr ""
+
+msgctxt "mail_list.newsletters_and_network_updates"
+msgid "Newsletters and network updates land here."
+msgstr ""
+
+msgctxt "sheets.next_week"
+msgid "Next week"
+msgstr ""
+
+msgctxt "data.no_ads_ever"
+msgid "No ads, ever"
+msgstr ""
+
+msgctxt "app.no_conversation_open"
+msgid "No conversation open"
+msgstr ""
+
+msgctxt "data.none"
+msgid "None"
+msgstr ""
+
+msgctxt "mail_list.nothing_social"
+msgid "Nothing social"
+msgstr ""
+
+msgctxt "auth.ok"
+msgid "OK"
+msgstr ""
+
+msgctxt "kit.overlays"
+msgid "OVERLAYS"
+msgstr ""
+
+msgctxt "settings.off"
+msgid "Off"
+msgstr ""
+
+msgctxt "settings.only_from_vips"
+msgid "Only from VIPs"
+msgstr ""
+
+msgctxt "thread.open"
+msgid "Open"
+msgstr ""
+
+msgctxt "settings.open_the_next_conversation"
+msgid "Open the next conversation after archiving"
+msgstr ""
+
+msgctxt "data.outbox"
+msgid "Outbox"
+msgstr ""
+
+msgctxt "settings.plan"
+msgid "PLAN"
+msgstr ""
+
+msgctxt "kit.platform"
+msgid "PLATFORM"
+msgstr ""
+
+msgctxt "settings.privacy_rules"
+msgid "PRIVACY & RULES"
+msgstr ""
+
+msgctxt "auth.passkey_sign_in_is"
+msgid "Passkey sign-in is not wired up in this design"
+msgstr ""
+
+msgctxt "auth.password"
+msgid "Password"
+msgstr ""
+
+msgctxt "settings.phone"
+msgid "Phone"
+msgstr ""
+
+msgctxt "app.pick_a_message_from"
+msgid "Pick a message from the list to read it here."
+msgstr ""
+
+msgctxt "sheets.pick_date_time"
+msgid "Pick date & time"
+msgstr ""
+
+msgctxt "pricing.pick_the_plan_that"
+msgid "Pick the plan that fits"
+msgstr ""
+
+msgctxt "pricing.plans"
+msgid "Plans"
+msgstr ""
+
+msgctxt "settings.platform"
+msgid "Platform"
+msgstr ""
+
+msgctxt "data.primary"
+msgid "Primary"
+msgstr ""
+
+msgctxt "sheets.print"
+msgid "Print"
+msgstr ""
+
+msgctxt "data.priority_support"
+msgid "Priority support"
+msgstr ""
+
+msgctxt "data.promotions"
+msgid "Promotions"
+msgstr ""
+
+msgctxt "settings.pure_black_in_dark"
+msgid "Pure black in dark mode"
+msgstr ""
+
+msgctxt "settings.reading"
+msgid "READING"
+msgstr ""
+
+msgctxt "search.recent"
+msgid "RECENT"
+msgstr ""
+
+msgctxt "thread.re"
+msgid "Re: {0}"
+msgstr ""
+
+msgctxt "compose.recipients"
+msgid "Recipients"
+msgstr ""
+
+msgctxt "auth.recovery_link_sent_to"
+msgid "Recovery link sent to {0}"
+msgstr ""
+
+msgctxt "settings.reduce_motion"
+msgid "Reduce motion"
+msgstr ""
+
+msgctxt "settings.remove_account"
+msgid "Remove account"
+msgstr ""
+
+msgctxt "thread.reply"
+msgid "Reply"
+msgstr ""
+
+msgctxt "settings.reply_all"
+msgid "Reply all"
+msgstr ""
+
+msgctxt "data.report_spam"
+msgid "Report spam"
+msgstr ""
+
+msgctxt "data.reported_spam"
+msgid "Reported spam"
+msgstr ""
+
+msgctxt "settings.require_face_id_to"
+msgid "Require Face ID to open"
+msgstr ""
+
+msgctxt "sheets.reset"
+msgid "Reset"
+msgstr ""
+
+msgctxt "search.results_for"
+msgid "Results for “{0}”"
+msgstr ""
+
+msgctxt "settings.roomy"
+msgid "Roomy"
+msgstr ""
+
+msgctxt "kit.selection"
+msgid "SELECTION"
+msgstr ""
+
+msgctxt "kit.space_shape"
+msgid "SPACE & SHAPE"
+msgstr ""
+
+msgctxt "auth.sso_is_not_wired"
+msgid "SSO is not wired up in this design"
+msgstr ""
+
+msgctxt "compose.suggested"
+msgid "SUGGESTED"
+msgstr ""
+
+msgctxt "kit.surfaces"
+msgid "SURFACES"
+msgstr ""
+
+msgctxt "settings.swipe_actions"
+msgid "SWIPE ACTIONS"
+msgstr ""
+
+msgctxt "settings.sync"
+msgid "SYNC"
+msgstr ""
+
+msgctxt "thread.saved"
+msgid "Saved “{0}”"
+msgstr ""
+
+msgctxt "settings.saves_battery_on_oled"
+msgid "Saves battery on OLED screens"
+msgstr ""
+
+msgctxt "sheets.schedule_send"
+msgid "Schedule send"
+msgstr ""
+
+msgctxt "data.scheduled"
+msgid "Scheduled"
+msgstr ""
+
+msgctxt "compose.scheduled_for"
+msgid "Scheduled for {0}"
+msgstr ""
+
+msgctxt "app.search"
+msgid "Search"
+msgstr ""
+
+msgctxt "sheets.search_in"
+msgid "Search in"
+msgstr ""
+
+msgctxt "search.search_in_mail"
+msgid "Search in mail"
+msgstr ""
+
+msgctxt "mail_list.search_in"
+msgid "Search in {0}"
+msgstr ""
+
+msgctxt "compose.send"
+msgid "Send"
+msgstr ""
+
+msgctxt "settings.send_read_receipts"
+msgid "Send read receipts"
+msgstr ""
+
+msgctxt "compose.sending"
+msgid "Sending…"
+msgstr ""
+
+msgctxt "data.sent"
+msgid "Sent"
+msgstr ""
+
+msgctxt "app.settings"
+msgid "Settings"
+msgstr ""
+
+msgctxt "sheets.share"
+msgid "Share"
+msgstr ""
+
+msgctxt "data.shared_inboxes"
+msgid "Shared inboxes"
+msgstr ""
+
+msgctxt "data.shared_inboxes_and_a"
+msgid "Shared inboxes and a custom domain."
+msgstr ""
+
+msgctxt "thread.show_all"
+msgid "Show all"
+msgstr ""
+
+msgctxt "auth.sign_in"
+msgid "Sign in"
+msgstr ""
+
+msgctxt "auth.sign_in_to_pick"
+msgid "Sign in to pick up where you left off."
+msgstr ""
+
+msgctxt "settings.sign_out"
+msgid "Sign out"
+msgstr ""
+
+msgctxt "auth.sign_up_with_sso"
+msgid "Sign up with SSO"
+msgstr ""
+
+msgctxt "auth.sign_up_with_a"
+msgid "Sign up with a passkey"
+msgstr ""
+
+msgctxt "settings.signature"
+msgid "Signature"
+msgstr ""
+
+msgctxt "settings.silence_everything_else"
+msgid "Silence everything else"
+msgstr ""
+
+msgctxt "data.snooze"
+msgid "Snooze"
+msgstr ""
+
+msgctxt "data.snooze_and_schedule_send"
+msgid "Snooze and schedule send"
+msgstr ""
+
+msgctxt "sheets.snooze_until"
+msgid "Snooze until"
+msgstr ""
+
+msgctxt "data.snoozed"
+msgid "Snoozed"
+msgstr ""
+
+msgctxt "sheets.snoozed_until"
+msgid "Snoozed until {0}"
+msgstr ""
+
+msgctxt "data.social"
+msgid "Social"
+msgstr ""
+
+msgctxt "settings.sound_vibration"
+msgid "Sound & vibration"
+msgstr ""
+
+msgctxt "data.spam"
+msgid "Spam"
+msgstr ""
+
+msgctxt "data.standard_filters"
+msgid "Standard filters"
+msgstr ""
+
+msgctxt "data.star"
+msgid "Star"
+msgstr ""
+
+msgctxt "app.starred"
+msgid "Starred"
+msgstr ""
+
+msgctxt "sheets.starred_only"
+msgid "Starred only"
+msgstr ""
+
+msgctxt "compose.subject"
+msgid "Subject"
+msgstr ""
+
+msgctxt "settings.swipe_left"
+msgid "Swipe left"
+msgstr ""
+
+msgctxt "settings.swipe_right"
+msgid "Swipe right"
+msgstr ""
+
+msgctxt "pricing.switched_to"
+msgid "Switched to {0}"
+msgstr ""
+
+msgctxt "settings.sync_on_wi_fi"
+msgid "Sync on Wi-Fi only"
+msgstr ""
+
+msgctxt "mail_list.syncing"
+msgid "Syncing…"
+msgstr ""
+
+msgctxt "settings.system"
+msgid "System"
+msgstr ""
+
+msgctxt "kit.text_entry"
+msgid "TEXT ENTRY"
+msgstr ""
+
+msgctxt "settings.tv"
+msgid "TV"
+msgstr ""
+
+msgctxt "kit.type"
+msgid "TYPE"
+msgstr ""
+
+msgctxt "settings.tablet"
+msgid "Tablet"
+msgstr ""
+
+msgctxt "pricing.the_full_comparison_table"
+msgid "The full comparison table is not in this design"
+msgstr ""
+
+msgctxt "settings.theme"
+msgid "Theme"
+msgstr ""
+
+msgctxt "sheets.this_weekend"
+msgid "This weekend"
+msgstr ""
+
+msgctxt "compose.to"
+msgid "To"
+msgstr ""
+
+msgctxt "sheets.tomorrow"
+msgid "Tomorrow"
+msgstr ""
+
+msgctxt "sheets.tomorrow_afternoon"
+msgid "Tomorrow afternoon"
+msgstr ""
+
+msgctxt "sheets.tomorrow_morning"
+msgid "Tomorrow morning"
+msgstr ""
+
+msgctxt "data.trash"
+msgid "Trash"
+msgstr ""
+
+msgctxt "settings.turn_off_transitions_and"
+msgid "Turn off transitions and spinners"
+msgstr ""
+
+msgctxt "kit.ui_kit"
+msgid "UI kit"
+msgstr ""
+
+msgctxt "auth.undo"
+msgid "Undo"
+msgstr ""
+
+msgctxt "settings.undo_send"
+msgid "Undo send"
+msgstr ""
+
+msgctxt "data.unlimited_mailboxes"
+msgid "Unlimited mailboxes"
+msgstr ""
+
+msgctxt "search.unread"
+msgid "Unread"
+msgstr ""
+
+msgctxt "sheets.unread_only"
+msgid "Unread only"
+msgstr ""
+
+msgctxt "data.updated_just_now"
+msgid "Updated just now"
+msgstr ""
+
+msgctxt "data.updates"
+msgid "Updates"
+msgstr ""
+
+msgctxt "settings.vacation_responder"
+msgid "Vacation responder"
+msgstr ""
+
+msgctxt "data.web_and_mobile"
+msgid "Web and mobile"
+msgstr ""
+
+msgctxt "auth.welcome_back"
+msgid "Welcome back"
+msgstr ""
+
+msgctxt "compose.write_your_message"
+msgid "Write your message"
+msgstr ""
+
+msgctxt "pricing.yearly_save_20"
+msgid "Yearly · save 20%"
+msgstr ""
+
+msgctxt "data.your_own_domain"
+msgid "Your own domain"
+msgstr ""
+
+msgctxt "settings.your_plan"
+msgid "Your plan"
+msgstr ""
+
+msgctxt "data.forever"
+msgid "forever"
+msgstr ""
+
+msgctxt "auth.or"
+msgid "or"
+msgstr ""
+
+msgctxt "data.per_month"
+msgid "per month"
+msgstr ""
+
+msgctxt "data.per_user_month"
+msgid "per user / month"
+msgstr ""
+
+msgctxt "thread.to"
+msgid "to {0}"
+msgstr ""
+
+msgctxt "auth.your_address"
+msgid "your address"
+msgstr ""
+
+msgctxt "mail_list.archived"
+msgid "{0} archived"
+msgstr ""
+
+msgctxt "settings.days"
+msgid "{0} days"
+msgstr ""
+
+msgctxt "thread.messages"
+msgid "{0} messages"
+msgstr ""
+
+msgctxt "mail_list.moved_to_trash"
+msgid "{0} moved to Trash"
+msgstr ""
+
+msgctxt "settings.s"
+msgid "{0} s"
+msgstr ""
+
+msgctxt "sheets.from_2"
+msgid "{0} · from {1}"
+msgstr ""

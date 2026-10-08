@@ -1,0 +1,1116 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: mailune\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "thread.cc"
+msgid ", cc {0}"
+msgstr "、Cc: {0}"
+
+msgctxt "data.1_tb_pooled_storage"
+msgid "1 TB pooled storage"
+msgstr "共有ストレージ 1 TB"
+
+msgctxt "data.1_mailbox"
+msgid "1 mailbox"
+msgstr "メールボックス 1 個"
+
+msgctxt "data.100_gb_storage"
+msgid "100 GB storage"
+msgstr "ストレージ 100 GB"
+
+msgctxt "data.15_gb_storage"
+msgid "15 GB storage"
+msgstr "ストレージ 15 GB"
+
+msgctxt "data.5_mailboxes"
+msgid "5 mailboxes"
+msgstr "メールボックス 5 個"
+
+msgctxt "settings.accounts"
+msgid "ACCOUNTS"
+msgstr "アカウント"
+
+msgctxt "settings.appearance"
+msgid "APPEARANCE"
+msgstr "外観"
+
+msgctxt "settings.away"
+msgid "AWAY"
+msgstr "不在"
+
+msgctxt "settings.accent"
+msgid "Accent"
+msgstr "アクセントカラー"
+
+msgctxt "sheets.accounts"
+msgid "Accounts"
+msgstr "アカウント"
+
+msgctxt "settings.adaptive"
+msgid "Adaptive"
+msgstr "自動"
+
+msgctxt "settings.adaptive_2"
+msgid "Adaptive · {0}"
+msgstr "自動 · {0}"
+
+msgctxt "compose.add"
+msgid "Add"
+msgstr "追加"
+
+msgctxt "settings.add_account"
+msgid "Add account"
+msgstr "アカウントを追加"
+
+msgctxt "sheets.add_another_account"
+msgid "Add another account"
+msgstr "別のアカウントを追加"
+
+msgctxt "data.admin_console_and_sso"
+msgid "Admin console and SSO"
+msgstr "管理コンソールと SSO"
+
+msgctxt "search.all_conversations"
+msgid "All conversations"
+msgstr "すべてのスレッド"
+
+msgctxt "drawer.all_inboxes"
+msgid "All inboxes"
+msgstr "すべての受信トレイ"
+
+msgctxt "data.all_mail"
+msgid "All mail"
+msgstr "すべてのメール"
+
+msgctxt "auth.already_have_an_account"
+msgid "Already have an account?"
+msgstr "アカウントをお持ちですか？"
+
+msgctxt "sheets.any_time"
+msgid "Any time"
+msgstr "いつでも"
+
+msgctxt "sheets.anyone"
+msgid "Anyone"
+msgstr "すべて"
+
+msgctxt "settings.app_lock"
+msgid "App lock"
+msgstr "アプリロック"
+
+msgctxt "sheets.apply"
+msgid "Apply"
+msgstr "適用"
+
+msgctxt "data.archive"
+msgid "Archive"
+msgstr "アーカイブする"
+
+msgctxt "data.archive_folder"
+msgid "Archive"
+msgstr "アーカイブ"
+
+msgctxt "data.archived"
+msgid "Archived “{0}”"
+msgstr "「{0}」をアーカイブしました"
+
+msgctxt "settings.ask_before_showing_images"
+msgid "Ask before showing images"
+msgstr "画像を表示する前に確認"
+
+msgctxt "compose.attach_from_files_photos"
+msgid "Attach from Files, Photos or Drive"
+msgstr "ファイル、写真、ドライブから添付"
+
+msgctxt "search.attachments"
+msgid "Attachments"
+msgstr "添付ファイル"
+
+msgctxt "settings.auto"
+msgid "Auto"
+msgstr "自動"
+
+msgctxt "settings.auto_2"
+msgid "Auto · {0}"
+msgstr "自動 · {0}"
+
+msgctxt "settings.auto_advance"
+msgid "Auto-advance"
+msgstr "自動で次へ"
+
+msgctxt "kit.buttons"
+msgid "BUTTONS"
+msgstr "ボタン"
+
+msgctxt "compose.bcc"
+msgid "Bcc"
+msgstr "Bcc"
+
+msgctxt "settings.billed_monthly"
+msgid "Billed monthly"
+msgstr "月額請求"
+
+msgctxt "settings.billed_yearly"
+msgid "Billed yearly"
+msgstr "年額請求"
+
+msgctxt "compose.blind_copy"
+msgid "Blind copy"
+msgstr "Bcc"
+
+msgctxt "sheets.block_sender"
+msgid "Block sender"
+msgstr "送信者をブロック"
+
+msgctxt "settings.blocked_senders"
+msgid "Blocked senders"
+msgstr "ブロックした送信者"
+
+msgctxt "sheets.blocked"
+msgid "Blocked {0}"
+msgstr "{0} をブロックしました"
+
+msgctxt "kit.colour"
+msgid "COLOUR"
+msgstr "カラー"
+
+msgctxt "settings.compose"
+msgid "COMPOSE"
+msgstr "作成"
+
+msgctxt "sheets.cancel"
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgctxt "compose.carbon_copy"
+msgid "Carbon copy"
+msgstr "Cc"
+
+msgctxt "compose.cc"
+msgid "Cc"
+msgstr "Cc"
+
+msgctxt "sheets.change_labels"
+msgid "Change labels"
+msgstr "ラベルを変更"
+
+msgctxt "pricing.change_or_cancel_at"
+msgid "Change or cancel at any time. Every plan keeps your address."
+msgstr "いつでも変更や解約ができます。どのプランでもアドレスはそのままです。"
+
+msgctxt "auth.choose_a_password"
+msgid "Choose a password"
+msgstr "パスワードを設定"
+
+msgctxt "pricing.choose"
+msgid "Choose {0}"
+msgstr "{0} を選ぶ"
+
+msgctxt "search.clear"
+msgid "Clear"
+msgstr "消去"
+
+msgctxt "settings.compact"
+msgid "Compact"
+msgstr "コンパクト"
+
+msgctxt "pricing.compare_every_feature"
+msgid "Compare every feature"
+msgstr "すべての機能を比較"
+
+msgctxt "kit.components"
+msgid "Components"
+msgstr "コンポーネント"
+
+msgctxt "app.compose"
+msgid "Compose"
+msgstr "作成"
+
+msgctxt "compose.confidential_expires_in_7"
+msgid "Confidential · expires in 7 days, no forwarding"
+msgstr "機密 · 7 日で失効、転送不可"
+
+msgctxt "auth.continue_with_sso"
+msgid "Continue with SSO"
+msgstr "SSO で続ける"
+
+msgctxt "auth.continue_with_a_passkey"
+msgid "Continue with a passkey"
+msgstr "パスキーで続ける"
+
+msgctxt "kit.controls"
+msgid "Controls"
+msgstr "コントロール"
+
+msgctxt "settings.conversation_view"
+msgid "Conversation view"
+msgstr "スレッド表示"
+
+msgctxt "settings.cozy"
+msgid "Cozy"
+msgstr "標準"
+
+msgctxt "auth.create_account"
+msgid "Create account"
+msgstr "アカウントを作成"
+
+msgctxt "auth.create_an_account"
+msgid "Create an account"
+msgstr "アカウントを作成"
+
+msgctxt "drawer.create_label"
+msgid "Create label"
+msgstr "ラベルを作成"
+
+msgctxt "sheets.create_new_label"
+msgid "Create new label"
+msgstr "新しいラベルを作成"
+
+msgctxt "auth.create_your_account"
+msgid "Create your account"
+msgstr "アカウントを作成"
+
+msgctxt "pricing.current"
+msgid "Current"
+msgstr "現在"
+
+msgctxt "pricing.current_plan"
+msgid "Current plan"
+msgstr "現在のプラン"
+
+msgctxt "data.custom_rules_and_labels"
+msgid "Custom rules and labels"
+msgstr "カスタムルールとラベル"
+
+msgctxt "settings.dark"
+msgid "Dark"
+msgstr "ダーク"
+
+msgctxt "sheets.date"
+msgid "Date"
+msgstr "日付"
+
+msgctxt "settings.days_of_mail_to"
+msgid "Days of mail to sync"
+msgstr "同期する日数"
+
+msgctxt "settings.default_reply"
+msgid "Default reply"
+msgstr "既定の返信"
+
+msgctxt "data.delete"
+msgid "Delete"
+msgstr "削除"
+
+msgctxt "settings.density"
+msgid "Density"
+msgstr "表示密度"
+
+msgctxt "settings.desktop"
+msgid "Desktop"
+msgstr "デスクトップ"
+
+msgctxt "compose.discard"
+msgid "Discard"
+msgstr "破棄"
+
+msgctxt "pricing.downgrade"
+msgid "Downgrade"
+msgstr "ダウングレード"
+
+msgctxt "sheets.download"
+msgid "Download"
+msgstr "ダウンロード"
+
+msgctxt "sheets.downloading"
+msgid "Downloading…"
+msgstr "ダウンロード中…"
+
+msgctxt "mail_list.draft"
+msgid "Draft"
+msgstr "下書き"
+
+msgctxt "compose.draft_saved"
+msgid "Draft saved"
+msgstr "下書きを保存しました"
+
+msgctxt "data.drafts"
+msgid "Drafts"
+msgstr "下書き"
+
+msgctxt "auth.email_address"
+msgid "Email address"
+msgstr "メールアドレス"
+
+msgctxt "pricing.every_plan_includes_end"
+msgid ""
+"Every plan includes end-to-end encrypted storage, two-factor authentication "
+"and a 30-day undo window."
+msgstr ""
+"どのプランにもエンドツーエンド暗号化ストレージ、2 要素認証、30 日間の取り消し"
+"期間が含まれます。"
+
+msgctxt "settings.every_token_and_component"
+msgid "Every token and component in one place"
+msgstr "すべてのトークンとコンポーネントを一覧"
+
+msgctxt "compose.files"
+msgid "Files"
+msgstr "ファイル"
+
+msgctxt "sheets.filter"
+msgid "Filter"
+msgstr "絞り込み"
+
+msgctxt "settings.filters_and_rules"
+msgid "Filters and rules"
+msgstr "フィルタとルール"
+
+msgctxt "data.for_one_mailbox_and"
+msgid "For one mailbox and the basics."
+msgstr "メールボックス 1 個と基本機能。"
+
+msgctxt "data.for_people_who_live"
+msgid "For people who live in their inbox."
+msgstr "受信トレイで暮らす人に。"
+
+msgctxt "auth.forgot_password"
+msgid "Forgot password?"
+msgstr "パスワードをお忘れですか？"
+
+msgctxt "thread.forward"
+msgid "Forward"
+msgstr "転送"
+
+msgctxt "kit.foundations"
+msgid "Foundations"
+msgstr "基礎"
+
+msgctxt "auth.free_to_start_upgrade"
+msgid "Free to start. Upgrade whenever you outgrow it."
+msgstr "無料で始めて、必要になったらアップグレード。"
+
+msgctxt "sheets.from"
+msgid "From"
+msgstr "差出人"
+
+msgctxt "compose.from"
+msgid "From {0}"
+msgstr "{0} から"
+
+msgctxt "auth.full_name"
+msgid "Full name"
+msgstr "氏名"
+
+msgctxt "thread.fwd"
+msgid "Fwd: {0}"
+msgstr "Fwd: {0}"
+
+msgctxt "settings.gmail_outlook_imap_or"
+msgid "Gmail, Outlook, IMAP or Exchange"
+msgstr "Gmail、Outlook、IMAP、Exchange"
+
+msgctxt "sheets.has_attachment"
+msgid "Has attachment"
+msgstr "添付ファイルあり"
+
+msgctxt "drawer.help_feedback"
+msgid "Help & feedback"
+msgstr "ヘルプとフィードバック"
+
+msgctxt "auth.i_agree_to_the"
+msgid "I agree to the terms of service and the privacy policy."
+msgstr "利用規約とプライバシーポリシーに同意します。"
+
+msgctxt "kit.icons"
+msgid "ICONS"
+msgstr "アイコン"
+
+msgctxt "kit.identity"
+msgid "IDENTITY"
+msgstr "アイデンティティ"
+
+msgctxt "kit.icons_2"
+msgid "Icons"
+msgstr "アイコン"
+
+msgctxt "thread.images_blocked"
+msgid "Images blocked"
+msgstr "画像をブロック中"
+
+msgctxt "data.important"
+msgid "Important"
+msgstr "重要"
+
+msgctxt "app.inbox"
+msgid "Inbox"
+msgstr "受信トレイ"
+
+msgctxt "auth.keep_me_signed_in"
+msgid "Keep me signed in"
+msgstr "ログイン状態を保持"
+
+msgctxt "drawer.labels"
+msgid "LABELS"
+msgstr "ラベル"
+
+msgctxt "kit.layout"
+msgid "LAYOUT"
+msgstr "レイアウト"
+
+msgctxt "kit.lists"
+msgid "LISTS"
+msgstr "リスト"
+
+msgctxt "sheets.labelled"
+msgid "Labelled {0}"
+msgstr "「{0}」を付けました"
+
+msgctxt "sheets.labels"
+msgid "Labels"
+msgstr "ラベル"
+
+msgctxt "settings.language"
+msgid "Language"
+msgstr "言語"
+
+msgctxt "sheets.later_today"
+msgid "Later today"
+msgstr "今日中"
+
+msgctxt "settings.layout"
+msgid "Layout"
+msgstr "レイアウト"
+
+msgctxt "settings.light"
+msgid "Light"
+msgstr "ライト"
+
+msgctxt "kit.motion"
+msgid "MOTION"
+msgstr "モーション"
+
+msgctxt "app.mail"
+msgid "Mail"
+msgstr "メール"
+
+msgctxt "settings.mail_notifications"
+msgid "Mail notifications"
+msgstr "メール通知"
+
+msgctxt "sheets.manage_accounts"
+msgid "Manage accounts"
+msgstr "アカウントを管理"
+
+msgctxt "sheets.mark_as_unread"
+msgid "Mark as unread"
+msgstr "未読にする"
+
+msgctxt "sheets.mark_important"
+msgid "Mark important"
+msgstr "重要にする"
+
+msgctxt "data.mark_read_unread"
+msgid "Mark read/unread"
+msgstr "既読／未読"
+
+msgctxt "sheets.marked_important"
+msgid "Marked important"
+msgstr "重要にしました"
+
+msgctxt "data.marked_read"
+msgid "Marked read"
+msgstr "既読にしました"
+
+msgctxt "data.marked_unread"
+msgid "Marked unread"
+msgstr "未読にしました"
+
+msgctxt "sheets.monday_morning"
+msgid "Monday morning"
+msgstr "月曜の朝"
+
+msgctxt "pricing.monthly"
+msgid "Monthly"
+msgstr "月額"
+
+msgctxt "search.more"
+msgid "More"
+msgstr "その他"
+
+msgctxt "pricing.most_popular"
+msgid "Most popular"
+msgstr "人気"
+
+msgctxt "data.move_to"
+msgid "Move to"
+msgstr "移動先"
+
+msgctxt "data.moved_to_trash"
+msgid "Moved to Trash"
+msgstr "ゴミ箱に移動しました"
+
+msgctxt "sheets.moved_to"
+msgid "Moved to {0}"
+msgstr "{0}に移動しました"
+
+msgctxt "sheets.mute_conversation"
+msgid "Mute conversation"
+msgstr "スレッドをミュート"
+
+msgctxt "sheets.muted"
+msgid "Muted"
+msgstr "ミュートしました"
+
+msgctxt "settings.notifications"
+msgid "NOTIFICATIONS"
+msgstr "通知"
+
+msgctxt "auth.new_here"
+msgid "New here?"
+msgstr "はじめてですか？"
+
+msgctxt "mail_list.newsletters_and_network_updates"
+msgid "Newsletters and network updates land here."
+msgstr "ニュースレターやネットワークの更新はここに届きます。"
+
+msgctxt "sheets.next_week"
+msgid "Next week"
+msgstr "来週"
+
+msgctxt "data.no_ads_ever"
+msgid "No ads, ever"
+msgstr "広告は一切なし"
+
+msgctxt "app.no_conversation_open"
+msgid "No conversation open"
+msgstr "スレッドが開かれていません"
+
+msgctxt "data.none"
+msgid "None"
+msgstr "なし"
+
+msgctxt "mail_list.nothing_social"
+msgid "Nothing social"
+msgstr "ソーシャルはありません"
+
+msgctxt "auth.ok"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "kit.overlays"
+msgid "OVERLAYS"
+msgstr "オーバーレイ"
+
+msgctxt "settings.off"
+msgid "Off"
+msgstr "オフ"
+
+msgctxt "settings.only_from_vips"
+msgid "Only from VIPs"
+msgstr "VIP のみ"
+
+msgctxt "thread.open"
+msgid "Open"
+msgstr "開く"
+
+msgctxt "settings.open_the_next_conversation"
+msgid "Open the next conversation after archiving"
+msgstr "アーカイブ後に次のスレッドを開く"
+
+msgctxt "data.outbox"
+msgid "Outbox"
+msgstr "送信トレイ"
+
+msgctxt "settings.plan"
+msgid "PLAN"
+msgstr "プラン"
+
+msgctxt "kit.platform"
+msgid "PLATFORM"
+msgstr "プラットフォーム"
+
+msgctxt "settings.privacy_rules"
+msgid "PRIVACY & RULES"
+msgstr "プライバシーとルール"
+
+msgctxt "auth.passkey_sign_in_is"
+msgid "Passkey sign-in is not wired up in this design"
+msgstr "このデザインではパスキーログインは未接続です"
+
+msgctxt "auth.password"
+msgid "Password"
+msgstr "パスワード"
+
+msgctxt "settings.phone"
+msgid "Phone"
+msgstr "スマートフォン"
+
+msgctxt "app.pick_a_message_from"
+msgid "Pick a message from the list to read it here."
+msgstr "リストからメッセージを選ぶと、ここに表示されます。"
+
+msgctxt "sheets.pick_date_time"
+msgid "Pick date & time"
+msgstr "日時を指定"
+
+msgctxt "pricing.pick_the_plan_that"
+msgid "Pick the plan that fits"
+msgstr "ぴったりのプランを選ぶ"
+
+msgctxt "pricing.plans"
+msgid "Plans"
+msgstr "プラン"
+
+msgctxt "settings.platform"
+msgid "Platform"
+msgstr "プラットフォーム"
+
+msgctxt "data.primary"
+msgid "Primary"
+msgstr "メイン"
+
+msgctxt "sheets.print"
+msgid "Print"
+msgstr "印刷"
+
+msgctxt "data.priority_support"
+msgid "Priority support"
+msgstr "優先サポート"
+
+msgctxt "data.promotions"
+msgid "Promotions"
+msgstr "プロモーション"
+
+msgctxt "settings.pure_black_in_dark"
+msgid "Pure black in dark mode"
+msgstr "ダークモードで純黒を使う"
+
+msgctxt "settings.reading"
+msgid "READING"
+msgstr "閲覧"
+
+msgctxt "search.recent"
+msgid "RECENT"
+msgstr "最近の検索"
+
+msgctxt "thread.re"
+msgid "Re: {0}"
+msgstr "Re: {0}"
+
+msgctxt "compose.recipients"
+msgid "Recipients"
+msgstr "宛先"
+
+msgctxt "auth.recovery_link_sent_to"
+msgid "Recovery link sent to {0}"
+msgstr "再設定リンクを {0} に送信しました"
+
+msgctxt "settings.reduce_motion"
+msgid "Reduce motion"
+msgstr "視差効果を減らす"
+
+msgctxt "settings.remove_account"
+msgid "Remove account"
+msgstr "アカウントを削除"
+
+msgctxt "thread.reply"
+msgid "Reply"
+msgstr "返信"
+
+msgctxt "settings.reply_all"
+msgid "Reply all"
+msgstr "全員に返信"
+
+msgctxt "data.report_spam"
+msgid "Report spam"
+msgstr "迷惑メールを報告"
+
+msgctxt "data.reported_spam"
+msgid "Reported spam"
+msgstr "迷惑メールとして報告しました"
+
+msgctxt "settings.require_face_id_to"
+msgid "Require Face ID to open"
+msgstr "起動時に Face ID を要求"
+
+msgctxt "sheets.reset"
+msgid "Reset"
+msgstr "リセット"
+
+msgctxt "search.results_for"
+msgid "Results for “{0}”"
+msgstr "「{0}」の検索結果"
+
+msgctxt "settings.roomy"
+msgid "Roomy"
+msgstr "ゆったり"
+
+msgctxt "kit.selection"
+msgid "SELECTION"
+msgstr "選択"
+
+msgctxt "kit.space_shape"
+msgid "SPACE & SHAPE"
+msgstr "余白と角丸"
+
+msgctxt "auth.sso_is_not_wired"
+msgid "SSO is not wired up in this design"
+msgstr "このデザインでは SSO は未接続です"
+
+msgctxt "compose.suggested"
+msgid "SUGGESTED"
+msgstr "候補"
+
+msgctxt "kit.surfaces"
+msgid "SURFACES"
+msgstr "サーフェス"
+
+msgctxt "settings.swipe_actions"
+msgid "SWIPE ACTIONS"
+msgstr "スワイプ操作"
+
+msgctxt "settings.sync"
+msgid "SYNC"
+msgstr "同期"
+
+msgctxt "thread.saved"
+msgid "Saved “{0}”"
+msgstr "「{0}」を保存しました"
+
+msgctxt "settings.saves_battery_on_oled"
+msgid "Saves battery on OLED screens"
+msgstr "有機 EL でバッテリーを節約"
+
+msgctxt "sheets.schedule_send"
+msgid "Schedule send"
+msgstr "送信日時を指定"
+
+msgctxt "data.scheduled"
+msgid "Scheduled"
+msgstr "予約送信"
+
+msgctxt "compose.scheduled_for"
+msgid "Scheduled for {0}"
+msgstr "{0} に送信予約しました"
+
+msgctxt "app.search"
+msgid "Search"
+msgstr "検索"
+
+msgctxt "sheets.search_in"
+msgid "Search in"
+msgstr "検索範囲"
+
+msgctxt "search.search_in_mail"
+msgid "Search in mail"
+msgstr "メールを検索"
+
+msgctxt "mail_list.search_in"
+msgid "Search in {0}"
+msgstr "{0}を検索"
+
+msgctxt "compose.send"
+msgid "Send"
+msgstr "送信"
+
+msgctxt "settings.send_read_receipts"
+msgid "Send read receipts"
+msgstr "開封確認を送信"
+
+msgctxt "compose.sending"
+msgid "Sending…"
+msgstr "送信中…"
+
+msgctxt "data.sent"
+msgid "Sent"
+msgstr "送信済み"
+
+msgctxt "app.settings"
+msgid "Settings"
+msgstr "設定"
+
+msgctxt "sheets.share"
+msgid "Share"
+msgstr "共有"
+
+msgctxt "data.shared_inboxes"
+msgid "Shared inboxes"
+msgstr "共有受信トレイ"
+
+msgctxt "data.shared_inboxes_and_a"
+msgid "Shared inboxes and a custom domain."
+msgstr "共有受信トレイと独自ドメイン。"
+
+msgctxt "thread.show_all"
+msgid "Show all"
+msgstr "すべて表示"
+
+msgctxt "auth.sign_in"
+msgid "Sign in"
+msgstr "ログイン"
+
+msgctxt "auth.sign_in_to_pick"
+msgid "Sign in to pick up where you left off."
+msgstr "ログインして続きから始めましょう。"
+
+msgctxt "settings.sign_out"
+msgid "Sign out"
+msgstr "ログアウト"
+
+msgctxt "auth.sign_up_with_sso"
+msgid "Sign up with SSO"
+msgstr "SSO で登録"
+
+msgctxt "auth.sign_up_with_a"
+msgid "Sign up with a passkey"
+msgstr "パスキーで登録"
+
+msgctxt "settings.signature"
+msgid "Signature"
+msgstr "署名"
+
+msgctxt "settings.silence_everything_else"
+msgid "Silence everything else"
+msgstr "それ以外は通知しない"
+
+msgctxt "data.snooze"
+msgid "Snooze"
+msgstr "スヌーズ"
+
+msgctxt "data.snooze_and_schedule_send"
+msgid "Snooze and schedule send"
+msgstr "スヌーズと送信予約"
+
+msgctxt "sheets.snooze_until"
+msgid "Snooze until"
+msgstr "スヌーズする期限"
+
+msgctxt "data.snoozed"
+msgid "Snoozed"
+msgstr "スヌーズ中"
+
+msgctxt "sheets.snoozed_until"
+msgid "Snoozed until {0}"
+msgstr "{0}までスヌーズしました"
+
+msgctxt "data.social"
+msgid "Social"
+msgstr "ソーシャル"
+
+msgctxt "settings.sound_vibration"
+msgid "Sound & vibration"
+msgstr "サウンドとバイブレーション"
+
+msgctxt "data.spam"
+msgid "Spam"
+msgstr "迷惑メール"
+
+msgctxt "data.standard_filters"
+msgid "Standard filters"
+msgstr "標準フィルタ"
+
+msgctxt "data.star"
+msgid "Star"
+msgstr "スター"
+
+msgctxt "app.starred"
+msgid "Starred"
+msgstr "スター付き"
+
+msgctxt "sheets.starred_only"
+msgid "Starred only"
+msgstr "スター付きのみ"
+
+msgctxt "compose.subject"
+msgid "Subject"
+msgstr "件名"
+
+msgctxt "settings.swipe_left"
+msgid "Swipe left"
+msgstr "左スワイプ"
+
+msgctxt "settings.swipe_right"
+msgid "Swipe right"
+msgstr "右スワイプ"
+
+msgctxt "pricing.switched_to"
+msgid "Switched to {0}"
+msgstr "{0} に変更しました"
+
+msgctxt "settings.sync_on_wi_fi"
+msgid "Sync on Wi-Fi only"
+msgstr "Wi-Fi でのみ同期"
+
+msgctxt "mail_list.syncing"
+msgid "Syncing…"
+msgstr "同期中…"
+
+msgctxt "settings.system"
+msgid "System"
+msgstr "システム"
+
+msgctxt "kit.text_entry"
+msgid "TEXT ENTRY"
+msgstr "テキスト入力"
+
+msgctxt "settings.tv"
+msgid "TV"
+msgstr "テレビ"
+
+msgctxt "kit.type"
+msgid "TYPE"
+msgstr "タイポグラフィ"
+
+msgctxt "settings.tablet"
+msgid "Tablet"
+msgstr "タブレット"
+
+msgctxt "pricing.the_full_comparison_table"
+msgid "The full comparison table is not in this design"
+msgstr "このデザインには比較表全体は含まれていません"
+
+msgctxt "settings.theme"
+msgid "Theme"
+msgstr "テーマ"
+
+msgctxt "sheets.this_weekend"
+msgid "This weekend"
+msgstr "今週末"
+
+msgctxt "compose.to"
+msgid "To"
+msgstr "宛先"
+
+msgctxt "sheets.tomorrow"
+msgid "Tomorrow"
+msgstr "明日"
+
+msgctxt "sheets.tomorrow_afternoon"
+msgid "Tomorrow afternoon"
+msgstr "明日の午後"
+
+msgctxt "sheets.tomorrow_morning"
+msgid "Tomorrow morning"
+msgstr "明日の朝"
+
+msgctxt "data.trash"
+msgid "Trash"
+msgstr "ゴミ箱"
+
+msgctxt "settings.turn_off_transitions_and"
+msgid "Turn off transitions and spinners"
+msgstr "トランジションと回転表示をオフにする"
+
+msgctxt "kit.ui_kit"
+msgid "UI kit"
+msgstr "UI キット"
+
+msgctxt "auth.undo"
+msgid "Undo"
+msgstr "取り消す"
+
+msgctxt "settings.undo_send"
+msgid "Undo send"
+msgstr "送信を取り消す"
+
+msgctxt "data.unlimited_mailboxes"
+msgid "Unlimited mailboxes"
+msgstr "メールボックス無制限"
+
+msgctxt "search.unread"
+msgid "Unread"
+msgstr "未読"
+
+msgctxt "sheets.unread_only"
+msgid "Unread only"
+msgstr "未読のみ"
+
+msgctxt "data.updated_just_now"
+msgid "Updated just now"
+msgstr "たった今更新しました"
+
+msgctxt "data.updates"
+msgid "Updates"
+msgstr "更新情報"
+
+msgctxt "settings.vacation_responder"
+msgid "Vacation responder"
+msgstr "不在通知"
+
+msgctxt "data.web_and_mobile"
+msgid "Web and mobile"
+msgstr "ウェブとモバイル"
+
+msgctxt "auth.welcome_back"
+msgid "Welcome back"
+msgstr "おかえりなさい"
+
+msgctxt "compose.write_your_message"
+msgid "Write your message"
+msgstr "メッセージを入力"
+
+msgctxt "pricing.yearly_save_20"
+msgid "Yearly · save 20%"
+msgstr "年額 · 20% お得"
+
+msgctxt "data.your_own_domain"
+msgid "Your own domain"
+msgstr "独自ドメイン"
+
+msgctxt "settings.your_plan"
+msgid "Your plan"
+msgstr "現在のプラン"
+
+msgctxt "data.forever"
+msgid "forever"
+msgstr "ずっと"
+
+msgctxt "auth.or"
+msgid "or"
+msgstr "または"
+
+msgctxt "data.per_month"
+msgid "per month"
+msgstr "月あたり"
+
+msgctxt "data.per_user_month"
+msgid "per user / month"
+msgstr "1 ユーザーあたり／月"
+
+msgctxt "thread.to"
+msgid "to {0}"
+msgstr "宛先 {0}"
+
+msgctxt "auth.your_address"
+msgid "your address"
+msgstr "登録アドレス"
+
+msgctxt "mail_list.archived"
+msgid "{0} archived"
+msgstr "{0} 件をアーカイブしました"
+
+msgctxt "settings.days"
+msgid "{0} days"
+msgstr "{0} 日"
+
+msgctxt "thread.messages"
+msgid "{0} messages"
+msgstr "{0} 件"
+
+msgctxt "mail_list.moved_to_trash"
+msgid "{0} moved to Trash"
+msgstr "{0} 件をゴミ箱に移動しました"
+
+msgctxt "settings.s"
+msgid "{0} s"
+msgstr "{0} 秒"
+
+msgctxt "sheets.from_2"
+msgid "{0} · from {1}"
+msgstr "{0} · {1} から"
