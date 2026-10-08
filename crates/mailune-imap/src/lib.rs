@@ -13,7 +13,7 @@ mod sync;
 pub use list::{ListedMailbox, mailbox_role, parse_list};
 pub use script::{FIXTURE, MailboxMessage, Scripted};
 pub use session::{Config, Connection, MemStream, SelectedMailbox};
-pub use sync::{DayWindow, SyncBatch, SyncedMessage, initial_sync};
+pub use sync::{DayWindow, SyncBatch, SyncedMessage, UidDelta, incremental_sync, initial_sync};
 
 /// Failure while reading one IMAP response or driving a session.
 #[derive(Debug, thiserror::Error)]

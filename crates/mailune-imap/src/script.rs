@@ -25,6 +25,8 @@ pub struct MailboxMessage {
     pub subject: String,
     /// RFC 5322 bytes, counted by BODYSTRUCTURE.
     pub raw: String,
+    /// CONDSTORE modification sequence. A later value is a newer change.
+    pub modseq: u64,
 }
 
 /// Scripted server. Feed client bytes with [`Scripted::ingest`].
@@ -37,6 +39,12 @@ pub struct Scripted {
     messages: Vec<MailboxMessage>,
     /// Commands other than LOGIN. LOGIN carries the password, so it stays out.
     trace: Vec<String>,
+    /// CONDSTORE and QRESYNC are advertised only when this is set.
+    /// `imap-codec` 1.0.0 marks that extension unfinished, so VANISHED is
+    /// written by this server and read by the sync client, not by the codec.
+    qresync: bool,
+    /// Uids removed from the mailbox, with the modseq of the removal.
+    vanished: Vec<(u32, u64)>,
 }
 
 impl Scripted {
@@ -56,7 +64,23 @@ impl Scripted {
             uid_validity,
             messages,
             trace: Vec::new(),
+            qresync: false,
+            vanished: Vec::new(),
         }
+    }
+
+    /// Advertise CONDSTORE and QRESYNC, and answer CHANGEDSINCE with VANISHED.
+    pub fn qresync(mut self) -> Self {
+        self.qresync = true;
+        self
+    }
+
+    /// Remember a uid that left the mailbox at `modseq`.
+    pub fn record_vanished(mut self, uid: u32, modseq: u64) -> Self {
+        if uid > 0 {
+            self.vanished.push((uid, modseq));
+        }
+        self
     }
 
     /// Commands this server has answered, apart from LOGIN.
@@ -102,7 +126,14 @@ impl Scripted {
         match verb.as_str() {
             "CAPABILITY" => {
                 let gmail = gmail_capability();
-                format!("* CAPABILITY IMAP4rev1 {gmail}\r\n{tag} OK CAPABILITY completed\r\n")
+                let extra = if self.qresync {
+                    " CONDSTORE QRESYNC"
+                } else {
+                    ""
+                };
+                format!(
+                    "* CAPABILITY IMAP4rev1 {gmail}{extra}\r\n{tag} OK CAPABILITY completed\r\n"
+                )
             }
             "LOGIN" => {
                 self.authed = true;
@@ -110,9 +141,7 @@ impl Scripted {
             }
             "SELECT" if self.authed => self.select(tag),
             "SEARCH" if self.selected && uid_command => self.search(tag, &rest),
-            "FETCH" if self.selected && uid_command => {
-                self.uid_fetch(tag, rest.first().copied().unwrap_or(""))
-            }
+            "FETCH" if self.selected && uid_command => self.uid_fetch(tag, line),
             "FETCH" if self.selected => fetch_response(tag),
             "SELECT" | "FETCH" | "SEARCH" => format!("{tag} NO not authenticated\r\n"),
             _ => format!("{tag} BAD unknown command\r\n"),
@@ -149,9 +178,16 @@ impl Scripted {
         format!("* SEARCH{prefix}\r\n{tag} OK SEARCH completed\r\n")
     }
 
-    fn uid_fetch(&self, tag: &str, set: &str) -> String {
+    fn uid_fetch(&self, tag: &str, line: &str) -> String {
+        let set = line.split_whitespace().nth(3).unwrap_or("");
+        let since = changed_since(line);
+        let uids = if set == "1:*" || set == "*" {
+            self.messages.iter().map(|message| message.uid).collect()
+        } else {
+            parse_set(set)
+        };
         let mut out = String::new();
-        for uid in parse_set(set) {
+        for uid in uids {
             let Some((seq, message)) = self
                 .messages
                 .iter()
@@ -160,11 +196,34 @@ impl Scripted {
             else {
                 continue;
             };
-            let sequence = seq + 1;
-            out.push_str(&fetch_meta(sequence, message));
+            if since.is_some_and(|floor| message.modseq <= floor) {
+                continue;
+            }
+            out.push_str(&fetch_meta(seq + 1, message));
+        }
+        if since.is_some() && self.qresync {
+            let gone: Vec<String> = self
+                .vanished
+                .iter()
+                .filter(|(_, seq)| since.is_some_and(|floor| *seq > floor))
+                .map(|(uid, _)| uid.to_string())
+                .collect();
+            if !gone.is_empty() {
+                out.push_str(&format!("* VANISHED {}\r\n", gone.join(",")));
+            }
+            out.push_str(&format!(
+                "* OK [HIGHESTMODSEQ {}] highest\r\n",
+                self.highest_modseq()
+            ));
         }
         out.push_str(&format!("{tag} OK FETCH completed\r\n"));
         out
+    }
+
+    fn highest_modseq(&self) -> u64 {
+        let live = self.messages.iter().map(|message| message.modseq).max();
+        let gone = self.vanished.iter().map(|(_, seq)| *seq).max();
+        live.max(gone).unwrap_or(0)
     }
 }
 
@@ -182,6 +241,7 @@ fn fixture_message() -> MailboxMessage {
         from: "ana@example.com".to_string(),
         subject: "Hi".to_string(),
         raw: FIXTURE.to_string(),
+        modseq: 1,
     }
 }
 
@@ -273,7 +333,19 @@ fn month_index(name: &str) -> Option<u32> {
         .map(|index| index as u32 + 1)
 }
 
-fn parse_set(token: &str) -> Vec<u32> {
+fn changed_since(line: &str) -> Option<u64> {
+    let upper = line.to_ascii_uppercase();
+    let start = upper.find("CHANGEDSINCE")? + "CHANGEDSINCE".len();
+    let rest = line.get(start..)?.trim_start();
+    let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
+    if digits.is_empty() {
+        None
+    } else {
+        digits.parse().ok()
+    }
+}
+
+pub(crate) fn parse_set(token: &str) -> Vec<u32> {
     let mut uids = Vec::new();
     for part in token.split(',') {
         if let Some((start, end)) = part.split_once(':') {

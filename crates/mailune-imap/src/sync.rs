@@ -224,6 +224,137 @@ fn istring(value: &IString<'_>) -> String {
     String::from_utf8_lossy(value.as_ref()).into_owned()
 }
 
+/// What changed since the last modseq, or the uid-set diff when the server
+/// has no QRESYNC.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UidDelta {
+    /// Messages CONDSTORE reported, or uids that were not in `known`.
+    pub changed: Vec<SyncedMessage>,
+    /// Uids VANISHED reported, or known uids the server no longer has.
+    pub vanished: Vec<u32>,
+    /// HIGHESTMODSEQ when the server speaks QRESYNC.
+    pub highest_modseq: Option<u64>,
+}
+
+/// Apply CHANGEDSINCE and VANISHED when the server advertises CONDSTORE and
+/// QRESYNC. Otherwise diff `known` against `UID SEARCH ALL` and fetch the
+/// uids that appeared.
+pub fn incremental_sync<S: Read + Write>(
+    session: &mut Connection<S>,
+    mailbox: &str,
+    known: &[u32],
+    modseq: u64,
+) -> Result<UidDelta, Error> {
+    session.select(mailbox)?;
+    let caps = session.capability()?;
+    let qresync = caps.iter().any(|cap| cap.eq_ignore_ascii_case("QRESYNC"))
+        && caps.iter().any(|cap| cap.eq_ignore_ascii_case("CONDSTORE"));
+    if qresync {
+        condstore_delta(session, modseq)
+    } else {
+        uid_diff(session, known)
+    }
+}
+
+fn condstore_delta<S: Read + Write>(
+    session: &mut Connection<S>,
+    modseq: u64,
+) -> Result<UidDelta, Error> {
+    let reply = session.transact(&format!(
+        "UID FETCH 1:* (UID FLAGS ENVELOPE BODYSTRUCTURE) (CHANGEDSINCE {modseq})"
+    ))?;
+    let (body, vanished, highest_modseq) = split_condstore(&reply);
+    Ok(UidDelta {
+        changed: parse_fetch(body.as_bytes())?,
+        vanished,
+        highest_modseq,
+    })
+}
+
+fn uid_diff<S: Read + Write>(
+    session: &mut Connection<S>,
+    known: &[u32],
+) -> Result<UidDelta, Error> {
+    let present = search_uids(session.transact("UID SEARCH ALL")?.as_bytes())?;
+    let vanished = known
+        .iter()
+        .copied()
+        .filter(|uid| !present.contains(uid))
+        .collect();
+    let arrived: Vec<u32> = present
+        .iter()
+        .copied()
+        .filter(|uid| !known.contains(uid))
+        .collect();
+    let changed = if arrived.is_empty() {
+        Vec::new()
+    } else {
+        let set = arrived
+            .iter()
+            .map(|uid| uid.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let fetched = session.transact(&format!(
+            "UID FETCH {set} (UID FLAGS ENVELOPE BODYSTRUCTURE)"
+        ))?;
+        parse_fetch(fetched.as_bytes())?
+    };
+    Ok(UidDelta {
+        changed,
+        vanished,
+        highest_modseq: None,
+    })
+}
+
+/// `imap-codec` 1.0.0 leaves CONDSTORE unfinished, so these two lines are
+/// split out before the FETCH body is given to the codec.
+fn split_condstore(reply: &str) -> (String, Vec<u32>, Option<u64>) {
+    let mut body = String::new();
+    let mut vanished = Vec::new();
+    let mut highest = None;
+    for line in reply.split("\r\n") {
+        if line.is_empty() {
+            continue;
+        }
+        let upper = line.to_ascii_uppercase();
+        if upper.starts_with("* VANISHED") {
+            vanished.extend(vanished_uids(line));
+        } else if let Some(seq) = highest_modseq_line(line) {
+            highest = Some(seq);
+        } else {
+            body.push_str(line);
+            body.push_str("\r\n");
+        }
+    }
+    (body, vanished, highest)
+}
+
+fn vanished_uids(line: &str) -> Vec<u32> {
+    line.split_whitespace()
+        .skip(2)
+        .filter(|token| !token.eq_ignore_ascii_case("EARLIER"))
+        .flat_map(|token| {
+            crate::script::parse_set(token.trim_matches(|ch: char| ch == '(' || ch == ')'))
+        })
+        .collect()
+}
+
+fn highest_modseq_line(line: &str) -> Option<u64> {
+    let upper = line.to_ascii_uppercase();
+    let start = upper.find("HIGHESTMODSEQ")? + "HIGHESTMODSEQ".len();
+    let rest = line.get(start..)?;
+    let digits: String = rest
+        .chars()
+        .skip_while(|ch| !ch.is_ascii_digit())
+        .take_while(char::is_ascii_digit)
+        .collect();
+    if digits.is_empty() {
+        None
+    } else {
+        digits.parse().ok()
+    }
+}
+
 /// Pull UIDVALIDITY and EXISTS out of a SELECT reply.
 pub(crate) fn parse_select(bytes: &[u8]) -> Result<(u32, u32), Error> {
     let mut uid_validity = None;
@@ -242,7 +373,7 @@ pub(crate) fn parse_select(bytes: &[u8]) -> Result<(u32, u32), Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{DayWindow, initial_sync};
+    use super::{DayWindow, incremental_sync, initial_sync};
     use crate::script::{MailboxMessage, Scripted};
     use crate::session::{Config, Connection};
 
@@ -283,14 +414,62 @@ mod tests {
         assert_eq!(fetches, 2);
     }
 
+    #[test]
+    fn condstore_changedsince_and_vanished_skip_older_modseqs() {
+        let server = Scripted::with_messages(
+            7,
+            vec![
+                stored(1, 1, "\\Seen", "quiet"),
+                stored(2, 5, "\\Flagged", "edited"),
+            ],
+        )
+        .qresync()
+        .record_vanished(4, 6);
+        let mut session = Connection::open_with(config(), server).unwrap();
+        session.login().unwrap();
+        let delta = incremental_sync(&mut session, "INBOX", &[1, 2, 4], 3).unwrap();
+        assert_eq!(delta.highest_modseq, Some(6));
+        assert_eq!(delta.vanished, vec![4]);
+        assert_eq!(delta.changed.len(), 1);
+        assert_eq!(delta.changed[0].uid, 2);
+        assert_eq!(delta.changed[0].subject, "edited");
+        assert_eq!(delta.changed[0].flags, vec!["\\Flagged".to_string()]);
+    }
+
+    #[test]
+    fn a_server_without_qresync_diffs_uid_sets() {
+        let server = Scripted::with_messages(
+            7,
+            vec![
+                stored(2, 1, "\\Seen", "kept"),
+                stored(3, 1, "\\Seen", "new"),
+            ],
+        );
+        let mut session = Connection::open_with(config(), server).unwrap();
+        session.login().unwrap();
+        let delta = incremental_sync(&mut session, "INBOX", &[1, 2], 0).unwrap();
+        assert_eq!(delta.highest_modseq, None);
+        assert_eq!(delta.vanished, vec![1]);
+        assert_eq!(delta.changed.len(), 1);
+        assert_eq!(delta.changed[0].uid, 3);
+        assert_eq!(delta.changed[0].subject, "new");
+    }
+
     fn message(uid: u32, day: u32, flag: &str, subject: &str) -> MailboxMessage {
+        let mut message = stored(uid, 1, flag, subject);
+        message.day = day;
+        message
+    }
+
+    fn stored(uid: u32, modseq: u64, flag: &str, subject: &str) -> MailboxMessage {
         MailboxMessage {
             uid,
-            day,
+            day: 20_261_008,
             flags: vec![flag.to_string()],
             from: "bo@example.com".to_string(),
             subject: subject.to_string(),
             raw: format!("Subject: {subject}\r\n\r\n{subject}\r\n"),
+            modseq,
         }
     }
 
