@@ -7,10 +7,12 @@
 
 mod host;
 mod list;
+mod reader;
 mod shell;
 
 pub use host::LinuxHost;
 pub use list::{ThreadList, load_list};
+pub use reader::{Reader, load_reader};
 pub use shell::{Shell, load_shell};
 
 use std::collections::BTreeMap;
