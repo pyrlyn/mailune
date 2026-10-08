@@ -5,6 +5,10 @@
 //! rows come from `mailune-fixture`. That parser drops the message id, so
 //! the id and `historyId` are read beside it.
 
+mod mutate;
+
+pub use mutate::{Draft, LabelChange, SentMessage, apply_batch_modify, apply_draft, apply_send};
+
 use mailune_protocol::AccountId;
 use mailune_store::{
     AccountRow, FlagRow, MailboxRow, MembershipRow, MessageRow, Store, SyncStateRow, ThreadRow,
@@ -263,7 +267,7 @@ fn email_only(value: &str) -> String {
         .unwrap_or_else(|| value.trim().to_string())
 }
 
-fn role_of(id: &str) -> Option<String> {
+pub(crate) fn role_of(id: &str) -> Option<String> {
     match id {
         "INBOX" | "inbox" => Some("inbox".to_string()),
         "SENT" | "sent" => Some("sent".to_string()),
@@ -274,14 +278,14 @@ fn role_of(id: &str) -> Option<String> {
     }
 }
 
-fn system_label(label: &str) -> bool {
+pub(crate) fn system_label(label: &str) -> bool {
     matches!(
         label,
         "INBOX" | "UNREAD" | "STARRED" | "IMPORTANT" | "SENT" | "DRAFT" | "SPAM" | "TRASH"
     ) || label.starts_with("CATEGORY_")
 }
 
-fn mailbox_label(label: &str) -> bool {
+pub(crate) fn mailbox_label(label: &str) -> bool {
     !matches!(label, "UNREAD" | "STARRED" | "IMPORTANT") && !label.starts_with("CATEGORY_")
 }
 
@@ -306,6 +310,20 @@ fn parse_history(text: &str) -> Result<(String, Vec<AddedMessage>), Error> {
         }
     }
     Ok((doc.history_id.unwrap_or_default(), added))
+}
+
+pub(crate) fn apply_fetched(
+    store: &mut Store,
+    account_id: &str,
+    text: &str,
+) -> Result<Vec<String>, Error> {
+    let messages = parse_batch(text)?;
+    let mut ids = Vec::with_capacity(messages.len());
+    for message in &messages {
+        apply_message(store, account_id, message)?;
+        ids.push(message.id.clone());
+    }
+    Ok(ids)
 }
 
 fn parse_batch(text: &str) -> Result<Vec<BatchMessage>, Error> {
