@@ -87,7 +87,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E10 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -733,14 +732,6 @@ Depends on: B1. The shared abi-drift crate is not in this repo.
 Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
 
 Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
-
-### E10. WASM JMAP calls
-
-Depends on: B9, P17. The web shell is on another branch.
-
-Done when: the wasm crate runs one scripted JMAP query and returns the same mailbox ids as the native parser. No browser page in this task.
-
-Execution plan: `mailune-wasm` and `mailune-jmap` only. Do not edit `web/`. The web shell hook is `batch8-ai`: a fixture query shows mailbox ids. Do not edit `mailune-wasm` from that branch.
 
 ### M9. macOS reader
 

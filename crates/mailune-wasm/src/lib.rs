@@ -1,11 +1,14 @@
 //! Browser surface. Each export forwards one call into the shared crates
 //! and hands JSON back, so the web client parses, threads and searches with
-//! the same code as the native shells.
+//! the same code as the native shells. Network calls go through the same
+//! adapters over the [`mailune_protocol::Http`] trait.
 //!
 //! Build the module with
 //! `cargo rustc -p mailune-wasm --target wasm32-unknown-unknown --crate-type cdylib`.
 
+mod jmap;
 mod json;
+mod replay;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -52,6 +55,18 @@ pub fn parse_query(text: &str) -> Result<String, String> {
     mailune_core::parse_query(text)
         .map(|query| json::terms(&query.terms))
         .map_err(|error| error.to_string())
+}
+
+/// Loads a JMAP session from `session_url` and lists mailbox ids, answering
+/// each request from `replies` in order (the session resource, then the
+/// `Mailbox/get` response).
+///
+/// # Errors
+///
+/// The adapter's error when a reply is missing or not the expected JSON.
+#[wasm_bindgen(js_name = jmapMailboxIds)]
+pub fn jmap_mailbox_ids(session_url: &str, replies: Vec<String>) -> Result<String, String> {
+    jmap::mailbox_ids(session_url, replies)
 }
 
 #[cfg(test)]

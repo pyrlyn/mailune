@@ -753,3 +753,13 @@ Done when: protocol types, MIME parse, threading, and the query parser agree wit
 Execution plan: new crate `mailune-wasm`: wasm-bindgen exports that forward to protocol serde, `mailune_mime::parse`, `thread_messages` and `parse_query`, with JSON shapes kept in one module. Native parity tests compare each export with the native call. Build the module with `cargo rustc --crate-type cdylib` for wasm32 (target installed).
 
 What landed: New crate `mailune-wasm` (wasm-bindgen 0.2.129, already in the lock): `normalizeEnvelope` (protocol `Envelope` JSON round trip), `parseMime` (headers and part list), `threadMessages` (JSON in, thread trees out) and `parseQuery` (terms). Each export is one forwarding expression; the JSON shapes live in `json.rs`, so the domain crates stay serde-free. Native parity tests compare every export with the native call, errors included. The wasm32 target is installed: `cargo build --workspace --exclude mailune-cli --lib --target wasm32-unknown-unknown` passes and `cargo rustc -p mailune-wasm --target wasm32-unknown-unknown --crate-type cdylib --release` writes a 1.1 MB module. No `cdylib` in the manifest, because the Android cross build has no linker. rsa (in `mailune-mime`) pulls getrandom 0.2, which has no browser backend by default, so the crate enables getrandom's `js` feature on wasm32 only. 162 production lines.
+
+### E10. WASM JMAP calls
+
+Depends on: B9, P17. The web shell is on another branch.
+
+Done when: the wasm crate runs one scripted JMAP query and returns the same mailbox ids as the native parser. No browser page in this task.
+
+Execution plan: Add mailune-jmap to mailune-wasm; a private replay transport implements mailune_protocol::Http from recorded bodies and a poll-once runner drives the adapter future; export jmapMailboxIds(sessionUrl, replies) loads the session and lists mailbox ids as JSON; a parity test compares it with the native JmapClient over ScriptedHttp on the jmap fixtures; check the wasm32 workspace build.
+
+What landed: mailune-wasm depends on mailune-jmap. A private Replay transport implements mailune_protocol::Http from recorded bodies, and a poll-once runner drives the adapter future (it refuses a future that would wait). The export jmapMailboxIds(sessionUrl, replies) loads the JMAP session and returns the mailbox ids as a JSON array; it stays a single forwarding expression. Tests: the export returns the same ids as the native JmapClient over ScriptedHttp on the session.json and sync-initial.json fixtures, and a missing reply is an error. The wasm32 workspace build passes. A fetch-based transport for real browser calls is left for the web client task.

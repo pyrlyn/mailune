@@ -81,7 +81,6 @@
 - E12. Server container
 - R7. Web CI
 - B6. C ABI
-- E10. WASM JMAP calls
 - L1. C library build
 - L2. Payload schema
 - L3. Linux tokens
