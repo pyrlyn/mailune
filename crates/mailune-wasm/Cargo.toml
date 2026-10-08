@@ -1,0 +1,19 @@
+[package]
+name = "mailune-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "WASM subset: protocol types, plain MIME, threading, and search"
+
+[dependencies]
+mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+mailune-mime = { path = "../mailune-mime" }
+
+[lints]
+workspace = true
