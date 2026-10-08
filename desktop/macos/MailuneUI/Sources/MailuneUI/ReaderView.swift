@@ -27,10 +27,13 @@ public struct ReaderView: View {
             Text(presentation.text)
                 .font(MailuneType.body)
                 .foregroundStyle(MailuneColor.ink)
+                .accessibilityLabel("Message body")
             Button(quotesCollapsed ? "Show quote" : "Hide quote") {
                 quotesCollapsed.toggle()
             }
             .font(MailuneType.body)
+            .accessibilityLabel("Quoted text")
+            .keyboardShortcut("q", modifiers: .command)
             Text(presentation.attachmentName)
                 .font(MailuneType.body)
                 .accessibilityLabel("Attachment \(presentation.attachmentName)")

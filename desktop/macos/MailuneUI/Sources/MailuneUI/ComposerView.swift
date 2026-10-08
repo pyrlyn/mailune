@@ -21,12 +21,15 @@ public struct ComposerView: View {
             HStack {
                 TextField("Recipient", text: $chip)
                     .font(MailuneType.body)
+                    .accessibilityLabel("Recipient")
                 Button("Add") { addChip() }
+                    .accessibilityLabel("Add recipient")
             }
             FlowChips(recipients: recipients)
             TextEditor(text: $message)
                 .font(MailuneType.body)
                 .frame(minHeight: 120)
+                .accessibilityLabel("Message body")
             Text(attachmentName)
                 .font(MailuneType.body)
                 .accessibilityLabel("Attachment \(attachmentName)")
@@ -35,6 +38,7 @@ public struct ComposerView: View {
             HStack {
                 Button("Send") { send() }
                     .disabled(!confirmed || recipients.isEmpty)
+                    .accessibilityLabel("Send message")
                 Button("Undo send") { undo() }
                     .disabled(stagedID == nil)
             }
