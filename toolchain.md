@@ -39,3 +39,6 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | diesel_migrations | local | https://github.com/diesel-rs/diesel | Embedded schema migrations in `mailune-store` |
 | libsqlite3-sys | local | https://github.com/rusqlite/rusqlite | Bundled SQLCipher for `mailune-store` |
 | divan | local | https://github.com/nvzqz/divan | Insert, page, and search benches in `mailune-store` |
+| axum | local | https://github.com/tokio-rs/axum | Push relay webhook handlers |
+| tokio | local | https://github.com/tokio-rs/tokio | In-memory axum test runtime |
+| tower | local | https://github.com/tower-rs/tower | In-memory axum request |

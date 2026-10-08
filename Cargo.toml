@@ -81,6 +81,12 @@ libsqlite3-sys = { version = "0.38.2", features = ["bundled-sqlcipher"] }
 # mailune-store benches: insert, page, and search. 0.1.21 checked on crates.io 2026-10-08.
 # Default features pull a CLI; the harness only needs the library.
 divan = { version = "0.1.21", default-features = false }
+# mailune-push: webhook handlers. 0.8.9 checked on crates.io 2026-10-08.
+axum = "0.8.9"
+# mailune-push tests: run the axum router in memory. 1.53.2 checked on crates.io 2026-10-08.
+tokio = { version = "1.53.2", features = ["macros", "rt"] }
+# mailune-push: call the router without binding a port. 0.5.3 checked on crates.io 2026-10-08.
+tower = { version = "0.5.3", features = ["util"] }
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.

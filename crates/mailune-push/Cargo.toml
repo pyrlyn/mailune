@@ -1,0 +1,20 @@
+[package]
+name = "mailune-push"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Push relay that stores account ids and nothing else"
+
+[dependencies]
+axum = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tower = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[lints]
+workspace = true
