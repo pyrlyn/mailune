@@ -5,9 +5,11 @@
 //! `@odata.deltaLink`, so the cursor is read beside the messages.
 
 mod calendar;
+mod ews;
 mod mutate;
 
 pub use calendar::{BusyBlock, ContactHit, autocomplete, availability};
+pub use ews::{Transport, inbox_display_name};
 pub use mutate::{
     BatchPart, FlagPatch, Move, SentMail, apply_batch, apply_flag, apply_move, apply_send,
 };
@@ -34,6 +36,12 @@ pub enum Error {
     /// A message page was not the fixture shape.
     #[error(transparent)]
     Fixture(#[from] mailune_fixture::Error),
+    /// SOAP bytes could not be turned into a folder. The text never includes the document.
+    #[error("EWS document could not be read")]
+    Ews,
+    /// The folder list did not include a display name.
+    #[error("EWS response did not include the folder")]
+    EwsBody,
 }
 
 /// Folders, a delta page, and one `$select` message.

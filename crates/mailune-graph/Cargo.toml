@@ -8,6 +8,7 @@ publish = false
 description = "Microsoft Graph mail sync from scripted JSON bodies"
 
 [dependencies]
+ews = "0.1.2"
 mailune-fixture = { path = "../mailune-fixture" }
 mailune-protocol = { path = "../mailune-protocol" }
 mailune-store = { path = "../mailune-store" }

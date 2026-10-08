@@ -941,6 +941,9 @@ name = "deranged"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7cd812cc2bc1d69d4764bd80df88b4317eaef9e773c75226407d9bc0876b211c"
+dependencies = [
+ "serde_core",
+]
 
 [[package]]
 name = "derive_builder"
@@ -1284,6 +1287,31 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys",
+]
+
+[[package]]
+name = "ews"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4e811b2a45e6150a69f752adeef691a356eb1e07f894fc795876b23c74d3de5"
+dependencies = [
+ "ews_proc_macros",
+ "quick-xml 0.41.0",
+ "serde",
+ "serde_path_to_error",
+ "thiserror 1.0.69",
+ "time",
+ "xml_struct",
+]
+
+[[package]]
+name = "ews_proc_macros"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e74a07e9809826ddfdd105cc32fbab30ca2a68d56406c7d1ab65e7e5ba666ab7"
+dependencies = [
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -1997,7 +2025,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.23.1",
  "mailune-protocol",
- "quick-xml",
+ "quick-xml 0.42.0",
  "serde",
  "serde_json",
  "sha2 0.11.0",
@@ -2073,6 +2101,7 @@ dependencies = [
 name = "mailune-graph"
 version = "0.1.0"
 dependencies = [
+ "ews",
  "mailune-fixture",
  "mailune-protocol",
  "mailune-store",
@@ -2812,6 +2841,16 @@ name = "quick-error"
 version = "1.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
+
+[[package]]
+name = "quick-xml"
+version = "0.41.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e660451e55124f798a69a5af3f49ccfbefbd41910eefd25caf2393e1f3473ec1"
+dependencies = [
+ "memchr",
+ "serde",
+]
 
 [[package]]
 name = "quick-xml"
@@ -4060,6 +4099,29 @@ dependencies = [
  "rand_core 0.6.4",
  "serde",
  "zeroize",
+]
+
+[[package]]
+name = "xml_struct"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43059d8e1ecbf98bccea1f80a43144c76267059b4015018338fc7df53e9181b5"
+dependencies = [
+ "anyhow",
+ "quick-xml 0.41.0",
+ "thiserror 1.0.69",
+ "xml_struct_derive",
+]
+
+[[package]]
+name = "xml_struct_derive"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61cd690908caaece5c3593bf67665d653087209a0a758d318fca92f61dc4656d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
