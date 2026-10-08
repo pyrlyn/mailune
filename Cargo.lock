@@ -1657,6 +1657,7 @@ dependencies = [
 name = "mailune-imap"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "imap-codec",
  "mailune-mime",
  "mailune-protocol",

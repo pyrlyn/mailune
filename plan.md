@@ -26,7 +26,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P7 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P8 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
 | P9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -330,14 +329,6 @@ Depends on: the rsa-sha256 relaxed/relaxed verifier already in `mailune-mime`.
 Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify against a supplied TXT record. No network.
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
-
-### P7. IMAP initial sync
-
-Depends on: P6. Reuse: the in-memory IMAP server in `mailune-imap`.
-
-Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYSTRUCTURE in batches, and applies a day window. No store write and no TCP.
-
-Execution plan: `mailune-imap` only.
 
 ### P8. IMAP incremental sync
 

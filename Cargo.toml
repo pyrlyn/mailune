@@ -60,6 +60,8 @@ rsa = { version = "0.9.10", features = ["sha2"] }
 rand = "0.8.8"
 # mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
 imap-codec = "1.0.0"
+# mailune-imap: SEARCH SINCE dates. imap-codec already links 0.4.45, the latest on crates.io (checked 2026-10-08).
+chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 # mailune-mime: RFC 5545 parse. 0.17.14 checked on crates.io 2026-10-08.
 icalendar = "0.17.14"
 # mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.

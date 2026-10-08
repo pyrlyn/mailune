@@ -1,17 +1,18 @@
-//! IMAP mailbox roles and an in-memory scripted server.
+//! IMAP mailbox roles, sync over a session, and an in-memory scripted server.
 //!
-//! `imap-codec` 1.0.0 parses LIST. SPECIAL-USE attributes win over a
-//! mailbox name. The scripted server speaks greeting, CAPABILITY, LOGIN,
-//! SELECT, and one FETCH over bytes the caller already holds. Nothing
-//! here connects.
+//! `imap-codec` 1.0.0 parses LIST and FETCH. SPECIAL-USE attributes win over
+//! a mailbox name. The session drives any `Read + Write` stream; tests use the
+//! scripted server over bytes the caller already holds. Nothing here connects.
 
 mod list;
 mod script;
 mod session;
+mod sync;
 
 pub use list::{ListedMailbox, mailbox_role, parse_list};
-pub use script::{FIXTURE, Scripted};
+pub use script::{FIXTURE, ScriptMailbox, ScriptMessage, Scripted};
 pub use session::{Config, Connection, MemStream};
+pub use sync::{MessageMeta, Selected, SyncBatch, Window};
 
 /// Failure while reading one IMAP response or driving a session.
 #[derive(Debug, thiserror::Error)]

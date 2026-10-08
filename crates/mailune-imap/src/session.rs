@@ -53,8 +53,15 @@ pub struct Connection<S> {
 impl Connection<MemStream> {
     /// Read the greeting from a new in-memory server.
     pub fn open(config: Config) -> Result<Self, Error> {
+        Self::over(MemStream::new(Scripted::new()), config)
+    }
+}
+
+impl<S: Read + Write> Connection<S> {
+    /// Read the greeting from `io`.
+    pub fn over(io: S, config: Config) -> Result<Self, Error> {
         let mut connection = Self {
-            io: MemStream::new(),
+            io,
             config,
             buf: Vec::new(),
             tag: 0,
@@ -64,9 +71,31 @@ impl Connection<MemStream> {
         connection.read_greeting()?;
         Ok(connection)
     }
-}
 
-impl<S: Read + Write> Connection<S> {
+    /// Whether the last CAPABILITY reply listed `name`.
+    pub fn has_capability(&self, name: &str) -> bool {
+        self.capabilities
+            .iter()
+            .any(|item| item.eq_ignore_ascii_case(name))
+    }
+
+    /// Sends `body` under a new tag and returns every line up to the tagged
+    /// reply.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Rejected`] on NO or BAD, [`Error::Session`] when the stream stops.
+    pub(crate) fn run(&mut self, body: &str) -> Result<String, Error> {
+        let tag = self.next_tag();
+        self.command(&tag, body)?;
+        let reply = self.read_until_tag(&tag)?;
+        if tagged_ok(&reply, &tag) {
+            Ok(reply)
+        } else {
+            Err(Error::Rejected)
+        }
+    }
+
     /// Whether a real socket would be required to use TLS. No handshake runs.
     pub fn tls_required(&self) -> bool {
         self.config.tls_required
@@ -163,8 +192,8 @@ pub struct MemStream {
 }
 
 impl MemStream {
-    fn new() -> Self {
-        let server = Scripted::new();
+    /// A stream to `server`, with its greeting ready to read.
+    pub fn new(server: Scripted) -> Self {
         let inbound = server.greeting().as_bytes().to_vec();
         Self { server, inbound }
     }

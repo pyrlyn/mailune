@@ -703,3 +703,13 @@ Done when: a cassette replays a feature call and a metric fails the run when the
 Execution plan: Add eval.rs to mailune-ai: a JSON cassette records the call, input, prompt SHA-256, model reply and expected output; replay runs the real feature through ScriptedEngine; a token-F1 metric and a prompt-digest check fail the run with Error::Drift. Fixtures are hand-written in crates/mailune-ai/cassettes.
 
 What landed: `eval.rs` and `cassettes/features.json`: five cassettes (short summary, rewrite, shorten, proofread, rule from a sentence) replay through the real feature code with `ScriptedEngine`. `run_cassettes` returns `Error::Drift` naming each cassette whose prompt digest changed, whose token-F1 fell below its `min_score`, or whose reply no longer parses. No model, no network.
+
+### P7. IMAP initial sync
+
+Depends on: P6. Reuse: the in-memory IMAP server in `mailune-imap`.
+
+Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYSTRUCTURE in batches, and applies a day window. No store write and no TCP.
+
+Execution plan: Extend the scripted server with mailboxes (UIDVALIDITY, UIDNEXT, HIGHESTMODSEQ, UID SEARCH SINCE, UID FETCH of UID, FLAGS, ENVELOPE and BODYSTRUCTURE as one-line replies). Add Connection::over, select and initial_sync in a new sync.rs; decode FETCH with imap-codec; window dates via chrono, which imap-codec already links.
+
+What landed: `sync.rs`: `Connection::select` records UIDVALIDITY, UIDNEXT and HIGHESTMODSEQ. `initial_sync` searches `UID SEARCH SINCE` for the day window, then fetches UID, FLAGS, ENVELOPE and BODYSTRUCTURE in batches, decoded by imap-codec, into a `SyncBatch` of `MessageMeta`. No store write, no TCP. The scripted server gained mailboxes and those commands. chrono is the one new direct dependency, already linked through imap-codec.
