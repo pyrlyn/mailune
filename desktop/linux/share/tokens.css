@@ -1,0 +1,16 @@
+/* Named colours, type, and spacing for the Linux shell. */
+
+@define-color window_bg #1e1e1e;
+@define-color accent #3d6df2;
+@define-color foreground #f4f4f5;
+
+.shell {
+  font-family: sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  padding: var(--space-s);
+}

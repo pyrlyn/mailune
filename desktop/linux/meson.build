@@ -41,3 +41,11 @@ test(
     'LD_LIBRARY_PATH': capi_dir,
   },
 )
+
+tokens_css = meson.current_source_dir() / 'share' / 'tokens.css'
+tokens_test = executable(
+  'tokens-test',
+  'tests/tokens.c',
+  c_args: ['-DTOKENS_CSS="' + tokens_css + '"'],
+)
+test('tokens', tokens_test)
