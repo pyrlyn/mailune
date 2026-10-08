@@ -1953,6 +1953,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-telemetry"
+version = "0.1.0"
+
+[[package]]
 name = "mailune-testkit"
 version = "0.1.0"
 dependencies = [
