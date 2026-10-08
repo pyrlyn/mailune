@@ -36,7 +36,6 @@
 - S8. Embedding store
 - S9. Hybrid retrieval fusion
 - T4. Queue property tests
-- A25. Phishing and scam assessment
 - A31. Voice dictation
 - E1. mailune-server
 - E2. Web frontend scaffold

@@ -683,3 +683,13 @@ Done when: a fixture sentence with a date and a time becomes an ICS suggestion. 
 Execution plan: `mailune-mime` `schedule.rs` next to `calendar.rs`: word heuristics for ISO dates, month-day in either order, weekdays, today and tomorrow, and 12- or 24-hour times. Civil-date arithmetic is done in place, so no `jiff` and no direct `chrono`. A one-hour floating-time VEVENT is built with `icalendar`.
 
 What landed: A sentence with a date (ISO, month-day, weekday, today or tomorrow) and a time (3:30pm, 10 am, 14:05, noon) becomes a one-hour `ScheduleSuggestion` with floating local DTSTART and DTEND, and the ICS text is built with `icalendar` and parses back. Without both a date and a time there is no suggestion. No jiff, no SMTP, no calendar server.
+
+### A25. Phishing and scam assessment
+
+Depends on: C8, A2. The rsa-sha256 verifier is already on this branch.
+
+Done when: auth results, link flags, and a scripted model verdict combine into one assessment. No network.
+
+Execution plan: Mirror DKIM/SPF/DMARC outcomes and link flags as plain inputs in mailune-ai (no mime dependency), add a phishing-verdict template under a new Phishing feature, parse a strict JSON verdict, combine into weighted reasons and a risk level. The model may only raise risk.
+
+What landed: `phishing.rs`: `combine` and `assess_phishing` turn auth outcomes, link flags and a scripted `{"verdict":...}` reply into one `Assessment` (risk, score, reasons). A malformed reply is ignored, and a "safe" verdict cannot lower a risk the facts set.

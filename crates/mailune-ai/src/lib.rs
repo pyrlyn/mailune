@@ -12,6 +12,7 @@ mod digest;
 mod engine;
 mod guard;
 mod ledger;
+mod phishing;
 mod platform;
 mod priority;
 mod prompts;
@@ -39,6 +40,10 @@ pub use engine::{
 };
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
+pub use phishing::{
+    Assessment, AuthOutcome, LinkFlags, ModelVerdict, PhishingSignals, Reason, Risk,
+    assess_phishing, combine,
+};
 pub use platform::{PlatformBridge, map_capability};
 pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
@@ -65,6 +70,8 @@ pub enum Feature {
     Compose,
     /// Turn a sentence into a mail rule.
     Rules,
+    /// A phishing and scam verdict on one message.
+    Phishing,
 }
 
 /// Where a feature may run.

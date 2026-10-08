@@ -42,7 +42,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -460,14 +459,6 @@ Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
 Done when: random ops against a model mailbox keep idempotency and undo invariants.
 
 Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
-
-### A25. Phishing and scam assessment
-
-Depends on: C8, A2. The rsa-sha256 verifier is already on this branch.
-
-Done when: auth results, link flags, and a scripted model verdict combine into one assessment. No network.
-
-Execution plan: `mailune-ai` only. Do not edit `mailune-mime`.
 
 ### A31. Voice dictation
 
