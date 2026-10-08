@@ -4,18 +4,19 @@ import SwiftUI
 /// A single column. This is the phone layout.
 public struct PhoneStack: View {
     @State private var list = PhoneListState()
+    @State private var opened: String?
     @State private var showComposer = false
 
     public init() {}
 
     public var body: some View {
         NavigationStack {
-            PhoneThreadList(state: $list)
+            PhoneThreadList(state: $list, opened: $opened)
                 .navigationTitle("Inbox")
                 .toolbar {
                     Button("Compose") { showComposer = true }
                 }
-                .navigationDestination(for: String.self) { id in
+                .navigationDestination(item: $opened) { id in
                     PhoneReader(threadID: id)
                 }
         }
@@ -55,10 +56,10 @@ public struct AdaptiveMailbox: View {
     public init() {}
 
     public var body: some View {
-        if sizeClass == .compact {
-            PhoneStack()
-        } else {
+        if sizeClass == .regular {
             PadSplit()
+        } else {
+            PhoneStack()
         }
     }
 }

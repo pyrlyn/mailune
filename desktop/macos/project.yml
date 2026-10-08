@@ -94,6 +94,20 @@ targets:
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual
         DEVELOPMENT_TEAM: ""
+  MailuneIOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: iOSUITests
+    dependencies:
+      - target: MailuneIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: MailuneIOS
+        ARCHS: arm64
 schemes:
   Mailune:
     build:
@@ -109,3 +123,7 @@ schemes:
     build:
       targets:
         MailuneIOS: all
+        MailuneIOSUITests: [test]
+    test:
+      targets:
+        - MailuneIOSUITests
