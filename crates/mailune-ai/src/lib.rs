@@ -3,6 +3,7 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod catalog;
 mod engine;
 mod guard;
 mod ledger;
@@ -13,6 +14,7 @@ mod redact;
 mod router;
 mod triage;
 
+pub use catalog::{BlobStore, Catalog};
 pub use engine::{LocalEngine, ScriptedEngine};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
@@ -145,6 +147,12 @@ pub enum Error {
     /// A scripted local engine was asked for an input it was not given.
     #[error("the local engine has no script for this input")]
     Unscripted,
+    /// The catalog was asked for a blob the store does not have.
+    #[error("model blob is missing")]
+    MissingBlob,
+    /// SHA-256 of the blob did not match the expected digest.
+    #[error("model blob hash does not match")]
+    HashMismatch,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

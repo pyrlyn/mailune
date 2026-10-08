@@ -10,6 +10,7 @@ description = "Privacy classes, feature routing, and typed model results"
 [dependencies]
 mailune-protocol = { path = "../mailune-protocol" }
 serde_json = { workspace = true }
+sha2 = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
