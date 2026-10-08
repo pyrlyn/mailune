@@ -1,0 +1,19 @@
+{
+  "accountId": "acc-1",
+  "state": "s1",
+  "list": [
+    {
+      "id": "m1",
+      "threadId": "t1",
+      "subject": "Hello",
+      "preview": "See you at the dock",
+      "receivedAt": "2026-03-01T12:00:00Z",
+      "from": [{ "name": "Ada Lovelace", "email": "ada@example.com" }],
+      "to": [{ "name": null, "email": "me@example.com" }],
+      "cc": [],
+      "keywords": { "$seen": true, "$flagged": true },
+      "hasAttachment": false
+    }
+  ],
+  "notFound": []
+}

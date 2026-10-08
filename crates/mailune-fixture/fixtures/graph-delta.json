@@ -1,0 +1,21 @@
+{
+  "value": [
+    {
+      "id": "AAMk",
+      "conversationId": "AAQk",
+      "subject": "Hello",
+      "bodyPreview": "See you at the dock",
+      "receivedDateTime": "2026-03-01T12:00:00Z",
+      "isRead": false,
+      "flag": { "flagStatus": "flagged" },
+      "hasAttachments": true,
+      "from": {
+        "emailAddress": { "name": "Ada Lovelace", "address": "ada@example.com" }
+      },
+      "toRecipients": [
+        { "emailAddress": { "name": null, "address": "me@example.com" } }
+      ]
+    }
+  ],
+  "@odata.deltaLink": "mailFolders/inbox/messages/delta?token=1"
+}

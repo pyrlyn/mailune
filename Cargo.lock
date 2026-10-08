@@ -423,6 +423,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "mailune-fixture"
+version = "0.1.0"
+dependencies = [
+ "mailune-protocol",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "mailune-mime"
 version = "0.1.0"
 dependencies = [
