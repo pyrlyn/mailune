@@ -9,6 +9,7 @@ description = "Assembles config, domain and adapters into a running core"
 
 [dependencies]
 mailune-core = { path = "../mailune-core" }
+mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
 [lints]
