@@ -11,5 +11,8 @@ description = "Privacy classes, feature routing, and typed model results"
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
+[dev-dependencies]
+insta = { workspace = true }
+
 [lints]
 workspace = true

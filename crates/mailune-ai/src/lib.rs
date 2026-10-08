@@ -3,11 +3,23 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod guard;
+mod ledger;
 mod platform;
+mod priority;
+mod prompts;
 mod redact;
+mod router;
+mod triage;
 
+pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
+pub use ledger::{FlowRecord, Ledger, Retention};
 pub use platform::{PlatformBridge, map_capability};
+pub use priority::{Priority, PriorityInput, assess};
+pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
+pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use triage::{TriageInput, categorize};
 
 use std::fmt;
 use std::future::Future;
@@ -113,6 +125,21 @@ pub enum Error {
     /// A cloud call was asked for mail that must stay on the device.
     #[error("cloud is not allowed for this mail")]
     CloudForbidden,
+    /// The feature has no privacy row, so the router will not guess one.
+    #[error("no privacy policy for this feature")]
+    NoPolicy,
+    /// The prompt is larger than the feature budget.
+    #[error("prompt exceeds the feature budget")]
+    OverBudget,
+    /// No model on the fallback chain can serve this prompt.
+    #[error("no provider can serve this prompt")]
+    NoProvider,
+    /// A tool proposal was missing, malformed, or not on the allow-list.
+    #[error("tool call denied")]
+    ToolDenied,
+    /// No published template has that id and version.
+    #[error("unknown prompt template")]
+    UnknownPrompt,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

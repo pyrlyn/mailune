@@ -1,9 +1,11 @@
 //! In-memory operation queue.
 //!
-//! The mailbox moves as soon as the person asks. A second enqueue with the
-//! same key does not apply again, so replay is safe. On a move conflict the
-//! server mailbox replaces the optimistic one. Undo is refused once the
-//! window has passed. Nothing here is stored in SQLite.
+//! The mailbox moves as soon as the person asks. Snooze, a reminder and
+//! reply-later use the same queue and the same undo window. They are not
+//! written as IMAP METADATA. A second enqueue with the same key does not
+//! apply again, so replay is safe. On a move conflict the server mailbox
+//! replaces the optimistic one. Undo is refused once the window has passed.
+//! Nothing here is stored in SQLite.
 
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
@@ -29,6 +31,10 @@ impl IdempotencyKey {
 }
 
 /// An optimistic change. `from` is where undo puts a move back.
+///
+/// Snooze, reminder and reply-later carry the wake time on the op. The
+/// queue's own timestamp is when the person asked, which is what the undo
+/// window measures.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Op {
     /// Move one thread from one mailbox to another.
@@ -40,6 +46,38 @@ pub enum Op {
         /// Mailbox the person asked for.
         to: MailboxId,
     },
+    /// Hide a thread until `until`.
+    Snooze {
+        /// Thread to hide.
+        thread: ThreadId,
+        /// When it should reappear.
+        until: SystemTime,
+    },
+    /// Surface a thread again at `at`.
+    Reminder {
+        /// Thread to remind about.
+        thread: ThreadId,
+        /// When the reminder is due.
+        at: SystemTime,
+    },
+    /// Bring a thread back so the person can answer.
+    ReplyLater {
+        /// Thread waiting for a reply.
+        thread: ThreadId,
+        /// When to bring it back.
+        at: SystemTime,
+    },
+}
+
+/// Which scheduled op is waiting. A move is not a schedule.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum When {
+    /// [`Op::Snooze`].
+    Snooze,
+    /// [`Op::Reminder`].
+    Reminder,
+    /// [`Op::ReplyLater`].
+    ReplyLater,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -104,15 +142,20 @@ impl Queue {
     ///
     /// # Errors
     ///
-    /// [`Error::UnknownOp`] when `key` is not a move in this queue.
+    /// [`Error::UnknownOp`] when `key` is not in this queue.
+    /// [`Error::NotAMove`] when `key` is a snooze, reminder, or reply-later.
     pub fn resolve_move(&mut self, key: &IdempotencyKey, server: MailboxId) -> Result<(), Error> {
         let queued = self
             .ops
             .iter_mut()
             .find(|item| &item.key == key)
             .ok_or(Error::UnknownOp)?;
-        let Op::Move { thread, .. } = &queued.op;
-        let thread = thread.clone();
+        let thread = match &queued.op {
+            Op::Move { thread, .. } => thread.clone(),
+            Op::Snooze { .. } | Op::Reminder { .. } | Op::ReplyLater { .. } => {
+                return Err(Error::NotAMove);
+            }
+        };
         queued.status = Status::Conflicted;
         self.location.insert(thread, server);
         Ok(())
@@ -163,16 +206,58 @@ impl Queue {
             .map(|item| &item.key)
             .collect()
     }
+
+    /// Pending snooze, reminder, or reply-later for `thread`. The latest one
+    /// wins, so undoing it reveals the previous pending schedule.
+    pub fn schedule(&self, thread: &ThreadId) -> Option<(When, SystemTime)> {
+        self.ops.iter().rev().find_map(|item| {
+            if item.status != Status::Pending {
+                return None;
+            }
+            let (id, at, kind) = schedule_of(&item.op)?;
+            (id == thread).then_some((kind, at))
+        })
+    }
+
+    /// Scheduled ops whose wake time is at or before `now`, oldest first.
+    ///
+    /// Moves are not scheduled. A time still in the future is not due.
+    pub fn due(&self, now: SystemTime) -> Vec<&IdempotencyKey> {
+        self.ops
+            .iter()
+            .filter(|item| item.status == Status::Pending && is_due(&item.op, now))
+            .map(|item| &item.key)
+            .collect()
+    }
 }
 
 fn apply(location: &mut HashMap<ThreadId, MailboxId>, op: &Op) {
-    let Op::Move { thread, to, .. } = op;
-    location.insert(thread.clone(), to.clone());
+    // A schedule does not move the thread. Undo drops the op itself.
+    if let Op::Move { thread, to, .. } = op {
+        location.insert(thread.clone(), to.clone());
+    }
 }
 
 fn revert(location: &mut HashMap<ThreadId, MailboxId>, op: &Op) {
-    let Op::Move { thread, from, .. } = op;
-    location.insert(thread.clone(), from.clone());
+    if let Op::Move { thread, from, .. } = op {
+        location.insert(thread.clone(), from.clone());
+    }
+}
+
+fn schedule_of(op: &Op) -> Option<(&ThreadId, SystemTime, When)> {
+    match op {
+        Op::Snooze { thread, until } => Some((thread, *until, When::Snooze)),
+        Op::Reminder { thread, at } => Some((thread, *at, When::Reminder)),
+        Op::ReplyLater { thread, at } => Some((thread, *at, When::ReplyLater)),
+        Op::Move { .. } => None,
+    }
+}
+
+fn is_due(op: &Op, now: SystemTime) -> bool {
+    let Some((_, at, _)) = schedule_of(op) else {
+        return false;
+    };
+    now.duration_since(at).is_ok()
 }
 
 fn within_window(at: SystemTime, now: SystemTime, window: Duration) -> bool {
@@ -267,5 +352,62 @@ mod tests {
             Err(Error::UndoExpired)
         ));
         assert_eq!(queue.location(&thread), Some(&archive));
+    }
+
+    #[test]
+    fn snooze_reminder_and_reply_later_share_the_undo_window() {
+        let mut queue = Queue::new(Duration::from_secs(5));
+        let now = SystemTime::UNIX_EPOCH;
+        let wake = now + Duration::from_secs(60);
+        let (thread, _, _) = ids();
+        queue
+            .enqueue(
+                IdempotencyKey::new("snooze"),
+                Op::Snooze {
+                    thread: thread.clone(),
+                    until: wake,
+                },
+                now,
+            )
+            .unwrap();
+        queue
+            .enqueue(
+                IdempotencyKey::new("remind"),
+                Op::Reminder {
+                    thread: thread.clone(),
+                    at: wake,
+                },
+                now,
+            )
+            .unwrap();
+        queue
+            .enqueue(
+                IdempotencyKey::new("later"),
+                Op::ReplyLater {
+                    thread: thread.clone(),
+                    at: wake,
+                },
+                now,
+            )
+            .unwrap();
+        assert_eq!(
+            queue.schedule(&thread),
+            Some((super::When::ReplyLater, wake))
+        );
+        assert!(queue.due(now).is_empty());
+        let due = queue.due(wake);
+        assert_eq!(due.len(), 3);
+        assert!(matches!(
+            queue.resolve_move(&IdempotencyKey::new("snooze"), MailboxId::new("inbox")),
+            Err(Error::NotAMove)
+        ));
+
+        queue.undo(now).unwrap();
+        assert_eq!(queue.schedule(&thread), Some((super::When::Reminder, wake)));
+        assert!(matches!(
+            queue.undo(now + Duration::from_secs(6)),
+            Err(Error::UndoExpired)
+        ));
+        assert_eq!(queue.due(wake).len(), 2);
     }
 }
