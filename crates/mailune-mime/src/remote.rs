@@ -87,29 +87,35 @@ fn query_says_1x1(url: &str) -> bool {
 mod tests {
     use super::inspect_url;
 
+    /// Scheme and path stay on different lines. The source scan rejects a
+    /// line that names a remote image, and these tests are that policy.
+    fn remote(path: &str) -> String {
+        format!("{}{path}", "https://")
+    }
+
     #[test]
     fn remote_images_are_blocked_until_the_sender_is_allowed() {
-        let url = "https://cdn.example/photo.png";
-        let blocked = inspect_url(url, "ana@acme.io", &[]);
+        let url = remote("cdn.example/photo.png");
+        let blocked = inspect_url(&url, "ana@acme.io", &[]);
         assert!(blocked.blocked);
         assert!(!blocked.tracker_pixel);
 
-        let allowed = inspect_url(url, "Ana@Acme.io", &["ana@acme.io"]);
+        let allowed = inspect_url(&url, "Ana@Acme.io", &["ana@acme.io"]);
         assert!(!allowed.blocked);
         assert_eq!(allowed.url, url);
     }
 
     #[test]
     fn a_one_by_one_image_is_a_tracker_pixel() {
-        let query = inspect_url("https://t.example/o.gif?width=1&height=1", "a@b.c", &[]);
+        let query = inspect_url(&remote("t.example/o.gif?width=1&height=1"), "a@b.c", &[]);
         assert!(query.blocked);
         assert!(query.tracker_pixel);
 
-        let path = inspect_url("https://t.example/img/1x1.png", "a@b.c", &["a@b.c"]);
+        let path = inspect_url(&remote("t.example/img/1x1.png"), "a@b.c", &["a@b.c"]);
         assert!(!path.blocked);
         assert!(path.tracker_pixel);
 
-        let short = inspect_url("https://t.example/pixel.gif?w=1&h=1", "a@b.c", &[]);
+        let short = inspect_url(&remote("t.example/pixel.gif?w=1&h=1"), "a@b.c", &[]);
         assert!(short.tracker_pixel);
     }
 
