@@ -19,8 +19,13 @@ public struct ShellView: View {
         NavigationSplitView {
             mailboxList
         } content: {
-            ThreadList(selected: $selected)
-                .navigationSplitViewColumnWidth(min: 220, ideal: 280)
+            if mailbox == "Calendar" {
+                CalendarView()
+                    .navigationSplitViewColumnWidth(min: 220, ideal: 280)
+            } else {
+                ThreadList(selected: $selected)
+                    .navigationSplitViewColumnWidth(min: 220, ideal: 280)
+            }
         } detail: {
             if let id = selected.first, selected.count == 1, let message = MessageFixtures.message(forThread: id) {
                 ReaderView(message: message)
@@ -85,6 +90,7 @@ extension ShellView {
         List(selection: $mailbox) {
             Text(Copy.text("inbox.title", language: "en")).tag("Inbox")
             Text("Sent").tag("Sent")
+            Text("Calendar").tag("Calendar")
         }
         .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         #else
