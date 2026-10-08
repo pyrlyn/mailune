@@ -33,6 +33,8 @@ libsqlite3-sys = { workspace = true, features = ["bundled-sqlcipher"] }
 libsqlite3-sys = { workspace = true, features = ["bundled"] }
 
 [dev-dependencies]
+# The chunker feeds the embedding test; the store itself never parses mail.
+mailune-mime = { path = "../mailune-mime" }
 tempfile = { workspace = true }
 
 [lints]

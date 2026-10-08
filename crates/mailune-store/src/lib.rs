@@ -8,6 +8,8 @@
 #[cfg(not(target_arch = "wasm32"))]
 mod blob;
 #[cfg(not(target_arch = "wasm32"))]
+mod embed;
+#[cfg(not(target_arch = "wasm32"))]
 mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
@@ -24,6 +26,8 @@ mod vector;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
+#[cfg(not(target_arch = "wasm32"))]
+pub use embed::{Choice, Embedder, Probe};
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
 #[cfg(not(target_arch = "wasm32"))]
@@ -81,4 +85,7 @@ pub enum Error {
         /// Mode SQLite reported.
         mode: String,
     },
+    /// No candidate embedder produced usable vectors.
+    #[error("no embedder produced usable vectors")]
+    NoEmbedder,
 }

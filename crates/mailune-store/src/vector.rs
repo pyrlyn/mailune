@@ -134,7 +134,7 @@ impl Store {
     }
 }
 
-fn norm(values: impl Iterator<Item = f32>) -> f32 {
+pub(crate) fn norm(values: impl Iterator<Item = f32>) -> f32 {
     values.map(|value| value * value).sum::<f32>().sqrt()
 }
 

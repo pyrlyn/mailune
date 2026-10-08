@@ -76,7 +76,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A32 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B9 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
@@ -648,14 +647,6 @@ Depends on: P31, P16.
 Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
 
 Execution plan: `mailune-push` only.
-
-### A32. Embedding pipeline
-
-Depends on: S8, S10. The local engine crate is on another branch.
-
-Done when: text is chunked, two scripted embedders are scored, and the winner's vectors are stored. No model download.
-
-Execution plan: `mailune-store` only. Do not edit `mailune-ai` or `mailune-mime`.
 
 ### A20. Ask with citations
 
