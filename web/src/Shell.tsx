@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Composer, emptyDraft, type Draft } from "./Composer";
 import { InboxIcon } from "./InboxIcon";
 import { Reader } from "./Reader";
-import { chosenThread, threads as fixtureThreads, type ThreadFixture } from "./fixture";
+import {
+  assistResult,
+  chosenAi,
+  chosenThread,
+  threads as fixtureThreads,
+  type ThreadFixture,
+} from "./fixture";
 import { translate } from "./i18n";
 import "./shell.css";
 
@@ -41,6 +47,7 @@ export function ShellView({
   onConfirmed: (confirmed: boolean) => void;
 }) {
   const selected = chosenThread(threads, selectedId);
+  const ai = chosenAi(selected.id);
   const folders = [...new Set(threads.map((thread) => thread.folder))];
   return (
     <div className="shell">
@@ -75,8 +82,22 @@ export function ShellView({
       <section className="pane" data-pane="reading" aria-label="Reading">
         <h2>{selected.subject}</h2>
         <p>{selected.from}</p>
+        <p className="summary">{ai.summary}</p>
+        <ul className="replies">
+          {ai.replies.map((reply) => (
+            <li key={reply}>
+              <button type="button">{reply}</button>
+            </li>
+          ))}
+        </ul>
         <Reader body={selected.body} />
-        <Composer draft={draft} confirmed={confirmed} onDraft={onDraft} onConfirmed={onConfirmed} />
+        <Composer
+          draft={draft}
+          confirmed={confirmed}
+          assist={assistResult}
+          onDraft={onDraft}
+          onConfirmed={onConfirmed}
+        />
       </section>
     </div>
   );

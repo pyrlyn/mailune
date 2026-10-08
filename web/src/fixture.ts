@@ -28,6 +28,32 @@ export const threads: ThreadFixture[] = [
   },
 ];
 
+export interface ThreadAi {
+  summary: string;
+  replies: string[];
+}
+
+export const threadAi: Record<string, ThreadAi> = {
+  build: {
+    summary: "The build is ready.",
+    replies: ["Thanks", "On it", "Later"],
+  },
+  thursday: {
+    summary: "Grace wants to meet Thursday.",
+    replies: ["Yes", "Afternoon", "Next week"],
+  },
+};
+
+export const assistResult = "Shortened: See you Thursday.";
+
+export function chosenAi(id: string): ThreadAi {
+  const found = threadAi[id];
+  if (!found) {
+    throw new Error("thread has no fixture summary");
+  }
+  return found;
+}
+
 export function chosenThread(list: ThreadFixture[], id: string): ThreadFixture {
   const found = list.find((thread) => thread.id === id);
   if (!found) {

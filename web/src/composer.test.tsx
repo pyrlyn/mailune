@@ -21,7 +21,7 @@ describe("composer", () => {
       body: "Afternoon",
     });
     const html = renderToStaticMarkup(
-      <Composer draft={draft} confirmed={false} onDraft={() => {}} onConfirmed={() => {}} />,
+      <Composer draft={draft} confirmed={false} assist="" onDraft={() => {}} onConfirmed={() => {}} />,
     );
     expect(html).toContain('value="ada@example.com"');
     expect(html).toContain('value="Hello"');
@@ -30,11 +30,11 @@ describe("composer", () => {
 
   it("keeps send disabled until confirm is on", () => {
     const off = renderToStaticMarkup(
-      <Composer draft={draft} confirmed={false} onDraft={() => {}} onConfirmed={() => {}} />,
+      <Composer draft={draft} confirmed={false} assist="" onDraft={() => {}} onConfirmed={() => {}} />,
     );
     expect(off).toContain('disabled=""');
     const on = renderToStaticMarkup(
-      <Composer draft={draft} confirmed={true} onDraft={() => {}} onConfirmed={() => {}} />,
+      <Composer draft={draft} confirmed={true} assist="" onDraft={() => {}} onConfirmed={() => {}} />,
     );
     expect(on).not.toContain('disabled=""');
     expect(on).toContain("Send");

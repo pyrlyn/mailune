@@ -67,3 +67,18 @@
 .composer button:disabled {
   opacity: 0.5;
 }
+
+.summary,
+.assist {
+  margin: var(--space-2) 0;
+}
+
+.replies {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.replies button {
+  width: auto;
+  border: 1px solid var(--color-accent);
+}

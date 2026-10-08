@@ -13,11 +13,13 @@ export function updateDraft(draft: Draft, field: keyof Draft, value: string): Dr
 export function Composer({
   draft,
   confirmed,
+  assist,
   onDraft,
   onConfirmed,
 }: {
   draft: Draft;
   confirmed: boolean;
+  assist: string;
   onDraft: (draft: Draft) => void;
   onConfirmed: (confirmed: boolean) => void;
 }) {
@@ -60,6 +62,7 @@ export function Composer({
         />
         Confirm send
       </label>
+      <p className="assist">{assist}</p>
       <button type="submit" disabled={!confirmed}>
         Send
       </button>
