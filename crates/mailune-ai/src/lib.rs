@@ -4,12 +4,14 @@
 //! model. This crate does not call a network provider.
 
 mod guard;
+mod ledger;
 mod platform;
 mod prompts;
 mod redact;
 mod router;
 
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
+pub use ledger::{FlowRecord, Ledger, Retention};
 pub use platform::{PlatformBridge, map_capability};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
