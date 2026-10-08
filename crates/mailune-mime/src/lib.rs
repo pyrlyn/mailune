@@ -4,11 +4,13 @@
 //! rest of Mailune sees. Nothing here opens a socket.
 
 mod build;
+mod link;
 mod message;
 mod parse;
 mod remote;
 
 pub use build::{Attachment, Outbound, build};
+pub use link::{LinkCheck, inspect_link};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
 pub use remote::{RemoteContent, inspect_url};
