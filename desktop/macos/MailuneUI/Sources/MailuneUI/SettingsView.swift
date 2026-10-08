@@ -37,6 +37,9 @@ public struct SettingsView: View {
                     in: 1...60
                 )
             }
+            Section("Privacy") {
+                Text(PrivacyCopy.summariesStayLocal)
+            }
         }
         .font(MailuneType.body)
         .padding(MailuneSpace.m)

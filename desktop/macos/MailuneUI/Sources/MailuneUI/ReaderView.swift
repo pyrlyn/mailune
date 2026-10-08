@@ -41,6 +41,20 @@ public struct ReaderView: View {
                 .font(MailuneType.body)
             Text("JavaScript off")
                 .font(MailuneType.body)
+            if let assist = AssistFixtures.assist(forThread: message.id) {
+                Text(assist.summary)
+                    .font(MailuneType.body)
+                    .accessibilityLabel("Summary")
+                HStack(spacing: MailuneSpace.s) {
+                    ForEach(assist.replies, id: \.self) { reply in
+                        Text(reply)
+                            .font(MailuneType.body)
+                            .padding(.horizontal, MailuneSpace.s)
+                            .background(MailuneColor.accent.opacity(0.15), in: Capsule())
+                            .accessibilityLabel("Reply \(reply)")
+                    }
+                }
+            }
         }
         .padding(MailuneSpace.m)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
