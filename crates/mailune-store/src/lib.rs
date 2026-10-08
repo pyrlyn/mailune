@@ -14,9 +14,11 @@ use diesel::prelude::*;
 use diesel::sql_types::Text;
 use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 
+mod blob;
 mod repo;
 mod schema;
 
+pub use blob::BlobStore;
 pub use repo::{
     AccountRow, ContactRow, FlagRow, MailboxRow, MembershipRow, MessageCursor, MessagePage,
     MessageRow, PartRow, SyncStateRow, ThreadRow,
@@ -47,6 +49,11 @@ pub enum Error {
     /// A typed query failed.
     #[error("database query failed")]
     Query,
+    /// A blob could not be written, read, or decrypted.
+    ///
+    /// The text does not include the key or the plaintext.
+    #[error("blob could not be stored")]
+    Blob,
 }
 
 /// A file-backed SQLite database in WAL mode.
@@ -113,18 +120,22 @@ impl Store {
 /// The diesel error is thrown away: its display text can echo the SQL, which
 /// would include the key.
 fn apply_key(conn: &mut SqliteConnection, key: &[u8]) -> Result<(), Error> {
-    let mut pragma = String::from("PRAGMA key = \"x'");
-    for byte in key {
-        pragma.push(nibble(byte >> 4));
-        pragma.push(nibble(byte & 0x0f));
-    }
-    pragma.push_str("'\";");
+    let mut pragma = format!("PRAGMA key = \"x'{}'\";", hex_encode(key));
     let failed = conn.batch_execute(&pragma).is_err();
     pragma.clear();
     if failed {
         return Err(Error::Open);
     }
     Ok(())
+}
+
+pub(crate) fn hex_encode(bytes: &[u8]) -> String {
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        out.push(nibble(byte >> 4));
+        out.push(nibble(byte & 0x0f));
+    }
+    out
 }
 
 fn nibble(value: u8) -> char {

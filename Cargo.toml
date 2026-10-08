@@ -47,6 +47,8 @@ mail-builder = { version = "1.0.0", default-features = false }
 quick-xml = "0.42.0"
 # mailune-auth: PKCE S256. Same major as ketch and cox.
 sha2 = "0.11"
+# mailune-store: encrypt content-addressed blobs with the caller key. 0.11.0 checked on crates.io 2026-10-08.
+chacha20poly1305 = "0.11.0"
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
 # mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.
