@@ -5,6 +5,7 @@
 
 mod catalog;
 mod cloud;
+mod compose;
 mod digest;
 mod engine;
 mod guard;
@@ -23,6 +24,7 @@ pub use cloud::{
     AnthropicRequest, ChatTurn, CloudCall, OpenAiRequest, anthropic_request,
     completion_from_anthropic, completion_from_openai, openai_request,
 };
+pub use compose::{ComposeOp, assist};
 pub use digest::{DigestMessage, digest};
 pub use engine::{LocalEngine, ScriptedEngine};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
