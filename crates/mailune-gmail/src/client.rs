@@ -9,8 +9,8 @@ use crate::batch::{self, segment};
 use crate::model::{HistoryPage, LabelList, ThreadList, WireMessage, WireThread};
 use crate::{Error, GmailLabel, GmailMessage, HistoryDiff};
 
-const API: &str = "https://gmail.googleapis.com";
-const USER: &str = "/gmail/v1/users/me";
+pub(crate) const API: &str = "https://gmail.googleapis.com";
+pub(crate) const USER: &str = "/gmail/v1/users/me";
 const BATCH: &str = "https://gmail.googleapis.com/batch/gmail/v1";
 /// Google advises at most 50 calls per batch to avoid rate limiting.
 const BATCH_SIZE: usize = 50;
@@ -207,7 +207,10 @@ impl<'h, H: Http> GmailClient<'h, H> {
         Ok(out)
     }
 
-    async fn send(&self, request: HttpRequest) -> Result<mailune_protocol::HttpResponse, Error> {
+    pub(crate) async fn send(
+        &self,
+        request: HttpRequest,
+    ) -> Result<mailune_protocol::HttpResponse, Error> {
         // The token is UTF-8 by contract; a non-UTF-8 byte is replaced, which
         // the server then rejects, rather than being logged anywhere.
         let bearer = format!("Bearer {}", String::from_utf8_lossy(self.token.as_bytes()));
@@ -224,7 +227,7 @@ impl<'h, H: Http> GmailClient<'h, H> {
     }
 }
 
-fn parse<T: DeserializeOwned>(body: &[u8]) -> Result<T, Error> {
+pub(crate) fn parse<T: DeserializeOwned>(body: &[u8]) -> Result<T, Error> {
     serde_json::from_slice(body).map_err(|error| Error::Format(error.to_string()))
 }
 

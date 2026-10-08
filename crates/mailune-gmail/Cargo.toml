@@ -10,6 +10,7 @@ description = "Gmail API adapter over an injected HTTP transport"
 # google-gmail1 is not linked (plan.md P21); requests are built here and sent
 # through the injected `Http` transport, so tests never dial out.
 [dependencies]
+base64 = { workspace = true }
 mailune-protocol = { path = "../mailune-protocol" }
 serde = { workspace = true }
 serde_json = { workspace = true }

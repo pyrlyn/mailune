@@ -7,9 +7,11 @@
 mod batch;
 mod client;
 mod model;
+mod mutate;
 
 pub use client::{GmailClient, SyncBatch};
 pub use model::{GmailLabel, GmailMessage, HistoryDiff};
+pub use mutate::{Draft, Sent};
 
 /// Failure returned by the Gmail adapter. No variant carries the token.
 #[derive(Debug, thiserror::Error)]

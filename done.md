@@ -663,3 +663,13 @@ Done when: threads, labels, a historyId incremental diff, and a batch fetch pars
 Execution plan: new crate `mailune-gmail` with no reqwest or google-gmail1: requests are built by hand and sent through the injected `Http` trait. labels, threads.list, history.list across pages (404 means full sync), and batch GETs as multipart/mixed. Tests: scripted bodies upsert through `mailune-store` and resume from the saved historyId.
 
 What landed: New crate `mailune-gmail`: `GmailClient` over the injected `Http` transport (no reqwest, no google-gmail1). `labels`, `thread_ids`, `history` (follows `nextPageToken`, 404 returns `None` for a full sync, refuses a non-numeric historyId), `messages` and `threads` through the multipart/mixed batch endpoint (50 per batch, inner 404 skipped, ids outside [A-Za-z0-9_-] refused), and `sync(since, limit)`. Labels become mailboxes; `UNREAD` and `STARRED` become flags. Tests upsert scripted bodies through `mailune-store` and resume from the saved historyId. Deleted ids are returned; the store has no delete yet.
+
+### P22. Gmail mutations
+
+Depends on: P21, P2.
+
+Done when: batchModify labels, send, and a draft run against the scripted transport. No TCP.
+
+Execution plan: `mailune-gmail` only: `modify_labels` (messages.batchModify, 1000 ids per call), `send_raw` and `create_draft` carrying caller-built RFC 5322 bytes as base64url (workspace `base64`). Scripted-transport tests check the request bodies and status errors.
+
+What landed: `GmailClient::modify_labels` (messages.batchModify, chunked at 1000 ids; mark read = remove `UNREAD`, move = add target and remove source), `send_raw` (messages.send, base64url `raw`, optional `threadId`; documented as call-after-confirmation) returning `Sent { id, thread_id }`, and `create_draft` (drafts.create) returning `Draft { id, message }`. The caller builds the RFC 5322 bytes. Reuses the workspace `base64` crate. Scripted-transport tests check bodies, round-trip the raw bytes, and map a 400 to `Error::Status`.
