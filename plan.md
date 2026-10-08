@@ -55,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -563,14 +562,6 @@ Depends on: P17.
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
 
 Execution plan: `mailune-jmap` only.
-
-### P25. Graph calendar and contacts
-
-Depends on: P23.
-
-Done when: availability and contact autocomplete parse from a scripted body. No TCP.
-
-Execution plan: `mailune-graph` only.
 
 ### B2. UniFFI records
 

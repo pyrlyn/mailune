@@ -15,7 +15,7 @@ mod search;
 mod thread;
 
 pub use cancel::{CancelToken, Progress, run_loop};
-pub use date::parse_rfc3339;
+pub use date::{format_rfc3339_utc, parse_rfc3339};
 pub use followup::{Exchange, awaiting_reply};
 pub use fusion::{Candidate, Fused, RRF_K, fuse};
 pub use lock::{AppLock, BiometricRequest};

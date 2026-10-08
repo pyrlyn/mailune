@@ -693,3 +693,13 @@ Done when: move, flag or category changes, sendMail, and `$batch` run against th
 Execution plan: `mailune-graph` only: `update_message` (PATCH isRead, flag, categories), `move_message` (returns the new id), `send_mime` (sendMail MIME form, base64 text/plain), `update_messages` through `$batch` in chunks of 20 with per-request statuses. Scripted-transport tests.
 
 What landed: `GraphClient::update_message` sends a PATCH with only the set fields of `MessagePatch { is_read, flagged, categories }`; `move_message` posts to `/move` and returns the new id Graph assigns; `send_mime` uses sendMail's MIME form (base64, `text/plain`), documented as call-after-confirmation; `update_messages` sends PATCHes through `$batch` 20 at a time and returns a `BatchOutcome` per message in request order even when responses come back shuffled. Ids are percent-encoded in paths. Reuses the workspace `base64` crate.
+
+### P25. Graph calendar and contacts
+
+Depends on: P23.
+
+Done when: availability and contact autocomplete parse from a scripted body. No TCP.
+
+Execution plan: `mailune-graph` only: `schedule` (calendar/getSchedule, UTC via `Prefer: outlook.timezone`, slots from availabilityView, busy blocks from scheduleItems) and `autocomplete` (People API `$search`). A UTC formatter joins `parse_rfc3339` in `mailune-core`. Scripted-body tests.
+
+What landed: `GraphClient::schedule(emails, start, end, interval)` posts `calendar/getSchedule` with `Prefer: outlook.timezone=\"UTC\"` and returns a `Schedule` per address: `slots` from `availabilityView` (free, tentative, busy, out of office, working elsewhere), `busy` blocks from `scheduleItems` (a block in another zone is dropped rather than guessed), and the error Graph gives for a calendar it cannot read. `autocomplete(prefix, limit)` searches the People API and returns each scored address, most relevant first; quotes and backslashes are stripped from the term. `mailune-core` gains `format_rfc3339_utc`, the inverse of `parse_rfc3339`.

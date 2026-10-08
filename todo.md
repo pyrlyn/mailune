@@ -49,7 +49,6 @@
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
-- P25. Graph calendar and contacts
 - B2. UniFFI records
 - B3. Swift package
 - M1. Xcode project

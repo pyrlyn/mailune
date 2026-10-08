@@ -1,15 +1,18 @@
 //! Microsoft Graph mail adapter: folders, per-folder message delta queries
-//! with `$select`, and mutations (PATCH, move, sendMail, `$batch`), sent
-//! through the injected [`mailune_protocol::Http`] transport. Exchange
-//! Online is reached this way; EWS is a separate path.
+//! with `$select`, mutations (PATCH, move, sendMail, `$batch`), calendar
+//! availability and contact autocomplete, sent through the injected
+//! [`mailune_protocol::Http`] transport. Exchange Online is reached this
+//! way; EWS is a separate path.
 //!
 //! Paging and delta links come from the server. They are followed only when
 //! they point back at the Graph host, so the token never goes elsewhere.
 
+mod calendar;
 mod client;
 mod model;
 mod mutate;
 
+pub use calendar::{Availability, Busy, Schedule};
 pub use client::{FolderDelta, GraphClient};
 pub use model::{GraphFolder, GraphMessage};
 pub use mutate::{BatchOutcome, MessagePatch};
