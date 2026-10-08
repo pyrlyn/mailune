@@ -1,0 +1,47 @@
+# JVM tests for desktop/android. The Android SDK and the emulator are absent.
+# The emulator is not a required step. This job is separate from ci.yml and
+# is not a required check.
+
+name: android
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jvm-test:
+    name: gradle
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          gradle-version: "9.8.0"
+          cache-disabled: true
+          dependency-graph: disabled
+          add-job-summary: never
+
+      - name: JVM tests
+        working-directory: desktop/android
+        run: gradle test --offline
