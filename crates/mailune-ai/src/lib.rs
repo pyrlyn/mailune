@@ -3,10 +3,12 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod guard;
 mod platform;
 mod redact;
 mod router;
 
+pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use platform::{PlatformBridge, map_capability};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
@@ -124,6 +126,9 @@ pub enum Error {
     /// No model on the fallback chain can serve this prompt.
     #[error("no provider can serve this prompt")]
     NoProvider,
+    /// A tool proposal was missing, malformed, or not on the allow-list.
+    #[error("tool call denied")]
+    ToolDenied,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
