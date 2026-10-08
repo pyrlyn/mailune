@@ -14,7 +14,24 @@ use diesel::prelude::*;
 use diesel::sql_types::Text;
 use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 
+mod repo;
 mod schema;
+
+pub use repo::{
+    AccountRow, ContactRow, FlagRow, MailboxRow, MembershipRow, MessageCursor, MessagePage,
+    MessageRow, PartRow, SyncStateRow, ThreadRow,
+};
+
+#[cfg(test)]
+fn scratch_dir() -> PathBuf {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let dir = std::env::temp_dir().join(format!("mailune-store-{nanos}-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    dir
+}
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
@@ -154,12 +171,10 @@ fn read_journal_mode(conn: &mut SqliteConnection) -> Result<String, Error> {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use diesel::connection::SimpleConnection;
     use diesel::prelude::*;
 
-    use super::Store;
+    use super::{Store, scratch_dir};
 
     #[derive(QueryableByName)]
     struct Probe {
@@ -167,20 +182,9 @@ mod tests {
         x: i32,
     }
 
-    fn scratch() -> PathBuf {
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0);
-        let dir =
-            std::env::temp_dir().join(format!("mailune-store-{nanos}-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
-    }
-
     #[test]
     fn opens_wal_without_leaking_the_key() {
-        let dir = scratch();
+        let dir = scratch_dir();
         let path = dir.join("mail.db");
         const KEY: &[u8] = b"super-secret-db-key";
         let mut store = Store::open(&path, KEY).unwrap();
@@ -198,7 +202,7 @@ mod tests {
 
     #[test]
     fn migrations_create_the_v1_tables() {
-        let dir = scratch();
+        let dir = scratch_dir();
         let path = dir.join("mail.db");
         let mut store = Store::open(&path, b"key").unwrap();
         assert_eq!(count_accounts(&mut store), 0);
@@ -269,7 +273,7 @@ mod tests {
 
     #[test]
     fn a_different_key_cannot_read_the_file() {
-        let dir = scratch();
+        let dir = scratch_dir();
         let path = dir.join("mail.db");
         {
             let mut store = Store::open(&path, b"key-a").unwrap();
