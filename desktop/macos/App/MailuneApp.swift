@@ -9,11 +9,9 @@ struct MailuneApp: App {
 
     var body: some Scene {
         WindowGroup {
-            VStack {
-                InboxView()
-                Text(host.system)
-            }
-            .navigationTitle(Mailbox.inbox.title)
+            ShellView()
+                .navigationTitle(Mailbox.inbox.title)
+                .accessibilityHint(host.system)
             .toolbar {
                 ToolbarItem {
                     Image("ToolbarCompose")
