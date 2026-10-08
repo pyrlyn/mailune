@@ -1,0 +1,16 @@
+[package]
+name = "mailune-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "UniFFI surface for native shells"
+
+[dependencies]
+mailune-protocol = { path = "../mailune-protocol" }
+thiserror = { workspace = true }
+uniffi = { workspace = true }
+
+[lints]
+workspace = true

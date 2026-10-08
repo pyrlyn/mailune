@@ -43,3 +43,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | aes | local | https://github.com/RustCrypto/block-ciphers | AES content key for S/MIME enveloped data |
 | cbc | local | https://github.com/RustCrypto/block-modes | CBC mode for S/MIME enveloped data |
 | cipher | local | https://github.com/RustCrypto/traits | Block decrypt trait for S/MIME enveloped data |
+| uniffi | local | https://github.com/mozilla/uniffi-rs | UniFFI records, errors, async, and callbacks in mailune-ffi |
