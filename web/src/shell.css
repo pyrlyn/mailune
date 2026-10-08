@@ -47,3 +47,23 @@
   border: 0;
   background: var(--color-paper);
 }
+
+.composer {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.composer input,
+.composer textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+.composer button:disabled {
+  opacity: 0.5;
+}

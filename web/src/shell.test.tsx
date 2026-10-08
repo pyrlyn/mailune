@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { emptyDraft } from "./Composer";
 import { ShellView } from "./Shell";
 import { chosenThread, threads } from "./fixture";
 
@@ -11,7 +12,15 @@ describe("thread list", () => {
     };
     onSelect(chosenThread(threads, "thursday").id);
     const html = renderToStaticMarkup(
-      <ShellView threads={threads} selectedId={selectedId} onSelect={onSelect} />,
+      <ShellView
+        threads={threads}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        draft={emptyDraft}
+        onDraft={() => {}}
+        confirmed={false}
+        onConfirmed={() => {}}
+      />,
     );
     expect(html).toContain('data-pane="folders"');
     expect(html).toContain('data-pane="list"');
