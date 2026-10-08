@@ -41,7 +41,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P12 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
-| S1 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | S2 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | S3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | S4 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -465,14 +464,6 @@ Depends on: the in-memory queue in `mailune-core` and S2.
 Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
 
 Execution plan: a load/save API on `mailune-store`, called by a test. Do not edit the queue's decision rules except to expose the pending set if it is still private.
-
-### S1. mailune-store
-
-Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.
-
-Done when: a file-backed SQLite database opens with WAL and a key argument. The key is a byte slice from the caller, never logged. If SQLCipher does not compile here, use bundled SQLite and say why in the commit message.
-
-Execution plan: new crate `mailune-store`. No network and no keychain.
 
 ### S2. Schema v1 migrations
 

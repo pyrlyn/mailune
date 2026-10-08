@@ -1,0 +1,32 @@
+[package]
+name = "mailune-store"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Local mail store: SQLite through Diesel"
+
+[dependencies]
+thiserror = { workspace = true }
+
+# The browser build has no C toolchain for SQLite; the WASM store (OPFS) is a
+# later task, so the crate is empty there.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+diesel = { workspace = true }
+zeroize = { workspace = true }
+
+# Apple targets link SQLCipher against CommonCrypto, so no OpenSSL is needed.
+# Elsewhere SQLCipher would need an OpenSSL build on every CI runner (Windows
+# has none), so those targets use plain SQLite and refuse a key at open.
+[target.'cfg(target_vendor = "apple")'.dependencies]
+libsqlite3-sys = { workspace = true, features = ["bundled-sqlcipher"] }
+
+[target.'cfg(not(any(target_vendor = "apple", target_arch = "wasm32")))'.dependencies]
+libsqlite3-sys = { workspace = true, features = ["bundled"] }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

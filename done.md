@@ -553,3 +553,13 @@ Requested by the creator. Reuse: translate-toolkit storage classes; research/mai
 Done when: translate-toolkit is pinned in `mise.toml`; `i18n/*.po` is the single source; one command writes every native catalog and fails on broken keys, placeholders or plural forms.
 
 What landed: `"pipx:translate-toolkit" = "3.20.0"` in `mise.toml` with `i18n`, `i18n --check` and `i18n:test` tasks. `i18n/mailune.pot` plus `de`, `fr`, `ja` catalogs imported from research/mail-app (276 strings, msgctxt keys, `{0}` placeholders). `scripts/i18n.py` writes `target/i18n/`: Apple `Localizable.strings` and `.stringsdict`, Android `strings.xml`, Windows `.resw` (plurals as `<key>_<tag>`), Linux `.mo`, web i18next v4 JSON. Gettext plural forms are spread over CLDR tags; placeholders become `%n$@`, `%n$s`, `{n}` or `{{n}}` (`{{count}}` in plurals).
+
+### S1. mailune-store
+
+Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.
+
+Done when: a file-backed SQLite database opens with WAL and a key argument. The key is a byte slice from the caller, never logged. If SQLCipher does not compile here, use bundled SQLite and say why in the commit message.
+
+Execution plan: new crate `mailune-store`: `Store::open(path, key)` with a 32-byte raw key, PRAGMA key through a silenced connection, then WAL, foreign keys and busy timeout. SQLCipher on Apple targets (CommonCrypto); bundled SQLite elsewhere refuses a key. Tests use tempfile.
+
+What landed: `mailune-store` opens a file-backed SQLite database in WAL mode. `Store::open(path, Some(key))` takes a raw 32-byte key, sends it as `PRAGMA key` from a zeroized buffer on a connection whose instrumentation is silenced, and maps a wrong key to `WrongKey`. Apple targets link `libsqlite3-sys` 0.38.2 `bundled-sqlcipher` against CommonCrypto; Linux, Windows and Android use `bundled` SQLite because SQLCipher there needs an OpenSSL build the CI runners do not have, and those builds refuse a key with `CipherUnavailable` instead of silently storing plaintext. The crate is empty on wasm32.
