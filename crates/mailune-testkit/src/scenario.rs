@@ -42,6 +42,25 @@ impl Scenario {
         }
         Ok(events)
     }
+
+    /// The same fold, as JSON another front end can replay.
+    ///
+    /// `steps` are the submissions. `events` are what [`Scenario::fold`]
+    /// returned for this host. The fold itself is unchanged.
+    ///
+    /// # Errors
+    ///
+    /// The same [`Error`] as [`Scenario::fold`]. Encoding the value is a host
+    /// error; these types already serialize.
+    pub fn fold_json(&self, host: &FakeHost) -> Result<String, Error> {
+        let events = self.fold(host)?;
+        let value = serde_json::json!({
+            "steps": &self.steps,
+            "events": &events,
+        });
+        serde_json::to_string(&value)
+            .map_err(|err| Error::host("scenario.fold_json", err.to_string()))
+    }
 }
 
 struct Mail {
@@ -317,5 +336,20 @@ mod tests {
             panic!("undo");
         };
         assert!(threads.is_empty());
+    }
+
+    #[test]
+    fn fold_json_is_the_same_events_another_front_end_can_read() {
+        let host = FakeHost::new();
+        let scenario = Scenario::new().then(sent()).then(Submission::Undo);
+        let events = scenario.fold(&host).unwrap();
+        let host = FakeHost::new();
+        let text = scenario.fold_json(&host).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&text).unwrap();
+        let again: Vec<Event> = serde_json::from_value(value["events"].clone()).unwrap();
+        let steps: Vec<Submission> = serde_json::from_value(value["steps"].clone()).unwrap();
+        assert_eq!(again, events);
+        assert_eq!(steps.len(), 2);
+        assert!(matches!(steps[0], Submission::Send { .. }));
     }
 }

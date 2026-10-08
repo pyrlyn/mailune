@@ -460,6 +460,7 @@ name = "mailune-testkit"
 version = "0.1.0"
 dependencies = [
  "mailune-protocol",
+ "serde_json",
 ]
 
 [[package]]
