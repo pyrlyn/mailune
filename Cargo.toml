@@ -66,6 +66,13 @@ icalendar = "0.17.14"
 pgp = { version = "0.20.0", default-features = false }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
+# mailune-store: SQLite through Diesel's typed DSL. 2.3.14 checked on crates.io 2026-10-08.
+diesel = { version = "2.3.14", features = ["sqlite"] }
+# mailune-store: embedded schema migrations. 2.3.2 checked on crates.io 2026-10-08.
+diesel_migrations = { version = "2.3.2", features = ["sqlite"] }
+# mailune-store: SQLCipher compiled into the binary so the caller key is applied in-process.
+# 0.38.2 checked on crates.io 2026-10-08. Inside diesel 2.3's libsqlite3-sys range.
+libsqlite3-sys = { version = "0.38.2", features = ["bundled-sqlcipher"] }
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
