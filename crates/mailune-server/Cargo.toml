@@ -1,0 +1,23 @@
+[package]
+name = "mailune-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "WebSocket JSON-RPC server for the methods mailune-rpc already defines"
+
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+mailune-protocol = { path = "../mailune-protocol" }
+mailune-rpc = { path = "../mailune-rpc" }
+serde = { workspace = true }
+tokio = { workspace = true, features = ["macros", "net", "rt-multi-thread"] }
+
+[dev-dependencies]
+futures-util = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+[lints]
+workspace = true

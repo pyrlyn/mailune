@@ -34,5 +34,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | Local MCP server for read-only tools and gated send |
-| tokio | local | https://github.com/tokio-rs/tokio | In-memory duplex for the MCP server test |
+| tokio | local | https://github.com/tokio-rs/tokio | MCP duplex and the JSON-RPC server runtime |
+| axum | local | https://github.com/tokio-rs/axum | WebSocket JSON-RPC server |
+| tokio-tungstenite | local | https://github.com/snapview/tokio-tungstenite | WebSocket client for the server test |
+| futures-util | local | https://github.com/rust-lang/futures-rs | Send and receive on the test WebSocket |
 | whisper-rs | local | https://codeberg.org/tazz4843/whisper-rs | Local speech-to-text for the composer |
