@@ -573,3 +573,13 @@ Done when: embedded migrations create accounts, mailboxes, messages, memberships
 Execution plan: one embedded migration `schema_v1` in `crates/mailune-store/migrations`, a hand-written `schema.rs`, and `Store::open` running pending migrations. A test touches every column through the DSL.
 
 What landed: `crates/mailune-store/migrations/2026-10-08-000001_schema_v1` creates accounts, mailboxes, threads, messages, memberships, parts, flags, sync_state, ops and contacts, keyed on `(account_id, id)` because provider ids are only unique per account. `Store::open` runs the embedded migrations through `diesel_migrations` 2.3.2. `schema.rs` is hand-written; a test selects every column through the DSL so a drift between it and `up.sql` fails.
+
+### S3. Repository API
+
+Depends on: S2. Reuse: Diesel's typed DSL.
+
+Done when: upserts, a thread query, cursor paging, and counts go through the typed DSL.
+
+Execution plan: `repo.rs` in `mailune-store`: upserts for accounts, mailboxes and messages (memberships, keywords and the thread row in one transaction), a keyset-paged thread list per mailbox, a thread's messages, mailbox counts, and the sync cursor per scope.
+
+What landed: `Store` gains `upsert_account`, `upsert_mailbox`, `upsert_message` (memberships, keywords and the thread row refreshed in one transaction; a message that changes thread leaves no empty thread), `thread_page` with a `(latest_at, id)` keyset cursor, `thread_messages`, `mailbox_counts`, and `set_sync_state`/`sync_state`. All of it is Diesel's typed DSL; recipient lists are one JSON column.

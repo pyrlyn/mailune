@@ -10,10 +10,14 @@ mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
 #[cfg(not(target_arch = "wasm32"))]
+mod repo;
+#[cfg(not(target_arch = "wasm32"))]
 mod schema;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
+#[cfg(not(target_arch = "wasm32"))]
+pub use repo::{Account, Counts, Cursor, Mailbox, StoredMessage, ThreadPage, ThreadSummary};
 
 /// Failure returned by the store.
 ///

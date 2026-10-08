@@ -8,6 +8,7 @@ publish = false
 description = "Local mail store: SQLite through Diesel"
 
 [dependencies]
+mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 
 # The browser build has no C toolchain for SQLite; the WASM store (OPFS) is a
@@ -15,6 +16,8 @@ thiserror = { workspace = true }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 diesel = { workspace = true }
 diesel_migrations = { workspace = true }
+# Recipient lists are one JSON column; a row per address buys nothing yet.
+serde_json = { workspace = true }
 zeroize = { workspace = true }
 
 # Apple targets link SQLCipher against CommonCrypto, so no OpenSSL is needed.
