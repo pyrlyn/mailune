@@ -15,6 +15,10 @@ pub struct Reader {
     pub javascript: bool,
     /// Remote content is blocked when this is false.
     pub remote: bool,
+    /// Fixture summary. No model is downloaded to produce it.
+    pub summary: String,
+    /// The one reply chip.
+    pub reply_chip: String,
 }
 
 /// Reads the body and the two flags from `text`.
@@ -26,6 +30,8 @@ pub fn load_reader(text: &str) -> Result<Reader, Error> {
     let mut body = None;
     let mut javascript = None;
     let mut remote = None;
+    let mut summary = None;
+    let mut reply_chip = None;
     for line in text.lines() {
         let line = line.trim();
         if line.is_empty() || line.starts_with('#') {
@@ -41,15 +47,23 @@ pub fn load_reader(text: &str) -> Result<Reader, Error> {
             "body" => body = Some(value.to_string()),
             "javascript" => javascript = Some(value == "on"),
             "remote" => remote = Some(value == "allowed"),
+            "summary" => summary = Some(value.to_string()),
+            "reply-chip" => reply_chip = Some(value.to_string()),
             _ => {}
         }
     }
-    match (body, javascript, remote) {
-        (Some(body), Some(javascript), Some(remote)) if !body.is_empty() => Ok(Reader {
-            body,
-            javascript,
-            remote,
-        }),
+    match (body, javascript, remote, summary, reply_chip) {
+        (Some(body), Some(javascript), Some(remote), Some(summary), Some(reply_chip))
+            if !body.is_empty() && !summary.is_empty() && !reply_chip.is_empty() =>
+        {
+            Ok(Reader {
+                body,
+                javascript,
+                remote,
+                summary,
+                reply_chip,
+            })
+        }
         _ => Err(Error::Description),
     }
 }
@@ -68,5 +82,14 @@ mod tests {
         assert_eq!(reader.body, "See you at the dock");
         assert!(!reader.javascript);
         assert!(!reader.remote);
+    }
+
+    #[test]
+    fn the_reader_includes_a_summary_and_one_reply_chip() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("share/reader.desc");
+        let text = std::fs::read_to_string(path).unwrap();
+        let reader = load_reader(&text).unwrap();
+        assert_eq!(reader.summary, "A short note about the dock");
+        assert_eq!(reader.reply_chip, "Thanks");
     }
 }
