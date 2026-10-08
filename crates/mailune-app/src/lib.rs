@@ -4,10 +4,15 @@
 //! Token bytes are read through [`SecretStore`] and never placed on a `Debug`
 //! or log path.
 
+mod secrets;
 mod views;
 
 use mailune_protocol::{AccountId, Secret, SecretId, SecretStore};
 
+pub use secrets::{
+    AccountConfig, AndroidSecretCall, FakeSecretStore, read_db_key, read_password, store_db_key,
+    store_password,
+};
 pub use views::{ComposerDraft, OpenThread, SettingsSnapshot, ThreadList, Views};
 
 /// Failure returned by assembly.
@@ -29,6 +34,20 @@ pub enum Error {
         /// Account that has no token.
         account: String,
     },
+    /// No password is stored for this account.
+    ///
+    /// The account id is a name, not the password.
+    #[error("no password is stored for {account}")]
+    MissingPassword {
+        /// Account that has no password.
+        account: String,
+    },
+    /// No database key is stored.
+    #[error("no database key is stored")]
+    MissingDbKey,
+    /// An Android put callback arrived without a secret.
+    #[error("android put needs a secret")]
+    AndroidPutMissing,
 }
 
 /// Confirms assembly links through to the domain.
