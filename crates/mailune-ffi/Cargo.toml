@@ -7,6 +7,19 @@ license.workspace = true
 publish = false
 description = "UniFFI surface for native shells"
 
+[lib]
+# The XCFramework wraps the static library. `lib` keeps the bindgen binary and the tests linking Rust.
+crate-type = ["lib", "staticlib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+# The generator matches this crate's uniffi. The static library does not compile it.
+bindgen = ["uniffi/cli"]
+
 [dependencies]
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }

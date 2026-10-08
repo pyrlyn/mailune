@@ -1,1 +1,6 @@
 /target/
+
+# Build output of desktop/macos/scripts/xcframework.sh
+/desktop/macos/MailuneCore/MailuneFFI.xcframework/
+/desktop/macos/MailuneCore/Sources/MailuneCore/mailune_ffi.swift
+/desktop/macos/MailuneCore/.build/
