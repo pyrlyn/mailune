@@ -1,0 +1,15 @@
+# Local preview of a version bump. CI releases through .github/workflows/bump.yml
+# (pyrlyn/ci bump.yml), which is the only thing that tags. Nothing here publishes.
+#
+# git_only: these crates are not on crates.io, so release-plz must read the last
+# version from git tags instead of the registry.
+# publish / git_release_enable / git_tag_enable stay off so `release-plz release`
+# cannot push a tag or a crates.io publish. bump.yml creates `mailune-v<version>`
+# and does not pass a publish command.
+
+[workspace]
+git_only = true
+publish = false
+git_release_enable = false
+git_tag_enable = false
+git_tag_name = "mailune-v{{ version }}"

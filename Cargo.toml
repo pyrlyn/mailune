@@ -26,6 +26,8 @@ serde_json = "1"
 insta = { version = "1.49.0", features = ["json"] }
 # mailune-cli only. Library crates return their own error type.
 anyhow = "1"
+# mailune-cli: account add/list. 4.6 matches cox; derive only.
+clap = { version = "4.6", features = ["derive"] }
 # mailune-cli tests: the dependency-direction check reads `cargo metadata`.
 cargo_metadata = "0.23.1"
 # mailune-cli tests: parse Rust sources for the forward-only FFI scaffold.
@@ -39,6 +41,12 @@ encoding_rs = "0.8.42"
 # mailune-mime: build a message the parser can read back. 1.0.0 checked on crates.io 2026-10-08.
 # Default features pull gethostname for a generated Message-ID. Callers set the id, so that stays off.
 mail-builder = { version = "1.0.0", default-features = false }
+# mailune-auth: Mozilla autoconfig XML. 0.42.0 from `cargo search` on 2026-10-08.
+quick-xml = "0.42.0"
+# mailune-auth: PKCE S256. Same major as ketch and cox.
+sha2 = "0.11"
+# mailune-auth: unpadded base64url for the PKCE verifier and challenge.
+base64 = "0.23"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.

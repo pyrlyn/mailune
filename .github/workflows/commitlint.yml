@@ -1,0 +1,58 @@
+name: commitlint
+
+# Rejects a commit message that contains a Co-Authored-By trailer.
+#
+# pyrlyn/ci@27290ae30105592f683c236fc76dcc2ee4348bdf has no commitlint workflow
+# (license-check.yml and cla.yml from that pin are separate callers). The same
+# rule lives in commitlint.config.mjs for a local commitlint. This job applies
+# it without Node: this repository does not pin Node, and the shared workflow
+# is missing.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  trailers:
+    name: commitlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Reject Co-Authored-By trailers
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = pull_request ]; then
+            base="origin/${BASE_REF}"
+            git rev-parse -q --verify "$base^{commit}" >/dev/null \
+              || { echo "base branch $base not found" >&2; exit 1; }
+            range="$base..HEAD"
+          else
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = 0000000000000000000000000000000000000000 ]; then
+              range="HEAD"
+            else
+              range="$BEFORE..HEAD"
+            fi
+          fi
+          bad=0
+          while IFS= read -r sha; do
+            [ -n "$sha" ] || continue
+            if git log -1 --format=%B "$sha" | grep -i -q '^co-authored-by:'; then
+              echo "commit $sha contains a Co-Authored-By trailer" >&2
+              git log -1 --format=%B "$sha" | grep -i '^co-authored-by:' >&2 || true
+              bad=1
+            fi
+          done < <(git rev-list --no-merges --reverse "$range")
+          exit "$bad"

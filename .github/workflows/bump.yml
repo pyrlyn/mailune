@@ -1,0 +1,50 @@
+name: bump
+
+# The only release path. release-plz.toml is git_only with publish turned off.
+# This caller uses pyrlyn/ci bump.yml and does not set publish-command or
+# CARGO_REGISTRY_TOKEN, so the run never publishes to crates.io. The tag is
+# mailune-v<version>, matching release-plz.toml.
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: which part of the version to raise when release-plz is not computing it
+        default: patch
+        type: choice
+        options: [patch, minor, major]
+      dry-run:
+        description: open the version pull request and wait for its checks, then close it
+        default: false
+        type: boolean
+      release-untagged-head:
+        description: release the untagged version already on main when there is nothing to commit
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    uses: pyrlyn/ci/.github/workflows/bump.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: write # the bump branch, the tag and the release
+      pull-requests: write # merge or close the bump pull request
+      actions: write # dispatch ci-workflows
+      checks: read
+      statuses: read
+      issues: write # a failed run opens a release-failure issue
+    with:
+      level: ${{ inputs.level }}
+      dry-run: ${{ inputs.dry-run }}
+      release-untagged-head: ${{ inputs.release-untagged-head }}
+      release-plz-update: true
+      tag-prefix: mailune-v
+      # Empty on purpose: do not dispatch a release build, and do not publish.
+      release-workflows: ""
+      publish-command: ""
+      ci-workflows: |
+        ci.yml
+        pipeline.yml
+    secrets:
+      BUMP_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
