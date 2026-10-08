@@ -666,7 +666,6 @@ mod tests {
     fn a_secret_debug_does_not_contain_the_bytes() {
         let secret = Secret::new(b"db-key-value");
         let rendered = format!("{secret:?}");
-        assert!(!rendered.contains("db-key-value"), "{rendered}");
         assert_eq!(rendered, "Secret(redacted)");
         assert_eq!(secret.as_bytes(), b"db-key-value");
     }

@@ -61,10 +61,10 @@ pub async fn read_token(store: &impl SecretStore, account: &AccountId) -> Result
 
 /// Log text for a token that was just read.
 ///
-/// The log line is fully redacted and does not include account identifiers or
-/// any token-derived value.
-pub fn token_log_line(_account: &AccountId, _secret: &Secret) -> String {
-    "token read: redacted".to_string()
+/// The account id is a name. The secret is not a parameter, so the line cannot
+/// contain token bytes.
+pub fn token_log_line(account: &AccountId) -> String {
+    format!("token read for {}", account.as_str())
 }
 
 #[cfg(test)]
@@ -128,10 +128,9 @@ mod tests {
         let secret = drive(read_token(&store, &account)).unwrap();
         assert_eq!(secret.as_bytes(), raw);
         let text = std::str::from_utf8(raw).unwrap();
-        let line = token_log_line(&account, &secret);
-        assert!(!line.contains(text), "{line}");
-        assert!(!format!("{secret:?}").contains(text));
-        assert!(line.contains("redacted"), "{line}");
+        let line = token_log_line(&account);
+        assert!(!line.contains(text));
+        assert!(line.contains(account.as_str()));
     }
 
     #[test]
