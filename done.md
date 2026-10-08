@@ -603,3 +603,13 @@ Done when: every shell can render the same state machine from that reducer.
 Execution plan: a pure reducer in `mailune-app` (`reducer.rs`), Crux-style: `Ui` holds the B1 `Views` plus UI-only state (composer open, pending confirmation, query); `Ui::update(Msg)` changes state and queues typed `Submission`s in an outbox the runtime drains; send and delete only leave after `Confirm`. Shells reach the same machine through `mailune-ffi` (`MailuneCore::dispatch` → `UiState`, Swift/Kotlin/C#) and `mailune-capi` (`mailune_core_dispatch`, JSON, Vala); the header and payload schema are re-blessed. No I/O. Under 500 lines of code.
 
 What landed: `mailune_app::Ui` is a pure Crux-style reducer: `Msg` in, state plus an outbox of typed `Submission`s out, with the B1 `Views` folded from `Msg::Core`. Send and delete wait for `Confirm`; archive, search and select go straight to the outbox; closing the composer saves the draft. Swift, Kotlin and C# reach it through `MailuneCore::dispatch` / `ui_state` in `mailune-ffi`, and Vala through `mailune_core_dispatch` in `mailune-capi` (header and payload schema re-blessed). The web shell will reach it through `mailune-server` once that forwards a dispatch method; that is not wired in this task.
+
+### C3. Autocrypt headers
+
+Depends on: C2. Reuse: the OpenPGP key type only if `mailune-crypto` can be called without editing it. Prefer a header codec in `mailune-mime`.
+
+Done when: an Autocrypt header is parsed and gossip keys are collected from a message. No WKD network lookup.
+
+Execution plan: `mailune-mime` only, plus a fuzz target. New `autocrypt.rs`: a header codec for Autocrypt Level 1 (`addr`, `prefer-encrypt`, `keydata`; `_`-prefixed attributes ignored, any other unknown attribute voids the header; keydata base64 with folding stripped and a size cap). `sender_autocrypt` returns the From address's key only when exactly one valid header matches From; `gossip_keys` reads `Autocrypt-Gossip` from a decrypted payload and keeps keys for the outer recipients only. Keydata stays opaque bytes (no `mailune-crypto` call). No WKD, no network. Fixture tests plus an `autocrypt-header` fuzz target in the nightly matrix.
+
+What landed: `mailune-mime::autocrypt` with `sender_autocrypt` (exactly one valid header whose `addr` is the single From address; delivery reports ignored) and `gossip_keys` (decrypted payload only, filtered to the outer recipients, first key per address, no preference). Underscore attributes are ignored, any other unknown or duplicate attribute voids the header, keydata is unfolded base64 capped at 64 KiB and kept opaque. Seven fixture tests and an `autocrypt-header` fuzz target in the nightly matrix. No WKD and no network.
