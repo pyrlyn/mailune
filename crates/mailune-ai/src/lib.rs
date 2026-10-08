@@ -9,6 +9,7 @@ mod platform;
 mod prompts;
 mod redact;
 mod router;
+mod triage;
 
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
@@ -16,6 +17,7 @@ pub use platform::{PlatformBridge, map_capability};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use triage::{TriageInput, categorize};
 
 use std::fmt;
 use std::future::Future;
