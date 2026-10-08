@@ -3,6 +3,7 @@
 //! I/O stays behind traits in `mailune-protocol`. This crate depends on the
 //! contract and on nothing that opens a socket, a file or a process.
 
+mod ask;
 mod cancel;
 mod followup;
 mod lock;
@@ -12,6 +13,7 @@ mod schedule;
 mod search;
 mod thread;
 
+pub use ask::{Answer, Citation, ask};
 pub use cancel::{CancelToken, Progress, run_loop};
 pub use followup::{Exchange, awaiting_reply};
 pub use lock::{AppLock, BiometricRequest};
