@@ -5,6 +5,7 @@
 
 mod build;
 mod contacts;
+mod html;
 mod link;
 mod message;
 mod parse;
@@ -14,6 +15,7 @@ mod unsubscribe;
 
 pub use build::{Attachment, Outbound, build};
 pub use contacts::{RankedContact, Sighting, rank_contacts};
+pub use html::{SanitizedHtml, sanitize_html};
 pub use link::{LinkCheck, inspect_link};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
@@ -33,4 +35,7 @@ pub enum Error {
     /// `mail-builder` could not write the message.
     #[error("the message could not be encoded")]
     Build(#[source] std::io::Error),
+    /// The HTML fragment could not be turned into a plain-text alternative.
+    #[error("html could not be turned into text")]
+    Html,
 }

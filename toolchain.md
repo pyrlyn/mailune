@@ -25,3 +25,5 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | encoding_rs | local | https://github.com/hsivonen/encoding_rs | Canonical charset name for a MIME part |
 | mail-builder | local | https://github.com/stalwartlabs/mail-builder | MIME build (text, HTML, attachment, reply headers) |
 | mail-parser | local | https://github.com/stalwartlabs/mail-parser | RFC 5322 / MIME parse |
+| ammonia | local | https://github.com/rust-ammonia/ammonia | HTML sanitizer for the message body |
+| html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |

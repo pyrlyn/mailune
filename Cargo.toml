@@ -47,6 +47,10 @@ quick-xml = "0.42.0"
 sha2 = "0.11"
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
+# mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.
+ammonia = "4.2.1"
+# mailune-mime: plain text from the sanitized HTML fragment. 0.17.1 checked on crates.io 2026-10-08.
+html2text = "0.17.1"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
