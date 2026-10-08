@@ -733,3 +733,13 @@ Done when: IDLE updates are parsed and a dropped session backs off then reconnec
 Execution plan: Scripted server: IDLE/DONE, pushed EXISTS/EXPUNGE/FETCH while idling, drop and refuse hooks, and a SharedServer so reconnects see the same mailboxes. Client idle.rs: idle, idle_poll, idle_done, parse_idle_line, Backoff, and IdleWatch::step that waits on the injected mailune-protocol Clock (testkit FakeHost in tests).
 
 What landed: `idle.rs`: `Connection::idle`, `idle_poll` and `idle_done` handle IDLE, and `parse_idle_line` reads EXISTS, EXPUNGE, FETCH flags and BYE. `IdleWatch::step` notices a dropped session and waits on the injected `Clock` with exponential `Backoff` (1, 2, then 4 s on the testkit fake clock, never on the thread). It then reconnects, re-selects and re-idles, and returns `Tick::Reconnected` so the caller can run an incremental sync. `SharedServer` lets reconnects reach the same scripted mailboxes.
+
+### P11. IMAP mutations
+
+Depends on: P7. Reuse: the scripted server.
+
+Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
+
+Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and APPEND with a synchronizing literal, answering COPYUID and APPENDUID under UIDPLUS. Client mutate.rs: store_flags, copy_messages, move_messages (MOVE, else COPY + Deleted + UID EXPUNGE, refused without UIDPLUS) and append; validate flags and mailbox names; bound COPYUID expansion.
+
+What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.

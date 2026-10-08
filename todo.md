@@ -21,7 +21,6 @@
 - C5. S/MIME sign and encrypt
 - C7. DKIM ed25519, simple, and l=
 - P10. Lazy body fetch
-- P11. IMAP mutations
 - P12. Persist the operation queue
 - S1. mailune-store
 - S2. Schema v1 migrations

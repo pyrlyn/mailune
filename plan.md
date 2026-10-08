@@ -27,7 +27,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P11 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -333,14 +332,6 @@ Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
 Depends on: P7. Reuse: imap-codec.
 
 Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
-
-Execution plan: `mailune-imap` only.
-
-### P11. IMAP mutations
-
-Depends on: P7. Reuse: the scripted server.
-
-Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
 
 Execution plan: `mailune-imap` only.
 

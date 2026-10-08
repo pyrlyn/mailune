@@ -85,7 +85,7 @@ impl<S: Read + Write> Connection<S> {
     /// [`Error::Rejected`] for an unknown mailbox, [`Error::Response`] when
     /// the reply has no UIDVALIDITY.
     pub fn select(&mut self, mailbox: &str) -> Result<Selected, Error> {
-        let reply = self.run(&format!("SELECT {}", quote_mailbox(mailbox)))?;
+        let reply = self.run(&format!("SELECT {}", quote_mailbox(mailbox)?))?;
         Ok(Selected {
             exists: untagged_number(&reply, "EXISTS").unwrap_or(0),
             uidvalidity: response_code(&reply, "UIDVALIDITY")
@@ -139,16 +139,24 @@ impl<S: Read + Write> Connection<S> {
 }
 
 /// Quotes a mailbox name unless it is a plain atom.
-pub(crate) fn quote_mailbox(name: &str) -> String {
-    if !name.is_empty()
+///
+/// # Errors
+///
+/// [`Error::Argument`] for a name with CR, LF or NUL, which a quoted string
+/// cannot carry and which would end the command early.
+pub(crate) fn quote_mailbox(name: &str) -> Result<String, Error> {
+    if name.bytes().any(|byte| matches!(byte, b'\r' | b'\n' | 0)) {
+        return Err(Error::Argument);
+    }
+    let atom = !name.is_empty()
         && name
             .bytes()
-            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'/' | b'.' | b'-' | b'_'))
-    {
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'/' | b'.' | b'-' | b'_'));
+    Ok(if atom {
         name.to_string()
     } else {
         format!("\"{}\"", name.replace('\\', "\\\\").replace('"', "\\\""))
-    }
+    })
 }
 
 /// `n` from a `* n KEYWORD` line.
@@ -389,7 +397,8 @@ pub(crate) mod tests {
     fn sets_and_names_are_encoded_for_the_wire() {
         assert_eq!(uid_set(&[1, 2, 3, 7, 9, 10]), "1:3,7,9:10");
         assert_eq!(uid_set(&[]), "");
-        assert_eq!(quote_mailbox("INBOX"), "INBOX");
-        assert_eq!(quote_mailbox("Sent Items"), "\"Sent Items\"");
+        assert_eq!(quote_mailbox("INBOX").unwrap(), "INBOX");
+        assert_eq!(quote_mailbox("Sent Items").unwrap(), "\"Sent Items\"");
+        assert!(matches!(quote_mailbox("a\r\nb"), Err(Error::Argument)));
     }
 }

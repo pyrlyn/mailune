@@ -7,6 +7,7 @@
 mod idle;
 mod incremental;
 mod list;
+mod mutate;
 mod script;
 mod session;
 mod sync;
@@ -14,6 +15,7 @@ mod sync;
 pub use idle::{Backoff, IdleEvent, IdleWatch, Tick, parse_idle_line};
 pub use incremental::{Delta, FlagChange, Resync, SyncState};
 pub use list::{ListedMailbox, mailbox_role, parse_list};
+pub use mutate::{Appended, FlagOp, UidMap};
 pub use script::{FIXTURE, ScriptMailbox, ScriptMessage, Scripted};
 pub use session::{Config, Connection, MemStream, SharedServer};
 pub use sync::{MessageMeta, Selected, SyncBatch, Window};
@@ -30,4 +32,10 @@ pub enum Error {
     /// The server answered NO or BAD.
     #[error("the server refused the command")]
     Rejected,
+    /// A name, flag or UID list cannot be sent safely.
+    #[error("the argument cannot be sent to the server")]
+    Argument,
+    /// The server lacks an extension this operation needs to be safe.
+    #[error("the server does not support this operation")]
+    Unsupported,
 }

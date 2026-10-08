@@ -141,6 +141,11 @@ impl<S: Read + Write> Connection<S> {
             .map_err(|_| Error::Session)
     }
 
+    /// Sends raw bytes, such as a literal after its continuation.
+    pub(crate) fn send_bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
+        self.io.write_all(bytes).map_err(|_| Error::Session)
+    }
+
     /// Reads one line, waiting for it.
     pub(crate) fn read_line(&mut self) -> Result<String, Error> {
         self.read_one_line()
