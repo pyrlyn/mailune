@@ -625,83 +625,10 @@ fn role_name(role: MailboxRole) -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use mailune_protocol::{
-        AccountId, Address, Envelope, Flags, MailboxId, MailboxRole, MessageId, ThreadId,
-        TransportSecurity,
-    };
+    use mailune_protocol::{MailboxId, ThreadId};
 
-    use super::{Account, Counts, Mailbox, StoredMessage};
-    use crate::Store;
-
-    fn account() -> AccountId {
-        AccountId::new("acc")
-    }
-
-    fn inbox() -> MailboxId {
-        MailboxId::new("inbox")
-    }
-
-    fn seeded() -> (tempfile::TempDir, Store) {
-        let dir = tempfile::tempdir().unwrap();
-        let mut store = Store::open(&dir.path().join("mail.db"), None).unwrap();
-        store
-            .upsert_account(&Account {
-                id: account(),
-                email: "me@example.com".into(),
-                display_name: Some("Me".into()),
-                provider: "jmap".into(),
-            })
-            .unwrap();
-        for (id, role) in [
-            ("inbox", MailboxRole::Inbox),
-            ("archive", MailboxRole::Archive),
-        ] {
-            store
-                .upsert_mailbox(&Mailbox {
-                    account: account(),
-                    id: MailboxId::new(id),
-                    name: id.into(),
-                    role: Some(role),
-                    parent: None,
-                })
-                .unwrap();
-        }
-        (dir, store)
-    }
-
-    fn message(id: &str, thread: &str, at: i64, seen: bool) -> StoredMessage {
-        StoredMessage {
-            account: account(),
-            envelope: Envelope {
-                id: MessageId::new(id),
-                thread: ThreadId::new(thread),
-                from: Address {
-                    name: Some("Ada".into()),
-                    email: "ada@example.com".into(),
-                },
-                to: vec![Address {
-                    name: None,
-                    email: "me@example.com".into(),
-                }],
-                cc: Vec::new(),
-                subject: format!("subject {thread}"),
-                stamp: at.to_string(),
-                snippet: "hi".into(),
-                flags: Flags {
-                    seen,
-                    flagged: false,
-                    draft: false,
-                    answered: false,
-                    deleted: false,
-                    keywords: vec!["work".into()],
-                },
-                attachment_count: 0,
-                transport: TransportSecurity::Tls,
-            },
-            received_at: at,
-            mailboxes: vec![inbox()],
-        }
-    }
+    use super::Counts;
+    use crate::testutil::{account, inbox, message, seeded};
 
     #[test]
     fn an_upsert_round_trips_the_envelope_and_replaces_it() {

@@ -137,3 +137,14 @@ diesel::table! {
         used -> BigInt,
     }
 }
+
+diesel::table! {
+    embeddings (account_id, message_id, chunk, model) {
+        account_id -> Text,
+        message_id -> Text,
+        chunk -> Integer,
+        model -> Text,
+        dim -> Integer,
+        vector -> Binary,
+    }
+}

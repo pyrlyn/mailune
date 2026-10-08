@@ -603,3 +603,13 @@ Done when: pending ops round-trip through `mailune-store` and replay onto the ex
 Execution plan: `Queue::pending_ops()` in `mailune-core` exposes the pending set (no rule change). `Store::save_ops`/`load_ops` in `mailune-store` write it to the `ops` table with nanosecond times; a test replays the rows through `Queue::enqueue`.
 
 What landed: `mailune-core` exposes `Queue::pending_ops()` (key, op, queued time), with no change to the queue's rules. `mailune-store` adds `save_ops`, which replaces the `ops` table with that set, and `load_ops`, which reads it back oldest first. Times are stored as nanoseconds, so a replayed op compares equal and the undo window still runs from the original queue time. A test reopens the file, replays through `Queue::enqueue`, and checks pending keys, location, schedule, idempotent re-replay and undo. `mailune-core` still has no store dependency.
+
+### S8. Embedding store
+
+Depends on: S3. Reuse: cosine in Rust. Do not use sqlite-vec.
+
+Done when: vectors stored in SQLite return the nearest neighbours by cosine.
+
+Execution plan: `vector.rs` in `mailune-store` plus an `embeddings` migration: f32 little-endian vectors per (message, chunk, model); `nearest` scans one account and model and sorts by cosine in Rust. No sqlite-vec.
+
+What landed: An `embeddings` table (third migration) keeps one little-endian f32 vector per message chunk and model, cascading with the message. `Store::put_embedding` upserts a vector; `Store::nearest` scans one account and model, skips other dimensions and zero vectors, and returns the top chunks by cosine with a stable tie order. Store unit tests now share one fixture module.

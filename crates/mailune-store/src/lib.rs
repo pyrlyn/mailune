@@ -17,6 +17,10 @@ mod ops;
 mod repo;
 #[cfg(not(target_arch = "wasm32"))]
 mod schema;
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod testutil;
+#[cfg(not(target_arch = "wasm32"))]
+mod vector;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
@@ -26,6 +30,8 @@ pub use open::{KEY_LEN, Store};
 pub use ops::PendingOp;
 #[cfg(not(target_arch = "wasm32"))]
 pub use repo::{Account, Counts, Cursor, Mailbox, StoredMessage, ThreadPage, ThreadSummary};
+#[cfg(not(target_arch = "wasm32"))]
+pub use vector::{ChunkRef, Neighbour};
 
 /// Failure returned by the store.
 ///

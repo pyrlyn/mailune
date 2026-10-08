@@ -42,7 +42,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S8 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | S9 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -466,14 +465,6 @@ Execution plan: `mailune-store` only.
 Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
 
 Done when: a second connection in the same process observes a write as a typed invalidation.
-
-Execution plan: `mailune-store` only.
-
-### S8. Embedding store
-
-Depends on: S3. Reuse: cosine in Rust. Do not use sqlite-vec.
-
-Done when: vectors stored in SQLite return the nearest neighbours by cosine.
 
 Execution plan: `mailune-store` only.
 
