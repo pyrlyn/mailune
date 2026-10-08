@@ -4,6 +4,12 @@
 //! and a `$select` message go through `mailune-fixture`, which ignores
 //! `@odata.deltaLink`, so the cursor is read beside the messages.
 
+mod mutate;
+
+pub use mutate::{
+    BatchPart, FlagPatch, Move, SentMail, apply_batch, apply_flag, apply_move, apply_send,
+};
+
 use mailune_protocol::Envelope;
 use mailune_store::{
     AccountRow, FlagRow, MailboxRow, MembershipRow, MessageRow, Store, SyncStateRow, ThreadRow,
