@@ -6,9 +6,11 @@
 //! in process. It does not open a socket.
 
 mod host;
+mod list;
 mod shell;
 
 pub use host::LinuxHost;
+pub use list::{ThreadList, load_list};
 pub use shell::{Shell, load_shell};
 
 use std::collections::BTreeMap;
