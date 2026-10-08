@@ -4,40 +4,26 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 
 ## Ph1 Core mail over IMAP and SMTP
 
-- C10 · M · after P1, P3, P5, P14, S6 · Fuzz targets: MIME, IMAP responses, HTML sanitiser, autoconfig XML, query parser, rules DSL. Reuse: cox/rtok/ketch fuzz/ layouts.
-- P3 · M · after P1, X10 · HTML policy: ammonia sanitize, cid: rewrite, remote-content stripping, html→text. Reuse: X10 text-sanitize; cox-web HTML→text pattern.
-- P5 · M · after P0, F8 · IMAP connection: TLS, CAPABILITY, auth (PLAIN, LOGIN, XOAUTH2, OAUTHBEARER), COMPRESS. Reuse: rtok src/tls.rs (rustls + webpki-roots).
-- P6 · S · after P5 · IMAP mailbox discovery: LIST, SPECIAL-USE, namespaces → roles. Reuse: NEW.
 - P7 · M · after P6, S3 · IMAP initial sync: UIDVALIDITY, batched envelope/flags/BODYSTRUCTURE, day window. Reuse: NEW.
 - P8 · L · after P7 · IMAP incremental sync: CONDSTORE/QRESYNC (CHANGEDSINCE, VANISHED) + diff fallback. Reuse: NEW.
 - P9 · M · after P7 · IMAP IDLE push with reconnect and backoff. Reuse: NEW.
 - P10 · S · after P7, S4 · Lazy body and attachment fetch (BODY.PEEK partial, BINARY). Reuse: NEW.
 - P11 · M · after P7 · IMAP mutations: STORE flags, MOVE (or COPY+EXPUNGE), APPEND, UIDPLUS mapping. Reuse: NEW.
 - P12 · L · after S2, F7 · Persist the operation queue (replay, idempotency, conflict policy, undo window) in the store. The in-memory state machine is already in mailune-core. Reuse: NEW.
-- P13 · M · after P2, P12 · SMTP send (lettre): XOAUTH2, STARTTLS/TLS, send-later, undo-send delay, save to Sent. Reuse: NEW.
-- P14 · M · after F8 · Live autoconfig lookup: ISPDB fetch, SRV (RFC 6186), MX heuristics. XML and .well-known JSON parsing is already in mailune-auth. Reuse: NEW.
-- P15 · M · after F8, C1 · OAuth2 loopback redirect and token refresh for Google and Microsoft. PKCE S256 verifier and challenge are already in mailune-auth. Reuse: cox-mcp src/auth.rs (loopback listener, keyring storage, refresh).
-- P16 · M · after P9, P12 · Sync scheduler: per-account workers, priorities, network/battery/Wi-Fi-only awareness. Reuse: NEW.
-- P30 · M · after P12 · Snooze, reminders, reply-later as scheduled ops; cross-device via keywords/METADATA where possible. Reuse: NEW.
 - R8 · M · after P7, R1 · Integration env: Stalwart + Dovecot in docker compose (PR subset, nightly full). Reuse: NEW.
-- R9 · S · after C10 · Nightly fuzzing workflow. Reuse: cox nightly.yml.
 - S1 · M · after F2, C1 · mailune-store: Diesel + bundled SQLCipher, WAL, embedded migrations, key from SecretStore. Reuse: cox-store; rtok src/store/mod.rs.
 - S2 · M · after S1, F7 · Schema v1 migrations: accounts, mailboxes, messages, memberships, threads, parts, flags, sync_state, ops, contacts. Reuse: cox-store migrations layout; optional prisma-toolkit Diesel generator for models.rs/schema.rs.
 - S3 · M · after S2 · Repository API in typed Diesel DSL: upserts, thread queries, cursor paging, counts. Reuse: cox-store models.rs/schema.rs patterns.
 - S4 · M · after S1 · Blob store for bodies/attachments: content-addressed, encrypted, quota + eviction. Reuse: NEW; sha2 (rust.md).
 - S5 · S · after S3 · FTS5 index over subject, addresses, body text (via sql_query inside store crate). Reuse: cox-store src/fts.rs; rtok FTS5 migrations.
 - S7 · S · after S3, X11 · Change feed → typed invalidation events for view models. Reuse: X11 sqlite-change-feed (cox-store watch.rs).
-- S11 · S · after S3 · Export: mbox / .eml, plus rules, drafts and settings JSON. Reuse: NEW.
 - S12 · S · after S3 · Storage benchmarks: 100k insert, list page, search. Reuse: divan (rust.md).
-- T2 · M · after P5, T1 · Scripted IMAP server with provider quirks (Gmail, Dovecot, Exchange IMAP). Reuse: NEW; imap-codec for server side encoding.
 - T4 · M · after P12, P8 · Sync property tests: random ops vs model mailbox, convergence invariants. Reuse: proptest (rust.md).
 
 ## Ph2 macOS on the FFI
 
-- B1 · L · after S7, P12, F9 · mailune-app assembly: owns config and runtime, folds Events into view models (thread list, thread, composer, settings). Reuse: cox-app; ketch-core (reports, never prints; callable from any thread); view-model shapes from research/mail-app ui/data.slint.
 - B2 · M · after B1, F6 · mailune-ffi: UniFFI 0.32 records, errors, async functions, callback interfaces. Reuse: ketch-ffi (callbacks.rs, records.rs, error.rs); cox-ffi (staticlib, bundled uniffi-bindgen).
 - B3 · S · after B2 · Swift packaging: XCFramework (macOS arm64, iOS, simulator) + SwiftPM MailuneCore. Reuse: ketch scripts/xcframework.sh; cross-code tools/build-xcframework.sh.
-- B7 · S · after B2 · Contract scenarios: generated JSON every front end's fake core replays. Reuse: ketch desktop/contract + ketch-ffi tests/contract.rs.
 - M1 · S · after B3 · Xcode project via XcodeGen + SPM packages (MailuneModel, MailuneUI, MailunePlatform), arm64, macOS 26. Reuse: cox desktop/macos layout; ketch desktop/macos.
 - M2 · S · after M1 · Design tokens → Swift (colors, type, spacing, radii, motion). Reuse: cox/ketch desktop/design (Style Dictionary); weft-swiftui theme.rs; research/mail-app theme.slint + brand tokens.css.
 - M3 · S · after M1 · Icon set: apple variant SVGs → asset catalog. Reuse: research/mail-app ui/icons/apple + tools/gen-icons.py.
@@ -59,21 +45,14 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 
 ## Ph3 AI v1 (local-first)
 
-- A2 · M · after A1 · Privacy policy router: per account/thread/feature, capability probe, fallback chain, budget. Reuse: runa-fit hardware probe.
 - A3 · M · after A1 · Local engine adapter: generation, embeddings, JSON-structured output. Reuse: runa-engine (embed.rs, structured.rs, prompt cache).
 - A4 · M · after A3 · Model manager: catalog, SHA-256 verified resumable downloads, storage, delete. Reuse: aulo-models downloader; runa-fit memory planner; hf-hub (rust.md).
 - A6 · M · after A1, X6, X7, C1 · Cloud BYOK providers: OpenAI-compatible (Ollama, LM Studio, Foundry Local) and Anthropic. Reuse: X5–X7 llm-* crates; runa-cloud routing.rs.
-- A7 · S · after A2, S2 · Data-flow ledger: feature, provider, bytes, message ids, retention class. Reuse: cox usage-ledger convention.
-- A9 · M · after A1 · Prompt-injection guard + tool permission engine (policy outside model, fail closed). Reuse: cox-permission rule engine; aulo conventions.
-- A10 · S · after A1, F10 · Prompt registry: versioned, localised templates with snapshot tests. Reuse: NEW.
 - A11 · M · after A2, A3, A9, A10, P3 · Thread summary: short, detailed, action items; cached by content hash. Reuse: NEW.
 - A12 · M · after A11 · Daily digest (“Today” brief) since last open. Reuse: NEW.
 - A13 · S · after A11 · Smart reply suggestions (3 options). Reuse: NEW.
 - A14 · M · after A2, A10 · Compose assist: draft from prompt, rewrite, tone, shorten, proofread. Reuse: NEW.
-- A16 · M · after S3, A2 · Triage categories (Imbox / Feed / Paper Trail / Promotions / Social / Updates): heuristics + small model. Reuse: NEW; ideas from HEY and research/mail-app category tabs.
-- A17 · M · after A16 · Priority score and needs-reply detection. Reuse: NEW.
 - A20 · M · after S9, A32, A2 · Ask your inbox: RAG with citations. Reuse: research/noema; S9.
-- A21 · S · after S3, A2 · Follow-up detector: sent mail awaiting reply → nudge. Reuse: NEW.
 - A23 · S · after A2 · Translation of messages and drafts with language detection. Reuse: NEW.
 - A30 · M · after X8, T5 · AI evaluation harness: per-feature metrics, cassettes, CI regression gate. Reuse: X8 llm-testkit (cox-provider-testkit).
 - A32 · M · after A3, S8, S10 · Background embedding pipeline with model choice by eval. Reuse: research/noema (bge-m3 / Qwen3-Embedding GGUF candidates).
@@ -83,7 +62,6 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 - M19 · M · after M9, M10, A11, A13, A14, A16 · AI surfaces: summary card, smart replies, triage tabs, compose assist, privacy panel + ledger view. Reuse: research/mail-app sparkle icon, category tabs.
 - S8 · M · after S3 · Embedding store: vectors in SQLite + cosine KNN. Reuse: rtok src/store/embed.rs (avoids sqlite-vec, which bundled Diesel SQLite cannot load).
 - S9 · M · after S5, S6, S8 · Hybrid retrieval: FTS5 BM25 + vector KNN fused with RRF (k=60), filters, citations. Reuse: research/noema retrieval design.
-- S10 · M · after P3 · Chunker: 400–600 token chunks, quote/signature stripping, provenance. Reuse: research/noema plan D7/D8; cox-tokens (tiktoken-rs).
 - X5 · S · Consume llm-wire + llm-http from packages/crates (aulo S1 T1.1, T1.2, in flight). Reuse: packages/crates llm-wire, llm-http (extracted from cox-provider-http).
 - X6 · S · after X5 · Consume llm-openai from packages/crates (aulo S1 T1.3, in flight). Reuse: packages/crates llm-openai.
 - X7 · S · after X5 · Consume llm-anthropic from packages/crates (aulo S1 T1.4, in flight). Reuse: packages/crates llm-anthropic.
@@ -100,16 +78,12 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 - P23 · L · after P15, S3 · Microsoft Graph mail sync: folders, delta queries, $select. Reuse: NEW (no official Rust SDK; graph-rs-sdk stale).
 - P24 · M · after P23 · Graph mutations and send: move, flags/categories, sendMail, $batch. Reuse: NEW.
 - P25 · M · after P23 · Graph calendar and contacts read (availability, autocomplete). Reuse: NEW.
-- P26 · M · after P1, P13 · Calendar invites: iCalendar parse, iMIP RSVP. Reuse: NEW (crate survey first; none in rust.md).
-- P29 · S · after P16, A17 · New-mail notification policy: VIP, AI priority, quiet hours → Notify events. Reuse: NEW.
-- T3 · M · after T1 · HTTP fixtures for JMAP, Gmail API and Graph. Reuse: wiremock usage in cox.
 
 ## Ph5 Other platforms
 
 - B4 · M · after B2 · Kotlin packaging: cargo-ndk (arm64-v8a, x86_64) + AAR with UniFFI Kotlin. Reuse: cross-code wry-jni (cargo-ndk), wry-kotlin Gradle.
 - B5 · S · after B2 · C# packaging: uniffi-bindgen-cs (pinned fork for 0.32) → Mailune.Core project. Reuse: ketch scripts/csharp.sh, uniffi.toml, desktop/windows KetchCore.csproj.
 - B6 · M · after B1, X9 · mailune-capi: JSON-record C ABI for Vala, cbindgen header, VAPI, meson, drift test. Reuse: ketch-capi (abi.rs, cbindgen.toml, vapi, meson.build, tests/capi.vala); scull-ffi event queue; slint-bindings sb_last_error.
-- B8 · M · after B1 · mailune-rpc: JSON-RPC surface + schemars schema → TypeScript types. Reuse: rtok src/web (schemars protocol); Delta Chat jsonrpc pattern.
 - B9 · L · after P1, P4, S6 · mailune-wasm: subset build (protocol, MIME, threading, query parser) + engine-parity test. Reuse: weft crates/weft-wasm + moon wasm task; slint-flutter native/rust/wasm.rs envelope.
 - D1 · S · after B4 · Gradle project: Compose + Material 3; :core (AAR), :ui, :app. Reuse: cross-code wry-kotlin Gradle setup.
 - D2 · S · after D1 · Tokens → Compose theme; material icon variant → VectorDrawables. Reuse: research/mail-app icons/material + theme.slint.
@@ -184,20 +158,16 @@ Approved work that is not yet in `plan.md`. Approved by the creator on 2026-10-0
 ## Ph6 Trust, agents, AI v2, push relay
 
 - A15 · M · after A14, S3 · Style profile learned locally from Sent (per-recipient tier). Reuse: NEW.
-- A18 · S · after A16 · AI-assisted Screener for first-time senders. Reuse: NEW (HEY Screener pattern).
 - A19 · M · after A16, A9 · Natural-language rules → typed rule DSL, preview matches before enabling. Reuse: NEW.
 - A22 · M · after A2, P26, P25 · Scheduling extraction: dates, times, intents → ICS suggestion with availability. Reuse: NEW; jiff (rust.md).
-- A24 · M · after A2, P1 · Extraction cards: OTP, tracking numbers, invoices, flights. Reuse: NEW.
 - A25 · M · after C7, C8, A2 · Phishing and scam assessment (auth results + links + model). Reuse: NEW.
 - A27 · M · after A11 · Attachment summarisation (text/PDF extraction). Reuse: NEW (crate survey needed).
 - A28 · L · after A9, P12, B1 · Agent tools layer: typed tools with scopes, preview, undo, audit log. Reuse: cox-permission; cox-tools patterns.
 - A29 · M · after A28 · Local MCP server with per-folder/label scopes, read-only default, in-app send approval. Reuse: cox-mcp (rmcp); weft packages/mcp; rtok-mcp host config install.
 - A31 · S · after A1 · Voice dictation in composer (whisper-rs). Reuse: cox-voice; runa-media ASR.
-- C2 · L · after P1, P2, C1 · OpenPGP: key generate/import, PGP/MIME encrypt/sign, decrypt/verify. Reuse: pgp crate (rust.md); ketch-core trust.rs usage.
 - C3 · M · after C2 · Autocrypt headers and gossip, WKD key discovery. Reuse: NEW.
 - C4 · M · after P1 · S/MIME verify and decrypt (cms + x509-cert). Reuse: NEW.
 - C5 · M · after C4, P2 · S/MIME sign and encrypt. Reuse: NEW.
-- C7 · M · after P1 · DKIM/SPF/DMARC/ARC verification and sender identity badges. Reuse: NEW; mail-auth.
 - P31 · M · after P21, P23 · Push relay service: Gmail Pub/Sub and Graph webhooks to empty APNs/FCM wakes. Reuse: NEW (Mimestream Private Push pattern); axum from rtok src/web.
 - P32 · S · after P31, P16 · Relay client: register devices, wake triggers sync. Reuse: NEW.
 

@@ -14,3 +14,33 @@
 - X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 - X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
+- A2. Privacy policy router
+- A7. Data-flow ledger
+- A9. Prompt-injection guard and tool permissions
+- A10. Prompt registry
+- A16. Triage heuristics
+- A17. Priority score and needs-reply
+- A18. First-time sender screener
+- A21. Follow-up detector
+- A24. Extraction cards
+- B1. View models for list, thread, composer, settings
+- B7. Contract scenario JSON
+- B8. JSON-RPC surface
+- C2. OpenPGP encrypt, sign, decrypt, verify
+- C7. Authentication-Results and DKIM verify
+- C10. Fuzz targets for MIME, autoconfig, and search
+- P3. HTML policy
+- P5. IMAP connection state machine
+- P6. IMAP LIST to mailbox roles
+- P13. SMTP send behind a fake transport
+- P14. Autoconfig lookup behind a fetch trait
+- P15. OAuth loopback and refresh
+- P16. Sync scheduler
+- P26. iCalendar parse
+- P29. New-mail notification policy
+- P30. Snooze, reminder, and reply-later ops
+- R9. Nightly fuzz workflow
+- S10. Chunker
+- S11. Export eml and mbox
+- T2. Scripted IMAP server
+- T3. JMAP, Gmail, and Graph fixtures
