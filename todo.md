@@ -154,3 +154,22 @@
 - D11. Android widgets and share
 - D12. Android UI tests
 - R5. Android CI
+- R18. Homebrew cask and registry entry
+- X5. Consume llm-wire and llm-http
+- X6. Consume llm-openai
+- X7. Consume llm-anthropic
+- X8. Extract llm-testkit
+- D13. Android release
+- I8. TestFlight pipeline
+- R11. Windows signing workflow
+- R12. Flatpak workflow
+- R13. TestFlight workflow
+- R14. Play workflow
+- W13. Windows release
+- A33. Paid hosted AI tier
+- P27. EWS for on-premises Exchange
+- B10. BoltFFI survey
+- S14. usearch for vectors
+- B11. Shared view-model core
+- P33. Calendar view
+- P34. Shared inboxes

@@ -12,14 +12,14 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | F5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | F10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| R17 | todo | P0 | 2 | 40% | |
-| X1 | todo | P0 | 3 | 0% | |
-| X2 | todo | P0 | 2 | 0% | |
-| X3 | todo | P0 | 3 | 0% | |
-| X4 | todo | P0 | 2 | 0% | |
-| X9 | todo | P0 | 2 | 0% | |
-| X10 | todo | P0 | 2 | 0% | |
-| X11 | todo | P0 | 2 | 0% | |
+| R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
+| X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X3 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | A3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -160,6 +160,25 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | D11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | D12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| R18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| X5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X6 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X7 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| X8 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| R11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| R12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
+| P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
+| B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
+| S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
+| B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
+| P33 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
+| P34 | in progress | P3 | 5 | 0% | Cursor / grok 4.7 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
@@ -219,11 +238,15 @@ Done when: Landing build lists Mailune. Workspace checks (nextest, clippy, fmt u
 
 Already landed: `docs/site.md` describes the landing. `brands/mailune` is not in the brand repo: an incomplete folder would fail the token build (`build.mjs` lists brands, and each one needs tokens, logos, exports, and a rebuilt `dist/`).
 
+Execution plan: `apps/brand` worktree only. Finish `brands/mailune` so the brand build passes. Commit there. Do not push.
+
 ### X1. Layered TOML config loader in packages/crates (extend config-schema or add layered-config)
 
 Depends on: nothing. Reuse: packages/crates config-schema (aulo S1 T1.14, in flight) + cox-config src/load.rs, rtok src/config/layers.rs; extend config-schema rather than add a second crate.
 
 Done when: Crate published per packages/crates release-plz; cox switched to it; rust.md row. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: `packages/crates` worktree, on `batch9-store`'s agent. Commit there. Do not push. Do not edit Mailune plan files.
 
 ### X2. Extract keychain secret store (env → keyring, no inline secrets) — secret-store
 
@@ -231,11 +254,15 @@ Depends on: nothing. Reuse: cox-provider-http, runa-cloud src/secrets.rs, aulo-s
 
 Done when: One implementation; one consumer migrated; no-real-keychain test helper included. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
+Execution plan: `packages/crates` worktree, crate `secret-store`. Commit there. Do not push.
+
 ### X3. Extract telemetry setup with redaction — telemetry-setup
 
 Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
 
 Done when: aulo or cox migrated; redaction test moves with it. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: `packages/crates` worktree, crate `telemetry-setup`. Commit there. Do not push.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
@@ -243,11 +270,15 @@ Depends on: nothing. Reuse: cox-i18n.
 
 Done when: cox migrated; .po fixtures + plural test. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
+Execution plan: `packages/crates` worktree, crate `gettext-catalog`. Commit there. Do not push.
+
 ### X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 
 Depends on: nothing. Reuse: scull crates/scull-ffi/tests/bindings.rs; ketch-capi drift test.
 
 Done when: scull uses it; diff shown on drift. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: `packages/crates` worktree, crate `abi-drift`. Commit there. Do not push.
 
 ### X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 
@@ -257,11 +288,15 @@ Done when: Mailune uses it for headers and plain text; fuzz target lives with th
 
 Already landed: `docs/text-sanitize.md` records that the crate is not on crates.io and not under `packages/crates` yet, so Mailune does not depend on it.
 
+Execution plan: `packages/crates` worktree. Add `text-sanitize` if it is missing. Commit there. Do not push.
+
 ### X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
 
 Depends on: nothing. Reuse: cox-store src/watch.rs.
 
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
 
 ### A3. Local engine adapter
 
@@ -1382,3 +1417,155 @@ Depends on: D1.
 Done when: a new workflow runs `gradle test` for the JVM modules. The emulator is not required. Do not edit `.github/workflows/ci.yml` and do not change required checks.
 
 Execution plan: `.github/workflows/android.yml` only.
+
+### R18. Homebrew cask and registry entry
+
+Depends on: M18. Reuse: homebrew-tap `Casks/ketch.rb`; ketch `tap.yml`; ketch-registry.
+
+Done when: a cask installs the macOS arm64 build and the registry lists Mailune. The cask and the registry live in those repositories.
+
+Execution plan: `packages/homebrew-tap` and `packages/ketch-registry` worktrees. arm64 only. Commit in each repo. Do not push.
+
+### X5. Consume llm-wire and llm-http
+
+Depends on: the aulo extraction of those crates. Reuse: `packages/crates` llm-wire and llm-http, extracted from cox-provider-http.
+
+Done when: Mailune calls those crates and does not keep a private copy. The crates are not in `packages/crates` yet.
+
+Execution plan: `packages/crates` worktree. Add `llm-wire` and `llm-http` if they are missing. Commit there. Do not push.
+
+### X6. Consume llm-openai
+
+Depends on: X5. Reuse: `packages/crates` llm-openai.
+
+Done when: the OpenAI BYOK path uses that crate. It is not in `packages/crates` yet.
+
+Execution plan: `packages/crates` worktree, crate `llm-openai`, after X5. Commit there. Do not push.
+
+### X7. Consume llm-anthropic
+
+Depends on: X5. Reuse: `packages/crates` llm-anthropic.
+
+Done when: the Anthropic BYOK path uses that crate. It is not in `packages/crates` yet.
+
+Execution plan: `packages/crates` worktree, crate `llm-anthropic`, after X5. Commit there. Do not push.
+
+### X8. Extract llm-testkit
+
+Depends on: X5. Reuse: cox-provider-testkit.
+
+Done when: replay cassettes with secret redaction live in one shared crate and Mailune's scripted providers use it.
+
+Execution plan: `packages/crates` worktree, crate `llm-testkit`, after X5. Commit there. Do not push.
+
+### D13. Android release
+
+Depends on: D1, R14. Reuse: the R14 Play workflow.
+
+Done when: a signed AAB can be sent to the Play internal track and a note says whether F-Droid is feasible. Signing waits on R14.
+
+Execution plan: `desktop/android` on `batch9-store` only. No Play upload. Do not install the Android SDK.
+
+### I8. TestFlight pipeline
+
+Depends on: I1, R13. Reuse: the R13 App Store Connect workflow, based on the pyrlyn/ci macos-sign action.
+
+Done when: a TestFlight upload can run from that workflow. A real upload waits on R13.
+
+Execution plan: `desktop/macos` on `batch7-imap` only. No real TestFlight upload.
+
+### R11. Windows signing workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
+
+### R12. Flatpak workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
+
+### R13. TestFlight workflow
+
+Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
+
+Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
+
+### R14. Play workflow
+
+Depends on: R10. Reuse: none yet.
+
+Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
+
+### W13. Windows release
+
+Depends on: W1, R11. Reuse: the R11 signing workflow.
+
+Done when: an MSIX is signed and a winget manifest installs it. Signing waits on R11.
+
+Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
+
+### A33. Paid hosted AI tier
+
+Depends on: A6, A7. Reuse: the existing privacy router.
+
+Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
+
+Execution plan: design doc on `batch8-ai`. Encrypted mail never goes to a cloud model. Do not send mail.
+
+### P27. EWS for on-premises Exchange
+
+Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing a client.
+
+Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
+
+Execution plan: survey, then a client behind an injected transport on `batch9-store`. No sockets. Exchange Online stays on Graph.
+
+### B10. BoltFFI survey
+
+From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one tool. Crux has moved to it. Revisit after the UniFFI phase.
+
+Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
+
+Execution plan: `docs/boltffi.md` on `batch7-imap`. Do not replace UniFFI.
+
+### S14. usearch for vectors
+
+From ideas. The in-SQLite KNN is S8.
+
+Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
+
+Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
+
+### B11. Shared view-model core
+
+From ideas. A Crux-style pure UI core in Rust, with `mailune-app` view models as a reducer.
+
+Done when: every shell can render the same state machine from that reducer.
+
+Execution plan: a pure reducer in `mailune-app` on `batch8-ai`. Stay under 500 lines of code.
+
+### P33. Calendar view
+
+From ideas. Grow the scheduling assistant (A22) and Graph calendar access (P25) into a calendar view.
+
+Done when: the view shows local ICS suggestions. A JMAP Calendars source is added only after that RFC is published.
+
+Execution plan: a calendar view on `batch7-imap` from fixture ICS. No JMAP Calendars source until that RFC is published.
+
+### P34. Shared inboxes
+
+From ideas. Shared inboxes and comments, as in Spark and Missive, conflict with a no-server path unless they use JMAP Sharing (RFC 9670).
+
+Done when: a design shows shared inboxes and comments on RFC 9670, or records that the RFC cannot carry them.
+
+Execution plan: `docs/jmap-sharing.md` on `batch7-imap`. No Mailune server in the path.
