@@ -40,7 +40,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P12 | in progress | P1 | 4 | 0% | Claude / opus-5.5 |
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S8 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -453,14 +452,6 @@ Depends on: P7. Reuse: the scripted server.
 Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
 
 Execution plan: `mailune-imap` only.
-
-### P12. Persist the operation queue
-
-Depends on: the in-memory queue in `mailune-core` and S2.
-
-Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
-
-Execution plan: a load/save API on `mailune-store`, called by a test. Do not edit the queue's decision rules except to expose the pending set if it is still private.
 
 ### S5. FTS5 index
 

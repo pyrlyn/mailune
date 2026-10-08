@@ -8,6 +8,7 @@ publish = false
 description = "Local mail store: SQLite through Diesel"
 
 [dependencies]
+mailune-core = { path = "../mailune-core" }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
 

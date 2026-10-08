@@ -12,6 +12,8 @@ mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
 #[cfg(not(target_arch = "wasm32"))]
+mod ops;
+#[cfg(not(target_arch = "wasm32"))]
 mod repo;
 #[cfg(not(target_arch = "wasm32"))]
 mod schema;
@@ -20,6 +22,8 @@ mod schema;
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
+#[cfg(not(target_arch = "wasm32"))]
+pub use ops::PendingOp;
 #[cfg(not(target_arch = "wasm32"))]
 pub use repo::{Account, Counts, Cursor, Mailbox, StoredMessage, ThreadPage, ThreadSummary};
 
@@ -62,6 +66,9 @@ pub enum Error {
     /// One sealed blob is larger than the whole quota.
     #[error("blob is larger than the quota")]
     BlobTooLarge,
+    /// An op time is before the Unix epoch or does not fit in nanoseconds.
+    #[error("operation time cannot be stored")]
+    OpTime,
     /// SQLite kept another journal mode, so readers would block the writer.
     #[error("journal mode is {mode}, not wal")]
     NotWal {

@@ -34,7 +34,6 @@
 - P9. IMAP IDLE
 - P10. Lazy body fetch
 - P11. IMAP mutations
-- P12. Persist the operation queue
 - S5. FTS5 index
 - S7. Change feed
 - S8. Embedding store

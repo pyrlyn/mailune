@@ -593,3 +593,13 @@ Done when: bodies are content-addressed, encrypted with a caller-supplied key, a
 Execution plan: `blob.rs` in `mailune-store` plus a `blobs` migration: SHA-256 address, AES-256-GCM (aes-gcm 0.10.3, already in the tree) with the address as associated data, LRU eviction by a use counter when the quota is passed.
 
 What landed: `Store::blobs(key, quota)` returns a `Blobs` handle. `put` addresses bytes by the SHA-256 of the plaintext, seals them with AES-256-GCM under the caller's 32-byte key (nonce from the digest, address as associated data), and evicts least-recently-used blobs until the quota fits; `get` refuses a wrong key or a swapped row with `BlobKey`. Recency is a counter, not the clock. Blobs live in a `blobs` table added by a second migration.
+
+### P12. Persist the operation queue
+
+Depends on: the in-memory queue in `mailune-core` and S2.
+
+Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
+
+Execution plan: `Queue::pending_ops()` in `mailune-core` exposes the pending set (no rule change). `Store::save_ops`/`load_ops` in `mailune-store` write it to the `ops` table with nanosecond times; a test replays the rows through `Queue::enqueue`.
+
+What landed: `mailune-core` exposes `Queue::pending_ops()` (key, op, queued time), with no change to the queue's rules. `mailune-store` adds `save_ops`, which replaces the `ops` table with that set, and `load_ops`, which reads it back oldest first. Times are stored as nanoseconds, so a replayed op compares equal and the undo window still runs from the original queue time. A test reopens the file, replays through `Queue::enqueue`, and checks pending keys, location, schedule, idempotent re-replay and undo. `mailune-core` still has no store dependency.
