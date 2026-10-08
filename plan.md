@@ -21,7 +21,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A30 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | C3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -293,14 +292,6 @@ Depends on: A11. Reuse: the scripted engine.
 Done when: a thread yields three reply suggestions.
 
 Execution plan: `mailune-ai` only.
-
-### A22. Scheduling extraction
-
-Depends on: P26. Reuse: `icalendar` already in the workspace. Do not add `jiff` unless a date cannot be expressed with the types already in the tree.
-
-Done when: a fixture sentence with a date and a time becomes an ICS suggestion. No SMTP and no calendar server.
-
-Execution plan: `mailune-mime` only, next to the calendar module.
 
 ### A23. Language detection
 

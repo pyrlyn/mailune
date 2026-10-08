@@ -673,3 +673,13 @@ Done when: a sentence becomes a typed rule, and a preview lists the messages tha
 Execution plan: `mailune-ai` `rules.rs`: a `rule-from-sentence` template under `Feature::Rules`, a closed JSON shape (`from`/`subject`/`category` conditions; archive, mark read, star and label actions; no send, forward or delete), validation, `preview` over messages, and `RulePreview::enable` as the only way to turn a rule on. Committed on this PR branch.
 
 What landed: A sentence becomes a typed `ProposedRule` through a scripted model reply that must parse into a closed shape: no send, forward or delete action, at least one condition, no extra fields. `preview` lists the matching message ids, and only `RulePreview::enable` produces an `EnabledRule`, so the person has seen the matches first.
+
+### A22. Scheduling extraction
+
+Depends on: P26. Reuse: `icalendar` already in the workspace. Do not add `jiff` unless a date cannot be expressed with the types already in the tree.
+
+Done when: a fixture sentence with a date and a time becomes an ICS suggestion. No SMTP and no calendar server.
+
+Execution plan: `mailune-mime` `schedule.rs` next to `calendar.rs`: word heuristics for ISO dates, month-day in either order, weekdays, today and tomorrow, and 12- or 24-hour times. Civil-date arithmetic is done in place, so no `jiff` and no direct `chrono`. A one-hour floating-time VEVENT is built with `icalendar`.
+
+What landed: A sentence with a date (ISO, month-day, weekday, today or tomorrow) and a time (3:30pm, 10 am, 14:05, noon) becomes a one-hour `ScheduleSuggestion` with floating local DTSTART and DTEND, and the ICS text is built with `icalendar` and parses back. Without both a date and a time there is no suggestion. No jiff, no SMTP, no calendar server.
