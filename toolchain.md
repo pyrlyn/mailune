@@ -35,6 +35,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
 | diesel | local | https://github.com/diesel-rs/diesel | Typed SQLite access in `mailune-store` |
+| diesel_migrations | local | https://github.com/diesel-rs/diesel | Embedded schema migrations in `mailune-store` |
 | libsqlite3-sys | local | https://github.com/rusqlite/rusqlite | Bundled SQLCipher on Apple targets, bundled SQLite elsewhere |
 | zeroize | local | https://github.com/RustCrypto/utils | Wipes the SQLCipher key text after the PRAGMA |
 | tempfile | local | https://github.com/Stebalien/tempfile | Scratch directories for store tests |

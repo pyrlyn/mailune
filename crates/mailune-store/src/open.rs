@@ -58,6 +58,7 @@ impl Store {
             apply_key(&mut conn, key)?;
         }
         configure(&mut conn)?;
+        crate::migrate::run(&mut conn)?;
         Ok(Self { conn })
     }
 

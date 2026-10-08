@@ -35,7 +35,6 @@
 - P10. Lazy body fetch
 - P11. IMAP mutations
 - P12. Persist the operation queue
-- S2. Schema v1 migrations
 - S3. Repository API
 - S4. Blob store
 - S5. FTS5 index

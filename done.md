@@ -563,3 +563,13 @@ Done when: a file-backed SQLite database opens with WAL and a key argument. The 
 Execution plan: new crate `mailune-store`: `Store::open(path, key)` with a 32-byte raw key, PRAGMA key through a silenced connection, then WAL, foreign keys and busy timeout. SQLCipher on Apple targets (CommonCrypto); bundled SQLite elsewhere refuses a key. Tests use tempfile.
 
 What landed: `mailune-store` opens a file-backed SQLite database in WAL mode. `Store::open(path, Some(key))` takes a raw 32-byte key, sends it as `PRAGMA key` from a zeroized buffer on a connection whose instrumentation is silenced, and maps a wrong key to `WrongKey`. Apple targets link `libsqlite3-sys` 0.38.2 `bundled-sqlcipher` against CommonCrypto; Linux, Windows and Android use `bundled` SQLite because SQLCipher there needs an OpenSSL build the CI runners do not have, and those builds refuse a key with `CipherUnavailable` instead of silently storing plaintext. The crate is empty on wasm32.
+
+### S2. Schema v1 migrations
+
+Depends on: S1. Reuse: Diesel migrations.
+
+Done when: embedded migrations create accounts, mailboxes, messages, memberships, threads, parts, flags, sync_state, ops, and contacts.
+
+Execution plan: one embedded migration `schema_v1` in `crates/mailune-store/migrations`, a hand-written `schema.rs`, and `Store::open` running pending migrations. A test touches every column through the DSL.
+
+What landed: `crates/mailune-store/migrations/2026-10-08-000001_schema_v1` creates accounts, mailboxes, threads, messages, memberships, parts, flags, sync_state, ops and contacts, keyed on `(account_id, id)` because provider ids are only unique per account. `Store::open` runs the embedded migrations through `diesel_migrations` 2.3.2. `schema.rs` is hand-written; a test selects every column through the DSL so a drift between it and `up.sql` fails.

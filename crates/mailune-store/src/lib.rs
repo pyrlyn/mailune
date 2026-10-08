@@ -6,7 +6,11 @@
 //! pretend to encrypt.
 
 #[cfg(not(target_arch = "wasm32"))]
+mod migrate;
+#[cfg(not(target_arch = "wasm32"))]
 mod open;
+#[cfg(not(target_arch = "wasm32"))]
+mod schema;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
@@ -40,6 +44,9 @@ pub enum Error {
     /// The key does not open the file, or the file is not a database.
     #[error("wrong key or not a database")]
     WrongKey,
+    /// A schema migration failed. The file keeps the last schema that applied.
+    #[error("migration failed: {0}")]
+    Migration(String),
     /// SQLite kept another journal mode, so readers would block the writer.
     #[error("journal mode is {mode}, not wal")]
     NotWal {

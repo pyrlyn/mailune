@@ -14,6 +14,7 @@ thiserror = { workspace = true }
 # later task, so the crate is empty there.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 diesel = { workspace = true }
+diesel_migrations = { workspace = true }
 zeroize = { workspace = true }
 
 # Apple targets link SQLCipher against CommonCrypto, so no OpenSSL is needed.
