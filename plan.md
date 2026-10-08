@@ -6,18 +6,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
-| C1 | todo | P0 | 2 | 0% | |
+| C1 | todo | P0 | 2 | 40% | |
 | C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | F4 | todo | P0 | 3 | 0% | |
 | F5 | todo | P0 | 2 | 0% | |
-| F8 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| F9 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
 | R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| R15 | todo | P0 | 2 | 0% | |
-| R16 | todo | P0 | 2 | 0% | |
-| R17 | todo | P0 | 2 | 0% | |
-| T1 | todo | P0 | 3 | 0% | |
+| R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
 | X2 | todo | P0 | 2 | 0% | |
 | X3 | todo | P0 | 3 | 0% | |
@@ -31,6 +26,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 Depends on: F8, X2. Reuse: X2 secret-store; cox no_real_keychain_in_tests.rs guard.
 
 Done when: Secrets never in config or logs (tests); test suite never touches real keychain. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Already landed: `mailune-app` reads a bearer token through `SecretStore` and logs `Secret(redacted)` only. Passwords, the database key, and the Android host callback are still open. `X2` (the shared keychain crate) is still open.
 
 ### C11. Threat model and trust boundaries document (core, AI, MCP)
 
@@ -52,20 +49,6 @@ Depends on: F2, X3. Reuse: X3 telemetry-setup (from aulo-telemetry, cox-telemetr
 
 Done when: Logs redact tokens (test); no println! in libraries. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-### F8. I/O and host traits: Net, Clock, Fs, SecretStore, Notifier, NetworkState, AuthSession, PlatformModel, BackgroundScheduler
-
-Depends on: F7. Reuse: cox-ffi src/host.rs (AppHost); ketch-ffi callbacks.rs.
-
-Done when: Traits documented; fakes exist in testkit (T1). Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: Add host traits `Net`, `Clock`, `Fs`, `SecretStore`, `Notifier`, `NetworkState`, `AuthSession`, `PlatformModel`, `BackgroundScheduler` to `mailune-protocol`, documented, no I/O crates. Shape from `cox-ffi` `src/host.rs` and `ketch-ffi` `callbacks.rs`. A local test fake proves each trait is implementable. The `mailune-testkit` crate is T1 — do not create it. Do not edit CI or threat-model files.
-
-### F9. Cancellation tokens and progress reporting
-
-Depends on: F8. Reuse: ketch-core src/cancel.rs; ketch-ffi callbacks.rs.
-
-Done when: A long sync aborts within 100 ms of cancel (test). Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
 ### F10. Gettext catalogs for core-originated strings
 
 Depends on: F2, X4. Reuse: X4 gettext-catalog (from cox-i18n); research/mail-app lang/*.po.
@@ -80,29 +63,13 @@ Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt u
 
 Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
-### R15. SonarCloud + coverage (cargo-llvm-cov)
-
-Depends on: R1. Reuse: pyrlyn/ci sonarcloud.yml; rtok justfile coverage.
-
-Done when: Coverage visible; soft-fail without token. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-### R16. License check, CLA, commitlint no-agent-attribution
-
-Depends on: R1. Reuse: pyrlyn/ci license-check.yml, cla.yml; ketch commitlint.
-
-Done when: Commit with Co-Authored-By fails. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
 ### R17. Brand entry (pyrlyn/brand brands/mailune) and landing docs/site.md
 
 Depends on: F1. Reuse: apps/brand, apps/landing CONTENT_CONTRACT.md.
 
 Done when: Landing build lists Mailune. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-### T1. mailune-testkit: fakes for all host traits + Submission→Event scenario builder
-
-Depends on: F8. Reuse: cox core determinism; test-util feature pattern (rust.md).
-
-Done when: Used by first scenario test in mailune-core. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+Already landed: `docs/site.md` describes the landing. `brands/mailune` is not in the brand repo: an incomplete folder would fail the token build (`build.mjs` lists brands, and each one needs tokens, logos, exports, and a rebuilt `dist/`).
 
 ### X1. Layered TOML config loader in packages/crates (extend config-schema or add layered-config)
 
@@ -139,6 +106,8 @@ Done when: scull uses it; diff shown on drift. Workspace checks (nextest, clippy
 Depends on: nothing. Reuse: packages/crates text-sanitize (from cox-sanitize).
 
 Done when: Mailune uses it for headers and plain text; fuzz target lives with the crate. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Already landed: `docs/text-sanitize.md` records that the crate is not on crates.io and not under `packages/crates` yet, so Mailune does not depend on it.
 
 ### X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
 
