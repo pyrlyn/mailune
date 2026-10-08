@@ -20,9 +20,14 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 divan = { workspace = true }
+usearch = "2.26.4"
 
 [[bench]]
 name = "store"
+harness = false
+
+[[bench]]
+name = "knn"
 harness = false
 
 [lints]
