@@ -50,3 +50,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | MSTest.Sdk | local | https://github.com/microsoft/testfx | Tests for the C# core |
+| Microsoft.WindowsAppSDK | local | https://github.com/microsoft/WindowsAppSDK | WinUI 3 shell for Windows x64 and arm64 |

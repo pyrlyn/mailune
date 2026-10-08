@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Mailune.App/Mailune.App.csproj" />
+  <Project Path="Mailune.AppCore.Tests/Mailune.AppCore.Tests.csproj" />
+  <Project Path="Mailune.AppCore/Mailune.AppCore.csproj" />
+  <Project Path="Mailune.Core.Tests/Mailune.Core.Tests.csproj" />
+  <Project Path="Mailune.Core/Mailune.Core.csproj" />
+</Solution>
