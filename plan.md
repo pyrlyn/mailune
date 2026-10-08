@@ -48,7 +48,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
-| A27 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -515,14 +514,6 @@ Depends on: C8, A2. The rsa-sha256 verifier is already on this branch.
 Done when: auth results, link flags, and a scripted model verdict combine into one assessment. No network.
 
 Execution plan: `mailune-ai` only. Do not edit `mailune-mime`.
-
-### A27. Attachment summarisation
-
-Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; otherwise plain text only, named in the commit.
-
-Done when: a text attachment becomes a summary through the scripted engine. No network.
-
-Execution plan: `mailune-ai` only.
 
 ### A31. Voice dictation
 

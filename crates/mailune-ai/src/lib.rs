@@ -4,6 +4,7 @@
 //! model. This crate does not call a network provider.
 
 mod agent;
+mod attachment;
 pub mod catalog;
 mod digest;
 mod engine;
@@ -24,6 +25,7 @@ pub use agent::{
     Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Requested, Scope, ToolCall,
     UndoRecord, needs_confirmation, parse_call,
 };
+pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
 pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
@@ -173,6 +175,9 @@ pub enum Error {
     /// A model blob had the wrong size or digest. It was deleted.
     #[error("model blob failed verification")]
     BadBlob,
+    /// The input is of a kind this feature does not read.
+    #[error("unsupported input for this feature")]
+    Unsupported,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.

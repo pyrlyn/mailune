@@ -121,15 +121,31 @@ impl SummaryCache {
         kind: SummaryKind,
         privacy: Privacy,
     ) -> Result<String, Error> {
-        let template = kind.template()?;
         let thread = render_thread(messages);
-        let key = cache_key(template, &thread);
+        self.complete(provider, kind.template()?, &thread, privacy)
+            .await
+    }
+
+    /// Fills `template` with `text` and completes it, from the cache when the
+    /// same template version has seen the same text.
+    ///
+    /// # Errors
+    ///
+    /// The provider's error. A failed call caches nothing.
+    pub async fn complete<P: Provider>(
+        &mut self,
+        provider: &P,
+        template: &PromptTemplate,
+        text: &str,
+        privacy: Privacy,
+    ) -> Result<String, Error> {
+        let key = cache_key(template, text);
         if let Some(hit) = self.entries.get(&key) {
             return Ok(hit.clone());
         }
         let prompt = Prompt {
             feature: template.feature,
-            text: render(template, &thread),
+            text: render(template, text),
             privacy: privacy.class,
             encrypted: privacy.encrypted,
         };

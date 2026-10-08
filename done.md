@@ -613,3 +613,13 @@ Done when: a digest covers messages since a given instant and skips older ones.
 Execution plan: `mailune-ai` `digest.rs`: `daily_digest` filters each thread to messages received at or after `since`, skips threads with none, summarizes the rest through the A11 cache (short kind), cites message ids, and orders entries newest first.
 
 What landed: A daily digest covers only messages received at or after a given instant: older mail and threads with nothing new never reach the model. Each entry is a cached short summary that cites its message ids; entries are newest first.
+
+### A27. Attachment summarisation
+
+Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; otherwise plain text only, named in the commit.
+
+Done when: a text attachment becomes a summary through the scripted engine. No network.
+
+Execution plan: `mailune-ai` `attachment.rs`: plain text only, since `rust.md` lists no maintained document extractor. `text/*` (not HTML) is decoded as UTF-8, capped at 16 KiB on a char boundary, and summarized through a new `summarize-attachment` template via `SummaryCache::complete`.
+
+What landed: A text attachment becomes a cached summary through the scripted engine and a new `summarize-attachment` template. Plain text only: `rust.md` has no maintained extractor, so PDF, office formats, raw HTML and non-UTF-8 bodies return `Error::Unsupported`. Text is capped at 16 KiB.

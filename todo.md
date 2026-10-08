@@ -42,7 +42,6 @@
 - T4. Queue property tests
 - A19. Natural-language rules
 - A25. Phishing and scam assessment
-- A27. Attachment summarisation
 - A31. Voice dictation
 - E1. mailune-server
 - E2. Web frontend scaffold
