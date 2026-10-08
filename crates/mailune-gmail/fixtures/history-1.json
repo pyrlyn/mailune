@@ -1,0 +1,13 @@
+{
+  "history": [
+    {
+      "id": "1250",
+      "messages": [{ "id": "m3", "threadId": "t2" }],
+      "labelsRemoved": [
+        { "message": { "id": "m3", "threadId": "t2" }, "labelIds": ["UNREAD"] }
+      ]
+    }
+  ],
+  "nextPageToken": "next/page",
+  "historyId": "1300"
+}

@@ -653,3 +653,13 @@ Done when: a scripted exchange creates a MaskedEmail and lists a Sieve script. N
 Execution plan: `extras.rs` in `mailune-jmap`: `MaskedEmail/set` create under Fastmail's capability and `SieveScript/get` under RFC 9661's, both over the scripted transport.
 
 What landed: `JmapClient::create_masked_email` creates an enabled address through `MaskedEmail/set` under `https://www.fastmail.com/dev/maskedemail` (a `notCreated` refusal is `Error::Rejected`), and `sieve_scripts` lists scripts through `SieveScript/get` under `urn:ietf:params:jmap:sieve` (RFC 9661). Scripted exchanges only.
+
+### P21. Gmail read sync
+
+Depends on: P15, S3. Do not add `google-gmail1`.
+
+Done when: threads, labels, a historyId incremental diff, and a batch fetch parse from a scripted body and upsert through the repository. No TCP.
+
+Execution plan: new crate `mailune-gmail` with no reqwest or google-gmail1: requests are built by hand and sent through the injected `Http` trait. labels, threads.list, history.list across pages (404 means full sync), and batch GETs as multipart/mixed. Tests: scripted bodies upsert through `mailune-store` and resume from the saved historyId.
+
+What landed: New crate `mailune-gmail`: `GmailClient` over the injected `Http` transport (no reqwest, no google-gmail1). `labels`, `thread_ids`, `history` (follows `nextPageToken`, 404 returns `None` for a full sync, refuses a non-numeric historyId), `messages` and `threads` through the multipart/mixed batch endpoint (50 per batch, inner 404 skipped, ids outside [A-Za-z0-9_-] refused), and `sync(since, limit)`. Labels become mailboxes; `UNREAD` and `STARRED` become flags. Tests upsert scripted bodies through `mailune-store` and resume from the saved historyId. Deleted ids are returned; the store has no delete yet.

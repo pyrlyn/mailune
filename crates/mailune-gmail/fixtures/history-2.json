@@ -1,0 +1,13 @@
+{
+  "history": [
+    {
+      "id": "1290",
+      "messagesAdded": [{ "message": { "id": "m4", "threadId": "t2" } }]
+    },
+    {
+      "id": "1295",
+      "messagesDeleted": [{ "message": { "id": "m2", "threadId": "t1" } }]
+    }
+  ],
+  "historyId": "1300"
+}

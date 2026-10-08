@@ -1,0 +1,10 @@
+{
+  "labels": [
+    { "id": "INBOX", "name": "INBOX", "type": "system" },
+    { "id": "SENT", "name": "SENT", "type": "system" },
+    { "id": "UNREAD", "name": "UNREAD", "type": "system" },
+    { "id": "STARRED", "name": "STARRED", "type": "system" },
+    { "id": "CATEGORY_SOCIAL", "name": "CATEGORY_SOCIAL", "type": "system" },
+    { "id": "Label_1", "name": "Work", "type": "user" }
+  ]
+}

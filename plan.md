@@ -55,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P21 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P23 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P24 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -567,14 +566,6 @@ Depends on: P17.
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
 
 Execution plan: `mailune-jmap` only.
-
-### P21. Gmail read sync
-
-Depends on: P15, S3. Do not add `google-gmail1`.
-
-Done when: threads, labels, a historyId incremental diff, and a batch fetch parse from a scripted body and upsert through the repository. No TCP.
-
-Execution plan: new crate `mailune-gmail`. An injected transport. Link `reqwest` only if tests never dial out.
 
 ### P22. Gmail mutations
 
