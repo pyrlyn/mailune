@@ -7,12 +7,17 @@ mod build;
 mod link;
 mod message;
 mod parse;
+mod quirks;
 mod remote;
 
 pub use build::{Attachment, Outbound, build};
 pub use link::{LinkCheck, inspect_link};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
+pub use quirks::{
+    Auth, Endpoint, ImapUsername, Provider, Quirks, SpecialMailbox, Transport, all, by_imap_host,
+    quirks,
+};
 pub use remote::{RemoteContent, inspect_url};
 
 /// Failure from parsing or building one message.
