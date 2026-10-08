@@ -1,15 +1,16 @@
+import MailuneModel
 import SwiftUI
 
 /// A single column. This is the phone layout.
 public struct PhoneStack: View {
+    @State private var list = PhoneListState()
+
     public init() {}
 
     public var body: some View {
         NavigationStack {
-            List {
-                Text("Inbox")
-            }
-            .navigationTitle("Inbox")
+            PhoneThreadList(state: $list)
+                .navigationTitle("Inbox")
         }
     }
 }
