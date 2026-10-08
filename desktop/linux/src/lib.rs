@@ -10,6 +10,7 @@ mod desktop_file;
 mod host;
 mod list;
 mod reader;
+mod scenario;
 mod shell;
 
 pub use composer::{Composer, load_composer};
@@ -17,6 +18,7 @@ pub use desktop_file::{DesktopFile, load_desktop_file};
 pub use host::LinuxHost;
 pub use list::{ThreadList, load_list};
 pub use reader::{Reader, load_reader};
+pub use scenario::{Scenario, load_scenario};
 pub use shell::{Shell, load_shell};
 
 use std::collections::BTreeMap;
