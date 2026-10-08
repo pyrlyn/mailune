@@ -6,10 +6,12 @@
 mod build;
 mod message;
 mod parse;
+mod remote;
 
 pub use build::{Attachment, Outbound, build};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
+pub use remote::{RemoteContent, inspect_url};
 
 /// Failure from parsing or building one message.
 #[derive(Debug, thiserror::Error)]
