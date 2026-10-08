@@ -16,6 +16,7 @@ mod prompts;
 mod redact;
 mod reply;
 mod router;
+mod style;
 mod summary;
 mod triage;
 
@@ -35,6 +36,7 @@ pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use reply::suggest_replies;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use style::StyleBook;
 pub use summary::{SummaryCache, SummaryKind, summarize};
 pub use triage::{TriageInput, categorize};
 
