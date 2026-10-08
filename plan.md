@@ -55,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P20 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | P21 | in progress | P1 | 5 | 0% | Claude / opus-5.5 |
 | P22 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
@@ -567,14 +566,6 @@ Execution plan: `mailune-store` only. Commit on `batch9-store`.
 Depends on: P17.
 
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
-
-Execution plan: `mailune-jmap` only.
-
-### P19. JMAP mutations and send
-
-Depends on: P17.
-
-Done when: a scripted exchange applies a flag change and an EmailSubmission. No SMTP socket.
 
 Execution plan: `mailune-jmap` only.
 

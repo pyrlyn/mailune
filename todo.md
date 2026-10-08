@@ -49,7 +49,6 @@
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
-- P19. JMAP mutations and send
 - P20. JMAP MaskedEmail and Sieve
 - P21. Gmail read sync
 - P22. Gmail mutations

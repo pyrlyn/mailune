@@ -7,6 +7,7 @@
 
 mod client;
 mod mail;
+mod mutate;
 mod wire;
 
 pub use client::{JmapClient, Session, SyncBatch};
@@ -31,6 +32,12 @@ pub enum Error {
     #[error("JMAP method error: {kind}")]
     Method {
         /// The error `type` from the server.
+        kind: String,
+    },
+    /// The server refused a create or update (`notCreated`, `notUpdated`).
+    #[error("JMAP server refused the change: {kind}")]
+    Rejected {
+        /// The SetError `type`.
         kind: String,
     },
     /// The session does not offer a mail account.
