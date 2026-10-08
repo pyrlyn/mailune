@@ -40,3 +40,10 @@
   background: var(--color-accent);
   color: var(--color-paper);
 }
+
+.message-body {
+  width: 100%;
+  min-height: 12rem;
+  border: 0;
+  background: var(--color-paper);
+}

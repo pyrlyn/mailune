@@ -6,6 +6,7 @@ export interface ThreadFixture {
   from: string;
   subject: string;
   snippet: string;
+  body: string;
 }
 
 export const threads: ThreadFixture[] = [
@@ -15,6 +16,7 @@ export const threads: ThreadFixture[] = [
     from: "Ada",
     subject: "Build notes",
     snippet: "The build is ready.",
+    body: "The build is ready. No further action.",
   },
   {
     id: "thursday",
@@ -22,6 +24,7 @@ export const threads: ThreadFixture[] = [
     from: "Grace",
     subject: "Thursday",
     snippet: "Can we meet Thursday?",
+    body: "Can we meet Thursday afternoon?",
   },
 ];
 

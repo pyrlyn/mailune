@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { InboxIcon } from "./InboxIcon";
+import { Reader } from "./Reader";
 import { chosenThread, threads as fixtureThreads, type ThreadFixture } from "./fixture";
 import { translate } from "./i18n";
 import "./shell.css";
@@ -55,7 +56,7 @@ export function ShellView({
       <section className="pane" data-pane="reading" aria-label="Reading">
         <h2>{selected.subject}</h2>
         <p>{selected.from}</p>
-        <p>{selected.snippet}</p>
+        <Reader body={selected.body} />
       </section>
     </div>
   );
