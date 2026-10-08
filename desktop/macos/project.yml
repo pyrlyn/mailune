@@ -78,6 +78,7 @@ targets:
     dependencies:
       - package: MailuneModel
       - package: MailuneUI
+      - package: MailunePlatform
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios
