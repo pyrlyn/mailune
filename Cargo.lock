@@ -375,6 +375,7 @@ dependencies = [
 name = "mailune-ai"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "mailune-protocol",
  "thiserror",
 ]
