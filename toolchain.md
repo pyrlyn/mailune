@@ -29,3 +29,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
 | rand | local | https://github.com/rust-random/rand | DKIM test key generation |
+| imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |

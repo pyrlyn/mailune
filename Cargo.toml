@@ -56,6 +56,8 @@ html2text = "0.17.1"
 rsa = { version = "0.9.10", features = ["sha2"] }
 # mailune-mime tests: generate a DKIM key. 0.8 matches rsa 0.9's rand_core. 0.8.8 checked on crates.io 2026-10-08.
 rand = "0.8.8"
+# mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
+imap-codec = "1.0.0"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
