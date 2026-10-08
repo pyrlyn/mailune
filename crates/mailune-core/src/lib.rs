@@ -3,12 +3,19 @@
 //! I/O stays behind traits in `mailune-protocol`. This crate depends on the
 //! contract and on nothing that opens a socket, a file or a process.
 
+mod cancel;
+
+pub use cancel::{CancelToken, Progress, run_loop};
+
 /// Failure returned by the domain.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// The contract crate refused the call.
     #[error(transparent)]
     Contract(#[from] mailune_protocol::Error),
+    /// A [`CancelToken`] stopped the work at a checkpoint.
+    #[error("cancelled")]
+    Cancelled,
 }
 
 /// Confirms the domain links through to the contract.
