@@ -9,6 +9,7 @@ description = "SQLite store: schema, search, blobs, and the op queue"
 
 [dependencies]
 diesel = { workspace = true }
+diesel_migrations = { workspace = true }
 libsqlite3-sys = { workspace = true }
 thiserror = { workspace = true }
 

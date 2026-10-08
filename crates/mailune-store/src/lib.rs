@@ -12,6 +12,11 @@ use std::time::{Duration, Instant};
 use diesel::connection::SimpleConnection;
 use diesel::prelude::*;
 use diesel::sql_types::Text;
+use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
+
+mod schema;
+
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 /// Failure from the store. The text never includes the database key.
 #[derive(Debug, thiserror::Error)]
@@ -63,6 +68,8 @@ impl Store {
         conn.batch_execute("PRAGMA busy_timeout = 5000; PRAGMA foreign_keys = ON;")
             .map_err(|_| Error::Open)?;
         enable_wal(&mut conn)?;
+        conn.run_pending_migrations(MIGRATIONS)
+            .map_err(|_| Error::Migrate)?;
         Ok(Self {
             path: path.to_path_buf(),
             conn,
@@ -187,6 +194,77 @@ mod tests {
         let text = format!("{err} {err:?}");
         assert!(!text.contains("super-secret"));
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn migrations_create_the_v1_tables() {
+        let dir = scratch();
+        let path = dir.join("mail.db");
+        let mut store = Store::open(&path, b"key").unwrap();
+        assert_eq!(count_accounts(&mut store), 0);
+        assert_eq!(count_mailboxes(&mut store), 0);
+        assert_eq!(count_threads(&mut store), 0);
+        assert_eq!(count_messages(&mut store), 0);
+        assert_eq!(count_memberships(&mut store), 0);
+        assert_eq!(count_parts(&mut store), 0);
+        assert_eq!(count_flags(&mut store), 0);
+        assert_eq!(count_sync_state(&mut store), 0);
+        assert_eq!(count_ops(&mut store), 0);
+        assert_eq!(count_contacts(&mut store), 0);
+        drop(store);
+        let mut again = Store::open(&path, b"key").unwrap();
+        assert_eq!(count_accounts(&mut again), 0);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    fn count_accounts(store: &mut Store) -> i64 {
+        use crate::schema::accounts::dsl::accounts;
+        accounts.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_mailboxes(store: &mut Store) -> i64 {
+        use crate::schema::mailboxes::dsl::mailboxes;
+        mailboxes.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_threads(store: &mut Store) -> i64 {
+        use crate::schema::threads::dsl::threads;
+        threads.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_messages(store: &mut Store) -> i64 {
+        use crate::schema::messages::dsl::messages;
+        messages.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_memberships(store: &mut Store) -> i64 {
+        use crate::schema::memberships::dsl::memberships;
+        memberships.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_parts(store: &mut Store) -> i64 {
+        use crate::schema::parts::dsl::parts;
+        parts.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_flags(store: &mut Store) -> i64 {
+        use crate::schema::flags::dsl::flags;
+        flags.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_sync_state(store: &mut Store) -> i64 {
+        use crate::schema::sync_state::dsl::sync_state;
+        sync_state.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_ops(store: &mut Store) -> i64 {
+        use crate::schema::ops::dsl::ops;
+        ops.count().get_result(&mut store.conn).unwrap()
+    }
+
+    fn count_contacts(store: &mut Store) -> i64 {
+        use crate::schema::contacts::dsl::contacts;
+        contacts.count().get_result(&mut store.conn).unwrap()
     }
 
     #[test]
