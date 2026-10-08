@@ -21,11 +21,12 @@ The source for this plan, with the feature matrix, the reuse inventory and a fil
 | `mailune-core` | Pure: sync state machines, JWZ threading, op queue, scheduling, rules DSL | — |
 | `mailune-ai` | Pure: feature router, privacy policy, prompt registry, tool permissions | — |
 | `mailune-imap`, `-smtp`, `-jmap`, `-gmail`, `-graph` | Protocol adapters | imap stack (spike P0), lettre, jmap-client, reqwest |
-| `mailune-mime` | Adapter: MIME parse and build, HTML sanitising, HTML to text, DKIM/DMARC checks | mail-parser, mail-builder, ammonia, html2text, mail-auth |
+| `mailune-mime` | Adapter: MIME parse and build, HTML sanitising, HTML to text, DKIM/DMARC checks, Autocrypt headers | mail-parser, mail-builder, ammonia, html2text, mail-auth |
 | `mailune-store` | Adapter: SQLite with SQLCipher, FTS5, vectors, blob store | diesel, libsqlite3-sys (bundled-sqlcipher) |
 | `mailune-ai-local` | Adapter: local generation and embeddings | runa-engine (llama-cpp-2) |
 | `mailune-ai-cloud` | Adapter: bring-your-own-key providers | packages/crates llm-http, llm-openai, llm-anthropic |
-| `mailune-crypto` | Adapter: OpenPGP, S/MIME, Autocrypt | pgp, cms, x509-cert |
+| `mailune-crypto` | Adapter: OpenPGP | pgp |
+| `mailune-smime` | Adapter: S/MIME at the CMS layer (verify, decrypt, sign, encrypt) | cms, x509-cert, rsa |
 | `mailune-auth` | Adapter: OAuth PKCE, account autoconfig | oauth2 or the cox-mcp auth code |
 | `mailune-app` | Assembly: owns config and the runtime, folds Events into view models | tokio |
 | `mailune-ffi`, `-capi`, `-rpc`, `-wasm`, `-cli`, `-mcp`, `-server` | Surfaces that only forward calls | uniffi, cbindgen, axum, wasm-bindgen, clap, rmcp |

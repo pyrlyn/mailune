@@ -13,6 +13,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | kotlin | mise (`desktop/android/mise.toml`) | Kotlin compiler for the Android shell | https://github.com/JetBrains/kotlin |
 | meson | system | Builds and runs the Vala test of `mailune-capi` | https://github.com/mesonbuild/meson |
 | vala | system (with GLib, GObject and json-glib) | Compiles `crates/mailune-capi/tests/capi.vala` against the VAPI | https://gitlab.gnome.org/GNOME/vala |
+| openssl | system | Regenerates the `mailune-smime` interop fixtures (`fixtures/regenerate.sh`); not needed to build or test | https://github.com/openssl/openssl |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -33,7 +34,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | mail-parser | local | https://github.com/stalwartlabs/mail-parser | RFC 5322 / MIME parse |
 | ammonia | local | https://github.com/rust-ammonia/ammonia | HTML sanitizer for the message body |
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
-| rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
+| rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification; S/MIME signatures and key transport |
 | rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
@@ -42,6 +43,10 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
 | libc | local | https://github.com/rust-lang/libc | `mailune-capi`: `malloc`ed answers GLib can `g_free` |
 | cbindgen | local (dev) | https://github.com/mozilla/cbindgen | `mailune-capi`: header drift test |
+| cms | local | https://github.com/RustCrypto/formats/tree/master/cms | `mailune-smime`: CMS SignedData and EnvelopedData |
+| x509-cert | local | https://github.com/RustCrypto/formats/tree/master/x509-cert | `mailune-smime`: signer and recipient certificates |
+| aes | local | https://github.com/RustCrypto/block-ciphers | `mailune-smime`: AES content cipher |
+| cbc | local | https://github.com/RustCrypto/block-modes | `mailune-smime`: CBC mode for S/MIME content |
 
 Gradle (`desktop/android`):
 

@@ -25,7 +25,6 @@
 - A22. Scheduling extraction
 - A23. Language detection
 - A30. Evaluation cassettes
-- C4. S/MIME verify and decrypt
 - C5. S/MIME sign and encrypt
 - C7. DKIM ed25519, simple, and l=
 - P7. IMAP initial sync
