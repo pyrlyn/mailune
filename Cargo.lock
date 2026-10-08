@@ -2019,6 +2019,7 @@ dependencies = [
 name = "mailune-linux"
 version = "0.1.0"
 dependencies = [
+ "mailune-protocol",
  "thiserror 2.0.21",
 ]
 

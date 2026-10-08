@@ -1,7 +1,13 @@
-//! Linux catalogues loaded by language code.
+//! Linux catalogues and an in-memory host.
 //!
 //! English is always loaded. A key missing from the selected language uses
 //! the English line. This is a plain `key=value` file, not a gettext runtime.
+//! The host keeps secrets, banners, the network path, and the OAuth redirect
+//! in process. It does not open a socket.
+
+mod host;
+
+pub use host::LinuxHost;
 
 use std::collections::BTreeMap;
 use std::path::Path;

@@ -5,9 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "Linux UI catalogues loaded by language code"
+description = "Linux catalogues and an in-memory host"
 
 [dependencies]
+mailune-protocol = { path = "../../crates/mailune-protocol" }
 thiserror = { workspace = true }
 
 [lints]
