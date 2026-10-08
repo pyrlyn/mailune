@@ -3,9 +3,11 @@
 //! `mail-parser` owns the grammar. This crate owns the domain shape the
 //! rest of Mailune sees. Nothing here opens a socket.
 
+mod build;
 mod message;
 mod parse;
 
+pub use build::{Attachment, Outbound, build};
 pub use message::{Body, MimeMessage, Part, PartRole};
 pub use parse::parse;
 
@@ -15,4 +17,7 @@ pub enum Error {
     /// The bytes are not an RFC 5322 message.
     #[error("the bytes are not an RFC 5322 message")]
     Parse,
+    /// `mail-builder` could not write the message.
+    #[error("the message could not be encoded")]
+    Build(#[source] std::io::Error),
 }

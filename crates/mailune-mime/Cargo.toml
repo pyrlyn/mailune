@@ -9,6 +9,7 @@ description = "MIME parse and build"
 
 [dependencies]
 encoding_rs = { workspace = true }
+mail-builder = { workspace = true }
 mail-parser = { workspace = true }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }
