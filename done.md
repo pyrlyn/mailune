@@ -545,3 +545,11 @@ Done when: a JMAP Email/get, a Gmail history list, and a Graph delta page parse 
 Execution plan: new crate `mailune-fixture`.
 
 What landed: Static JMAP, Gmail, and Graph fixtures parse into protocol rows. No network.
+
+### F12. Gettext as the localisation source, converted to each shell's native format
+
+Requested by the creator. Reuse: translate-toolkit storage classes; research/mail-app lang/*.po as the seed.
+
+Done when: translate-toolkit is pinned in `mise.toml`; `i18n/*.po` is the single source; one command writes every native catalog and fails on broken keys, placeholders or plural forms.
+
+What landed: `"pipx:translate-toolkit" = "3.20.0"` in `mise.toml` with `i18n`, `i18n --check` and `i18n:test` tasks. `i18n/mailune.pot` plus `de`, `fr`, `ja` catalogs imported from research/mail-app (276 strings, msgctxt keys, `{0}` placeholders). `scripts/i18n.py` writes `target/i18n/`: Apple `Localizable.strings` and `.stringsdict`, Android `strings.xml`, Windows `.resw` (plurals as `<key>_<tag>`), Linux `.mo`, web i18next v4 JSON. Gettext plural forms are spread over CLDR tags; placeholders become `%n$@`, `%n$s`, `{n}` or `{{n}}` (`{{count}}` in plurals).

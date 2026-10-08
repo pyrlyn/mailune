@@ -70,3 +70,11 @@ mise exec -- cargo nextest run --workspace
 mise exec -- cargo clippy --workspace --all-targets -- -D warnings
 mise exec -- cargo fmt --all -- --check
 ```
+
+Localisation: `i18n/mailune.pot` and `i18n/<lang>.po` are the only source. Add a string there with a msgctxt key, never in a native catalog.
+
+```bash
+mise run i18n          # native catalogs into target/i18n
+mise run i18n --check  # validate keys, placeholders and plural forms
+mise run i18n:test
+```

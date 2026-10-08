@@ -7,6 +7,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | git | system | Version control | https://github.com/git/git |
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
+| translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
