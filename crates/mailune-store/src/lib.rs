@@ -15,12 +15,14 @@ use diesel::sql_types::Text;
 use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 
 mod blob;
+mod embed;
 mod fts;
 mod repo;
 mod schema;
 mod watch;
 
 pub use blob::BlobStore;
+pub use embed::Neighbour;
 pub use repo::{
     AccountRow, ContactRow, FlagRow, MailboxRow, MembershipRow, MessageCursor, MessagePage,
     MessageRow, PartRow, SyncStateRow, ThreadRow,

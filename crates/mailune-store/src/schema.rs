@@ -96,3 +96,11 @@ diesel::table! {
         name -> Text,
     }
 }
+
+diesel::table! {
+    embeddings (id) {
+        id -> Text,
+        dims -> Integer,
+        vector -> Binary,
+    }
+}
