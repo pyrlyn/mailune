@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "S/MIME verify and decrypt"
+description = "S/MIME sign, encrypt, verify, and decrypt"
 
 [dependencies]
 aes = { workspace = true }
@@ -14,13 +14,11 @@ cipher = { workspace = true }
 cms = { workspace = true }
 const-oid = { workspace = true }
 der = { workspace = true }
+rand = { workspace = true }
 rsa = { workspace = true }
 spki = { workspace = true }
 thiserror = { workspace = true }
 x509-cert = { workspace = true }
-
-[dev-dependencies]
-rand = { workspace = true }
 
 [lints]
 workspace = true

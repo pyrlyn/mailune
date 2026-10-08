@@ -1,27 +1,35 @@
-//! S/MIME verify and decrypt.
+//! S/MIME sign, encrypt, verify, and decrypt.
 //!
-//! `cms` 0.2.3 parses the message. The signature is checked with the RSA key
-//! inside the supplied certificate, and the enveloped content key is opened
-//! with the supplied private key. Nothing reads a keychain or opens a socket.
-//! RSA with SHA-256 and AES-CBC key transport are the algorithms this crate
-//! checks. Other recipient types are left unread.
+//! `cms` 0.2.3 builds and parses the message. The signature is checked with
+//! the RSA key inside the supplied certificate, and the enveloped content key
+//! is opened with the supplied private key. Nothing reads a keychain or opens
+//! a socket. RSA with SHA-256 and AES-128-CBC key transport are the algorithms
+//! this crate uses. Other recipient types are left unread.
 
 use aes::{Aes128, Aes192, Aes256};
 use cipher::block_padding::Pkcs7;
 use cipher::{BlockDecryptMut, KeyIvInit};
+use cms::builder::{
+    ContentEncryptionAlgorithm, EnvelopedDataBuilder, KeyEncryptionInfo,
+    KeyTransRecipientInfoBuilder, SignedDataBuilder, SignerInfoBuilder,
+};
+use cms::cert::{CertificateChoices, IssuerAndSerialNumber};
 use cms::content_info::ContentInfo;
-use cms::enveloped_data::{EncryptedContentInfo, EnvelopedData, RecipientInfo};
-use cms::signed_data::{SignedAttributes, SignedData, SignerIdentifier};
+use cms::enveloped_data::{
+    EncryptedContentInfo, EnvelopedData, RecipientIdentifier, RecipientInfo,
+};
+use cms::signed_data::{EncapsulatedContentInfo, SignedAttributes, SignedData, SignerIdentifier};
 use const_oid::ObjectIdentifier;
-use der::{Decode, Encode, Tagged};
+use der::{AnyRef, Decode, Encode, Tag, Tagged};
+use rand::rngs::OsRng;
 use rsa::RsaPrivateKey;
 use rsa::RsaPublicKey;
 use rsa::pkcs1::DecodeRsaPrivateKey;
-use rsa::pkcs1v15::{Signature, VerifyingKey};
+use rsa::pkcs1v15::{Signature, SigningKey, VerifyingKey};
 use rsa::pkcs8::DecodePrivateKey;
 use rsa::sha2::{Digest, Sha256};
 use rsa::signature::Verifier;
-use spki::DecodePublicKey;
+use spki::{AlgorithmIdentifierOwned, DecodePublicKey};
 use x509_cert::Certificate;
 
 /// Failure from one S/MIME message. The text does not include key bytes.
@@ -36,6 +44,12 @@ pub enum Error {
     /// The content-encryption key or the ciphertext could not be opened.
     #[error("the message could not be decrypted")]
     Decrypt,
+    /// The private key or the certificate could not produce a signature.
+    #[error("the message could not be signed")]
+    Sign,
+    /// The certificate could not encrypt the content.
+    #[error("the message could not be encrypted")]
+    Encrypt,
 }
 
 /// Verify a signed CMS message and return the encapsulated content.
@@ -120,6 +134,89 @@ pub fn decrypt(message: &[u8], private_key: &[u8]) -> Result<Vec<u8>, Error> {
         }
     }
     Err(Error::Decrypt)
+}
+
+/// Sign `plaintext` with a PKCS#1 or PKCS#8 RSA key and attach `certificate`.
+///
+/// The key must be the private half of the certificate. [`verify`] checks the
+/// result.
+///
+/// # Errors
+///
+/// [`Error::Sign`] when the key and the certificate do not match, or the CMS
+/// message cannot be built.
+pub fn sign(plaintext: &[u8], private_key: &[u8], certificate: &[u8]) -> Result<Vec<u8>, Error> {
+    let private = RsaPrivateKey::from_pkcs1_der(private_key)
+        .or_else(|_| RsaPrivateKey::from_pkcs8_der(private_key))
+        .map_err(|_| Error::Sign)?;
+    let certificate = Certificate::from_der(certificate).map_err(|_| Error::Sign)?;
+    if rsa_public(&certificate).map_err(|_| Error::Sign)? != RsaPublicKey::from(&private) {
+        return Err(Error::Sign);
+    }
+    let signing = SigningKey::<Sha256>::new(private);
+    let content = EncapsulatedContentInfo {
+        econtent_type: const_oid::db::rfc5911::ID_DATA,
+        econtent: Some(
+            der::Any::new(Tag::OctetString, plaintext.to_vec()).map_err(|_| Error::Sign)?,
+        ),
+    };
+    let digest = AlgorithmIdentifierOwned {
+        oid: const_oid::db::rfc5912::ID_SHA_256,
+        parameters: None,
+    };
+    let sid = SignerIdentifier::IssuerAndSerialNumber(IssuerAndSerialNumber {
+        issuer: certificate.tbs_certificate.issuer.clone(),
+        serial_number: certificate.tbs_certificate.serial_number.clone(),
+    });
+    let signer = SignerInfoBuilder::new(&signing, sid, digest.clone(), &content, None)
+        .map_err(|_| Error::Sign)?;
+    SignedDataBuilder::new(&content)
+        .add_digest_algorithm(digest)
+        .map_err(|_| Error::Sign)?
+        .add_certificate(CertificateChoices::Certificate(certificate))
+        .map_err(|_| Error::Sign)?
+        .add_signer_info::<SigningKey<Sha256>, Signature>(signer)
+        .map_err(|_| Error::Sign)?
+        .build()
+        .map_err(|_| Error::Sign)?
+        .to_der()
+        .map_err(|_| Error::Sign)
+}
+
+/// Encrypt `plaintext` to the RSA key in `certificate`.
+///
+/// [`decrypt`] opens the result with that certificate's private key.
+///
+/// # Errors
+///
+/// [`Error::Encrypt`] when the certificate has no RSA key or the CMS message
+/// cannot be built.
+pub fn encrypt(plaintext: &[u8], certificate: &[u8]) -> Result<Vec<u8>, Error> {
+    let certificate = Certificate::from_der(certificate).map_err(|_| Error::Encrypt)?;
+    let public = rsa_public(&certificate).map_err(|_| Error::Encrypt)?;
+    let rid = RecipientIdentifier::IssuerAndSerialNumber(IssuerAndSerialNumber {
+        issuer: certificate.tbs_certificate.issuer.clone(),
+        serial_number: certificate.tbs_certificate.serial_number.clone(),
+    });
+    let mut rng = OsRng;
+    let recipient =
+        KeyTransRecipientInfoBuilder::new(rid, KeyEncryptionInfo::Rsa(public), &mut rng)
+            .map_err(|_| Error::Encrypt)?;
+    let enveloped =
+        EnvelopedDataBuilder::new(None, plaintext, ContentEncryptionAlgorithm::Aes128Cbc, None)
+            .map_err(|_| Error::Encrypt)?
+            .add_recipient_info(recipient)
+            .map_err(|_| Error::Encrypt)?
+            .build_with_rng(&mut OsRng)
+            .map_err(|_| Error::Encrypt)?;
+    let body = enveloped.to_der().map_err(|_| Error::Encrypt)?;
+    let content = der::Any::from(AnyRef::try_from(body.as_slice()).map_err(|_| Error::Encrypt)?);
+    ContentInfo {
+        content_type: const_oid::db::rfc5911::ID_ENVELOPED_DATA,
+        content,
+    }
+    .to_der()
+    .map_err(|_| Error::Encrypt)
 }
 
 fn signed_data(message: &[u8]) -> Result<SignedData, Error> {
@@ -230,7 +327,7 @@ mod tests {
     use x509_cert::serial_number::SerialNumber;
     use x509_cert::time::Validity;
 
-    use super::{decrypt, verify};
+    use super::{decrypt, encrypt, sign, verify};
 
     fn certificate_and_key() -> (Vec<u8>, Vec<u8>, SigningKey<Sha256>, rsa::RsaPublicKey) {
         let mut rng = OsRng;
@@ -335,5 +432,15 @@ mod tests {
         let other = RsaPrivateKey::new(&mut OsRng, 1024).unwrap();
         let other_der = other.to_pkcs1_der().unwrap();
         assert!(decrypt(&enveloped, other_der.as_bytes()).is_err());
+    }
+
+    #[test]
+    fn sign_and_encrypt_round_trip_through_verify_and_decrypt() {
+        let (certificate, private_key, _, _) = certificate_and_key();
+        let plaintext = b"hello smime";
+        let signed = sign(plaintext, &private_key, &certificate).unwrap();
+        assert_eq!(verify(&signed, &certificate).unwrap(), plaintext);
+        let enveloped = encrypt(plaintext, &certificate).unwrap();
+        assert_eq!(decrypt(&enveloped, &private_key).unwrap(), plaintext);
     }
 }
