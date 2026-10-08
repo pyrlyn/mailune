@@ -1,0 +1,18 @@
+[package]
+name = "mailune-ai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Privacy classes, feature routing, and typed model results"
+
+[dependencies]
+mailune-protocol = { path = "../mailune-protocol" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,25 @@
+name: license-check
+
+# Fails when LICENSE, the royalty-free license, PRICING.md, or the README
+# license-sync block drift from the canonical copies in pyrlyn/ci. The reusable
+# workflow reads those files from pyrlyn/ci main (canonical-ref default), not
+# from this pin, so a pin move does not lag the license sync.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  license:
+    uses: pyrlyn/ci/.github/workflows/license-check.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: read
+      actions: write # cancel-run on failure

@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
 members = ["crates/*"]
+# fuzz/ is its own cargo-fuzz workspace. Excluded so `cargo test --workspace` does not build it.
+exclude = ["fuzz"]
 # Bare `cargo run` / `cargo build` resolve against the CLI. The manifest is
 # virtual (no root package). Test and lint commands pass `--workspace`.
 default-members = ["crates/mailune-cli"]
@@ -26,11 +28,44 @@ serde_json = "1"
 insta = { version = "1.49.0", features = ["json"] }
 # mailune-cli only. Library crates return their own error type.
 anyhow = "1"
+# mailune-cli: account add/list. 4.6 matches cox; derive only.
+clap = { version = "4.6", features = ["derive"] }
 # mailune-cli tests: the dependency-direction check reads `cargo metadata`.
 cargo_metadata = "0.23.1"
 # mailune-cli tests: parse Rust sources for the forward-only FFI scaffold.
 # 3.0.6 checked on crates.io 2026-10-08. Parsing only; default features stay off.
 syn = { version = "3.0.6", default-features = false, features = ["full", "parsing"] }
+# mailune-mime: grammar for RFC 5322 / MIME. 0.11.9 checked on crates.io 2026-10-08.
+# `full_encoding` is the path that decodes the long tail (Shift_JIS and the rest) through encoding_rs.
+mail-parser = { version = "0.11.9", default-features = false, features = ["full_encoding"] }
+# mailune-mime: canonical charset name from the Encoding Standard. 0.8.42 checked on crates.io 2026-10-08.
+encoding_rs = "0.8.42"
+# mailune-mime: build a message the parser can read back. 1.0.0 checked on crates.io 2026-10-08.
+# Default features pull gethostname for a generated Message-ID. Callers set the id, so that stays off.
+mail-builder = { version = "1.0.0", default-features = false }
+# mailune-auth: Mozilla autoconfig XML. 0.42.0 from `cargo search` on 2026-10-08.
+quick-xml = "0.42.0"
+# mailune-auth: PKCE S256. Same major as ketch and cox.
+sha2 = "0.11"
+# mailune-auth: unpadded base64url for the PKCE verifier and challenge.
+base64 = "0.23"
+# mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.
+ammonia = "4.2.1"
+# mailune-mime: plain text from the sanitized HTML fragment. 0.17.1 checked on crates.io 2026-10-08.
+html2text = "0.17.1"
+# mailune-mime: DKIM rsa-sha256. 0.9.10 is the stable line (0.10 is still a release candidate), checked on crates.io 2026-10-08.
+# The sha2 feature re-exports the digest the verifier hashes with.
+rsa = { version = "0.9.10", features = ["sha2"] }
+# DKIM test keys and OpenPGP key generation. 0.8 matches rsa 0.9 and pgp 0.20. 0.8.8 checked on crates.io 2026-10-08.
+rand = "0.8.8"
+# mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
+imap-codec = "1.0.0"
+# mailune-mime: RFC 5545 parse. 0.17.14 checked on crates.io 2026-10-08.
+icalendar = "0.17.14"
+# mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.
+pgp = { version = "0.20.0", default-features = false }
+# fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
+libfuzzer-sys = "0.4.13"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.

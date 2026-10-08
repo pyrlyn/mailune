@@ -1,0 +1,39 @@
+[package]
+name = "mailune-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+license = "GPL-3.0-or-later OR LicenseRef-Mailune-Royalty-Free"
+description = "libFuzzer targets for Mailune parsers"
+
+[package.metadata]
+cargo-fuzz = true
+
+# Separate workspace so the parent `cargo test --workspace` does not build these
+# nightly targets. libfuzzer-sys is pinned to the same version as the parent
+# workspace.dependencies; this package cannot inherit that table.
+[dependencies]
+libfuzzer-sys = "0.4.13"
+mailune-auth = { path = "../crates/mailune-auth" }
+mailune-core = { path = "../crates/mailune-core" }
+mailune-mime = { path = "../crates/mailune-mime" }
+
+[workspace]
+
+[[bin]]
+name = "mime-parse"
+path = "fuzz_targets/mime_parse.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "autoconfig-xml"
+path = "fuzz_targets/autoconfig_xml.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "search-query"
+path = "fuzz_targets/search_query.rs"
+test = false
+doc = false

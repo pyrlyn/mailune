@@ -4,14 +4,9 @@
 - C11. Threat model and trust boundaries document (core, AI, MCP)
 - F4. mailune-config: typed TOML, layering, committed JSON Schema
 - F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
-- F8. I/O and host traits: Net, Clock, Fs, SecretStore, Notifier, NetworkState, AuthSession, PlatformModel, BackgroundScheduler
-- F9. Cancellation tokens and progress reporting
 - F10. Gettext catalogs for core-originated strings
 - R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
-- R15. SonarCloud + coverage (cargo-llvm-cov)
-- R16. License check, CLA, commitlint no-agent-attribution
 - R17. Brand entry (pyrlyn/brand brands/mailune) and landing docs/site.md
-- T1. mailune-testkit: fakes for all host traits + Submission→Event scenario builder
 - X1. Layered TOML config loader in packages/crates (extend config-schema or add layered-config)
 - X2. Extract keychain secret store (env → keyring, no inline secrets) — secret-store
 - X3. Extract telemetry setup with redaction — telemetry-setup
@@ -19,3 +14,162 @@
 - X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 - X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 - X11. Extract SQLite change feed (PRAGMA data_version poller) — sqlite-change-feed
+- A3. Local engine adapter
+- A4. Model catalog and verified blobs
+- A6. Cloud BYOK request shapes
+- A11. Thread summary cache
+- A12. Daily digest
+- A13. Smart reply suggestions
+- A14. Compose assist
+- A15. Style profile from sent mail
+- A22. Scheduling extraction
+- A23. Language detection
+- A30. Evaluation cassettes
+- C3. Autocrypt headers
+- C4. S/MIME verify and decrypt
+- C5. S/MIME sign and encrypt
+- C7. DKIM ed25519, simple, and l=
+- P7. IMAP initial sync
+- P8. IMAP incremental sync
+- P9. IMAP IDLE
+- P10. Lazy body fetch
+- P11. IMAP mutations
+- P12. Persist the operation queue
+- S1. mailune-store
+- S2. Schema v1 migrations
+- S3. Repository API
+- S4. Blob store
+- S5. FTS5 index
+- S7. Change feed
+- S8. Embedding store
+- S9. Hybrid retrieval fusion
+- T4. Queue property tests
+- A19. Natural-language rules
+- A25. Phishing and scam assessment
+- A27. Attachment summarisation
+- A28. Agent tools
+- A29. Local MCP server
+- A31. Voice dictation
+- E1. mailune-server
+- E2. Web frontend scaffold
+- E3. Web tokens and icons
+- E4. Web localisation catalogs
+- S12. Storage benchmarks
+- P17. JMAP read sync
+- P18. JMAP push
+- P19. JMAP mutations and send
+- P20. JMAP MaskedEmail and Sieve
+- P21. Gmail read sync
+- P22. Gmail mutations
+- P23. Graph mail sync
+- P24. Graph mutations and send
+- P25. Graph calendar and contacts
+- B2. UniFFI records
+- B3. Swift package
+- M1. Xcode project
+- M2. Swift design tokens
+- M3. macOS icons
+- M4. macOS localisation
+- M5. macOS host integrations
+- M7. macOS shell
+- M8. macOS thread list
+- M12. macOS settings
+- M9. macOS reader
+- M10. macOS composer
+- M6. Apple on-device model
+- M11. macOS search
+- M13. macOS onboarding
+- M14. macOS integration
+- M15. App Intents
+- M16. macOS accessibility
+- M19. macOS AI surfaces
+- R3. Swift CI
+- P31. Push relay
+- P32. Relay client
+- A32. Embedding pipeline
+- A20. Ask with citations
+- T6. Performance budgets
+- B9. WASM subset
+- R8. Integration compose file
+- E5. Web shell and thread list
+- E6. Web reader
+- E7. Web composer
+- E8. Web AI surfaces
+- E9. Web offline cache
+- E11. Web end-to-end test
+- E12. Server container
+- R7. Web CI
+- B6. C ABI
+- E10. WASM JMAP calls
+- L1. C library build
+- L2. Payload schema
+- L3. Linux tokens
+- L4. Linux catalogues
+- R6. Linux CI
+- L5. Linux host
+- L6. Linux shell
+- L7. Linux thread list
+- L8. Linux reader
+- L9. Linux composer
+- L10. Linux AI surfaces
+- L11. Linux desktop integration
+- L12. Linux UI scenario
+- L13. Flatpak manifest
+- M17. macOS UI test
+- M18. macOS release script
+- I1. iOS target
+- I2. iOS host
+- I3. iOS thread list
+- I4. iOS reader
+- I5. iOS composer
+- I6. iOS model policy
+- I9. iOS UI test
+- I10. iOS AI surfaces
+- I7. iOS extensions
+- B5. C# core project
+- W1. WinUI solution
+- W2. Windows tokens
+- W3. Windows catalogues
+- W4. Windows host
+- W5. Windows on-device model
+- W6. Windows shell
+- W7. Windows thread list
+- W8. Windows reader
+- W9. Windows composer
+- W10. Windows AI surfaces
+- W11. Windows integration
+- W12. Windows UI scenario
+- R4. Windows CI
+- B4. Kotlin core
+- D1. Android project
+- D2. Android tokens
+- D3. Android catalogues
+- D4. Android host
+- D6. Android shell
+- D7. Android thread list
+- D8. Android reader
+- D9. Android composer
+- D10. Android AI surfaces
+- D5. Gemini Nano
+- D11. Android widgets and share
+- D12. Android UI tests
+- R5. Android CI
+- R18. Homebrew cask and registry entry
+- X5. Consume llm-wire and llm-http
+- X6. Consume llm-openai
+- X7. Consume llm-anthropic
+- X8. Extract llm-testkit
+- D13. Android release
+- I8. TestFlight pipeline
+- R11. Windows signing workflow
+- R12. Flatpak workflow
+- R13. TestFlight workflow
+- R14. Play workflow
+- W13. Windows release
+- A33. Paid hosted AI tier
+- P27. EWS for on-premises Exchange
+- B10. BoltFFI survey
+- S14. usearch for vectors
+- B11. Shared view-model core
+- P33. Calendar view
+- P34. Shared inboxes

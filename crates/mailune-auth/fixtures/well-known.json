@@ -1,0 +1,18 @@
+{
+  "incoming": [
+    {
+      "protocol": "imap",
+      "host": "imap.example.com",
+      "port": 993,
+      "security": "tls"
+    }
+  ],
+  "outgoing": [
+    {
+      "protocol": "smtp",
+      "host": "smtp.example.com",
+      "port": 587,
+      "security": "starttls"
+    }
+  ]
+}
