@@ -1,0 +1,35 @@
+# CodeQL and Semgrep in parallel behind `pipeline / gate`. fmt, clippy
+# (`-D warnings`) and nextest are not repeated here: ci.yml runs them through
+# pyrlyn/ci ci-rust.yml. Draft pull requests skip every job, the gate included,
+# until marked ready. Snyk stays at the workflow default (off); no token is
+# passed.
+# Shared workflows: https://github.com/pyrlyn/ci/blob/main/docs/reusable-workflows.md
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: pipeline-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  pipeline:
+    uses: pyrlyn/ci/.github/workflows/pipeline.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: read
+      security-events: write
+      actions: write
+    with:
+      rust: false
+      codeql-languages: '["actions", "rust"]'

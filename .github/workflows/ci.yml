@@ -1,0 +1,55 @@
+name: ci
+
+# fmt once, then clippy (`--all-targets --all-features -- -D warnings`), check
+# and nextest on each target of pyrlyn/ci's shared matrix. The matrix is not
+# copied here: callers inherit it, and a pin move is how a matrix change
+# arrives. That matrix is Linux x86_64, Linux aarch64, macOS aarch64
+# (`xcode-27`) and Windows x86_64. Intel macOS is not a target.
+#
+# Rust comes from mise.toml (1.99.0). ci-rust fails the job when rustc is
+# anything else.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # changes.yml classifies the diff. `docs_only` turns the Rust work into
+  # no-ops that still report under `rust / <target>`, so a required check does
+  # not wait. A path no rule claims is not documentation, and a failed
+  # classification does not skip the suite: same fail-open rule as path-gates
+  # (`unmatched = all` runs every gate).
+  changes:
+    uses: pyrlyn/ci/.github/workflows/changes.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    permissions:
+      contents: read
+    with:
+      # Snapshots and fixtures under crates/ are the Rust suite even when
+      # they are not `.rs` or a Cargo manifest.
+      rust-paths: |
+        ^crates/
+
+  rust:
+    needs: changes
+    # A failed `changes` job must run the suite, not skip it.
+    if: ${{ !cancelled() }}
+    uses: pyrlyn/ci/.github/workflows/ci-rust.yml@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+    # cancel-run-on-failure (on by default) needs `actions: write` on the caller.
+    permissions:
+      contents: read
+      actions: write
+    with:
+      clippy-args: --locked
+      tools: nextest
+      # The local workspace check. `-D warnings` is inside ci-rust.yml, after `--`.
+      test-command: cargo nextest run --workspace --locked
+      # Docs-only: no work, same check names. Any other diff runs the suite.
+      skip: ${{ needs.changes.result == 'success' && needs.changes.outputs.docs_only == 'true' }}
