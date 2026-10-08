@@ -6,10 +6,18 @@ rust-version.workspace = true
 license.workspace = true
 publish = false
 description = "Command-line surface for Mailune"
+autobins = false
+
+[[bin]]
+name = "mailune"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = { workspace = true }
+clap = { workspace = true }
 mailune-app = { path = "../mailune-app" }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 cargo_metadata = { workspace = true }

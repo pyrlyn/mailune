@@ -82,14 +82,25 @@ fn workspace_sources_do_not_call_the_keychain_or_fetch_remote_images() {
 
 #[test]
 fn scanner_flags_a_planted_keychain_call() {
-    let planted = format!("fn load() {{ {}Entry::new(\"app\", \"id\"); }}", keyring_call());
-    assert!(violations(&planted).iter().any(|hit| hit.contains("keychain")));
+    let planted = format!(
+        "fn load() {{ {}Entry::new(\"app\", \"id\"); }}",
+        keyring_call()
+    );
+    assert!(
+        violations(&planted)
+            .iter()
+            .any(|hit| hit.contains("keychain"))
+    );
 }
 
 #[test]
 fn scanner_flags_security_framework() {
     let planted = format!("let framework = \"{}\";", security_framework());
-    assert!(violations(&planted).iter().any(|hit| hit.contains("keychain")));
+    assert!(
+        violations(&planted)
+            .iter()
+            .any(|hit| hit.contains("keychain"))
+    );
 }
 
 #[test]
@@ -99,7 +110,11 @@ fn scanner_flags_a_remote_image_url() {
         schemes()[1],
         image_suffixes()[0]
     );
-    assert!(violations(&planted).iter().any(|hit| hit.contains("remote image")));
+    assert!(
+        violations(&planted)
+            .iter()
+            .any(|hit| hit.contains("remote image"))
+    );
 }
 
 #[test]
