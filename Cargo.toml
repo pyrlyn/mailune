@@ -47,6 +47,10 @@ quick-xml = "0.42.0"
 sha2 = "0.11"
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
+# mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.
+pgp = { version = "0.20.0", default-features = false }
+# mailune-crypto: OsRng for key generation. pgp 0.20 uses rand 0.8.
+rand = "0.8.8"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
