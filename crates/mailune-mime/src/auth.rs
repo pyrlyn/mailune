@@ -7,8 +7,9 @@
 //! a TXT record supplied by [`DkimDns`] with no socket. `cfdkim` 0.3.0 was
 //! last published in 2023. This module parses the headers itself and checks
 //! `rsa-sha256` with RustCrypto `rsa` 0.9.10 (the stable line; 0.10 is still
-//! a release candidate) against the `p=` tag. `ed25519-sha256` is reported
-//! as [`DkimVerdict::PermError`].
+//! a release candidate) and `ed25519-sha256` with `ed25519-dalek` 3.0.0
+//! against the `p=` tag. RFC 8463 signs the SHA-256 digest of the canonical
+//! headers, not the header bytes.
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
@@ -20,6 +21,20 @@ use rsa::sha2::{Digest, Sha256};
 use rsa::signature::Verifier;
 
 use crate::Error;
+
+/// How `a=` names the signature.
+#[derive(Clone, Copy)]
+enum Algorithm {
+    RsaSha256,
+    Ed25519Sha256,
+}
+
+/// `c=` names one algorithm for the header and one for the body.
+#[derive(Clone, Copy)]
+enum Canon {
+    Simple,
+    Relaxed,
+}
 
 /// One method result on an Authentication-Results header.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,7 +80,7 @@ pub struct AuthBadge {
 /// Outcome of checking DKIM on one message.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DkimVerdict {
-    /// At least one `rsa-sha256` signature matched the TXT record.
+    /// At least one supported signature matched the TXT record.
     Pass,
     /// A signature was present and did not match.
     Fail,
@@ -109,7 +124,9 @@ pub fn authentication_badge(header: &str) -> Result<AuthBadge, Error> {
 
 /// Verify DKIM-Signature headers on a CRLF message.
 ///
-/// Only `rsa-sha256` with `c=relaxed/relaxed` is checked. `l=` is refused.
+/// `rsa-sha256` and `ed25519-sha256` are checked. `c=` may be simple or
+/// relaxed on each side (the default is simple/simple). `l=` limits the
+/// hash to that many octets of the canonical body.
 pub fn verify_dkim(message: &[u8], dns: &impl DkimDns) -> DkimVerdict {
     let Some((head, body)) = split_message(message) else {
         return DkimVerdict::PermError;
@@ -161,7 +178,12 @@ fn verify_one(
             .find(|(key, _)| key == name)
             .map(|(_, value)| value.as_str())
     };
-    if get("v") != Some("1") || get("a") != Some("rsa-sha256") {
+    let algorithm = match get("a") {
+        Some("rsa-sha256") => Algorithm::RsaSha256,
+        Some("ed25519-sha256") => Algorithm::Ed25519Sha256,
+        _ => return DkimVerdict::PermError,
+    };
+    if get("v") != Some("1") {
         return DkimVerdict::PermError;
     }
     if let Some(query) = get("q")
@@ -174,13 +196,19 @@ fn verify_one(
     else {
         return DkimVerdict::PermError;
     };
-    // Only relaxed/relaxed is implemented. A length limit would hash a prefix
-    // and still report pass, so `l=` is refused instead.
-    if get("c") != Some("relaxed/relaxed") || get("l").is_some() {
+    let Some((header_canon, body_canon)) = canons(get("c")) else {
         return DkimVerdict::PermError;
-    }
-    let canonical_body = relaxed_body(body);
-    let actual = STANDARD.encode(Sha256::digest(&canonical_body));
+    };
+    // `l=` counts canonical octets (RFC 6376 §3.5). A longer count cannot
+    // be a prefix of this body, so it is a permanent error.
+    let Some(limit) = body_limit(get("l")) else {
+        return DkimVerdict::PermError;
+    };
+    let canonical_body = canonical_body(body, body_canon);
+    let Some(hashed) = limited(&canonical_body, limit) else {
+        return DkimVerdict::PermError;
+    };
+    let actual = STANDARD.encode(Sha256::digest(hashed));
     if !eq_ignore_ws(&actual, body_hash) {
         return DkimVerdict::Fail;
     }
@@ -192,27 +220,68 @@ fn verify_one(
     let Some(record) = dns.txt(&name) else {
         return DkimVerdict::TempError;
     };
-    let Some(key) = public_key(&record) else {
-        return DkimVerdict::PermError;
-    };
-    let Some(signed_bytes) = signed_header(fields, signature, signed) else {
+    let Some(signed_bytes) = signed_header(fields, signature, signed, header_canon) else {
         return DkimVerdict::PermError;
     };
     let Ok(sig_bytes) = STANDARD.decode(strip_ws(sig_b)) else {
         return DkimVerdict::PermError;
     };
-    let Ok(parsed) = Signature::try_from(sig_bytes.as_slice()) else {
+    match algorithm {
+        Algorithm::RsaSha256 => verify_rsa(&record, &signed_bytes, &sig_bytes),
+        Algorithm::Ed25519Sha256 => verify_ed25519(&record, &signed_bytes, &sig_bytes),
+    }
+}
+
+fn verify_rsa(record: &str, signed_bytes: &[u8], sig_bytes: &[u8]) -> DkimVerdict {
+    let Some((kind, der)) = key_bytes(record) else {
+        return DkimVerdict::PermError;
+    };
+    if kind != "rsa" {
+        return DkimVerdict::PermError;
+    }
+    let Some(key) = RsaPublicKey::from_public_key_der(&der)
+        .ok()
+        .or_else(|| RsaPublicKey::from_pkcs1_der(&der).ok())
+    else {
+        return DkimVerdict::PermError;
+    };
+    let Ok(parsed) = Signature::try_from(sig_bytes) else {
         return DkimVerdict::PermError;
     };
     let verifying = VerifyingKey::<Sha256>::new(key);
-    if verifying.verify(&signed_bytes, &parsed).is_ok() {
+    if verifying.verify(signed_bytes, &parsed).is_ok() {
         DkimVerdict::Pass
     } else {
         DkimVerdict::Fail
     }
 }
 
-fn public_key(record: &str) -> Option<RsaPublicKey> {
+fn verify_ed25519(record: &str, signed_bytes: &[u8], sig_bytes: &[u8]) -> DkimVerdict {
+    let Some((kind, raw)) = key_bytes(record) else {
+        return DkimVerdict::PermError;
+    };
+    if kind != "ed25519" {
+        return DkimVerdict::PermError;
+    }
+    let Ok(raw) = <[u8; 32]>::try_from(raw.as_slice()) else {
+        return DkimVerdict::PermError;
+    };
+    let Ok(key) = ed25519_dalek::VerifyingKey::from_bytes(&raw) else {
+        return DkimVerdict::PermError;
+    };
+    let Ok(bytes) = <[u8; 64]>::try_from(sig_bytes) else {
+        return DkimVerdict::PermError;
+    };
+    let signature = ed25519_dalek::Signature::from_bytes(&bytes);
+    let digest = Sha256::digest(signed_bytes);
+    if ed25519_dalek::Verifier::verify(&key, digest.as_slice(), &signature).is_ok() {
+        DkimVerdict::Pass
+    } else {
+        DkimVerdict::Fail
+    }
+}
+
+fn key_bytes(record: &str) -> Option<(String, Vec<u8>)> {
     let tags = tag_pairs(&unfold(record));
     let get = |name: &str| {
         tags.iter()
@@ -224,25 +293,20 @@ fn public_key(record: &str) -> Option<RsaPublicKey> {
     {
         return None;
     }
-    if let Some(kind) = get("k")
-        && kind != "rsa"
-    {
-        return None;
-    }
+    let kind = get("k").unwrap_or("rsa").to_ascii_lowercase();
     let p = strip_ws(get("p")?);
     if p.is_empty() {
         return None;
     }
-    let der = STANDARD.decode(p).ok()?;
-    RsaPublicKey::from_public_key_der(&der)
-        .ok()
-        .or_else(|| RsaPublicKey::from_pkcs1_der(&der).ok())
+    let bytes = STANDARD.decode(p).ok()?;
+    Some((kind, bytes))
 }
 
 fn signed_header(
     fields: &[HeaderField],
     signature: &HeaderField,
     signed_names: &str,
+    canon: Canon,
 ) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     let mut seen: Vec<(String, usize)> = Vec::new();
@@ -262,7 +326,7 @@ fn signed_header(
             .rev()
             .nth(count);
         if let Some(field) = field {
-            out.extend_from_slice(relaxed_field(&field.raw).as_bytes());
+            out.extend_from_slice(canonical_field(&field.raw, canon).as_bytes());
             if let Some(slot) = seen
                 .iter_mut()
                 .find(|(seen, _)| seen.eq_ignore_ascii_case(name))
@@ -273,7 +337,7 @@ fn signed_header(
             }
         }
     }
-    out.extend_from_slice(relaxed_field(&empty_b_tag(&signature.raw)?).as_bytes());
+    out.extend_from_slice(canonical_field(&empty_b_tag(&signature.raw)?, canon).as_bytes());
     Some(out)
 }
 
@@ -331,6 +395,64 @@ fn relaxed_body(body: &[u8]) -> Vec<u8> {
         }
         out.extend_from_slice(line);
     }
+    out.extend_from_slice(b"\r\n");
+    out
+}
+
+fn canons(tag: Option<&str>) -> Option<(Canon, Canon)> {
+    let tag = tag.unwrap_or("simple/simple");
+    let (header, body) = tag.split_once('/').unwrap_or((tag, tag));
+    Some((canon_name(header)?, canon_name(body)?))
+}
+
+fn canon_name(name: &str) -> Option<Canon> {
+    match name {
+        "simple" => Some(Canon::Simple),
+        "relaxed" => Some(Canon::Relaxed),
+        _ => None,
+    }
+}
+
+fn body_limit(tag: Option<&str>) -> Option<Option<usize>> {
+    let Some(tag) = tag else {
+        return Some(None);
+    };
+    if tag.is_empty() || !tag.bytes().all(|byte| byte.is_ascii_digit()) {
+        return None;
+    }
+    Some(Some(tag.parse().ok()?))
+}
+
+fn limited(body: &[u8], limit: Option<usize>) -> Option<&[u8]> {
+    match limit {
+        None => Some(body),
+        Some(limit) if limit > body.len() => None,
+        Some(limit) => Some(&body[..limit]),
+    }
+}
+
+fn canonical_body(body: &[u8], canon: Canon) -> Vec<u8> {
+    match canon {
+        Canon::Relaxed => relaxed_body(body),
+        Canon::Simple => simple_body(body),
+    }
+}
+
+fn canonical_field(raw: &str, canon: Canon) -> String {
+    match canon {
+        Canon::Relaxed => relaxed_field(raw),
+        // Simple keeps the field bytes and only restores the CRLF that
+        // splitting the header block removed.
+        Canon::Simple => format!("{raw}\r\n"),
+    }
+}
+
+fn simple_body(body: &[u8]) -> Vec<u8> {
+    let mut end = body.len();
+    while body.get(end.saturating_sub(2)..end) == Some(b"\r\n".as_slice()) {
+        end -= 2;
+    }
+    let mut out = body[..end].to_vec();
     out.extend_from_slice(b"\r\n");
     out
 }
@@ -580,6 +702,107 @@ mod tests {
         assert_eq!(
             verify_dkim(message.as_bytes(), &dns),
             DkimVerdict::TempError
+        );
+    }
+
+    #[test]
+    fn ed25519_passes_against_the_supplied_txt_record() {
+        let mut seed = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut seed);
+        let signing = ed25519_dalek::SigningKey::from_bytes(&seed);
+        let public = signing.verifying_key().to_bytes();
+        let record = format!("v=DKIM1; k=ed25519; p={}", STANDARD.encode(public));
+        let body = b"Hello there\r\n";
+        let bh = STANDARD.encode(Sha256::digest(relaxed_body(body)));
+        let unsigned = format!(
+            "DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=example.com; s=sel; h=from:subject; bh={bh}; b="
+        );
+        let from = "From: Ana <ana@example.com>";
+        let subject = "Subject: Hello";
+        let mut signed = Vec::new();
+        signed.extend_from_slice(relaxed_field(from).as_bytes());
+        signed.extend_from_slice(relaxed_field(subject).as_bytes());
+        let emptied = empty_b_tag(&unsigned).unwrap();
+        signed.extend_from_slice(relaxed_field(&emptied).as_bytes());
+        let digest = Sha256::digest(&signed);
+        let signature = ed25519_dalek::Signer::sign(&signing, digest.as_slice());
+        let b64 = STANDARD.encode(signature.to_bytes());
+        let message = format!(
+            "{unsigned}{b64}\r\n{from}\r\n{subject}\r\n\r\n{}",
+            std::str::from_utf8(body).unwrap()
+        );
+        let dns = MapDns { record };
+        assert_eq!(verify_dkim(message.as_bytes(), &dns), DkimVerdict::Pass);
+        let tampered = message.replace("Hello there", "Hello There");
+        assert_eq!(verify_dkim(tampered.as_bytes(), &dns), DkimVerdict::Fail);
+    }
+
+    #[test]
+    fn simple_canonicalization_keeps_whitespace() {
+        let mut rng = rand::thread_rng();
+        let private = RsaPrivateKey::new(&mut rng, 1024).unwrap();
+        let public = rsa::RsaPublicKey::from(&private);
+        let der = public.to_public_key_der().unwrap();
+        let record = format!("v=DKIM1; k=rsa; p={}", STANDARD.encode(der.as_bytes()));
+        let body = b"Hello  there\r\n\r\n";
+        let canonical = b"Hello  there\r\n";
+        let bh = STANDARD.encode(Sha256::digest(canonical));
+        let unsigned = format!(
+            "DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=example.com; s=sel; h=from:subject; bh={bh}; b="
+        );
+        let from = "From: Ana <ana@example.com>";
+        let subject = "Subject: Hello";
+        let mut signed = Vec::new();
+        signed.extend_from_slice(format!("{from}\r\n").as_bytes());
+        signed.extend_from_slice(format!("{subject}\r\n").as_bytes());
+        let emptied = empty_b_tag(&unsigned).unwrap();
+        signed.extend_from_slice(format!("{emptied}\r\n").as_bytes());
+        let signature = SigningKey::<Sha256>::new(private).sign(&signed);
+        let b64 = STANDARD.encode(signature.to_bytes());
+        let message = format!(
+            "{unsigned}{b64}\r\n{from}\r\n{subject}\r\n\r\n{}",
+            std::str::from_utf8(body).unwrap()
+        );
+        let dns = MapDns { record };
+        assert_eq!(verify_dkim(message.as_bytes(), &dns), DkimVerdict::Pass);
+        let spaced = message.replace("Hello  there", "Hello there");
+        assert_eq!(verify_dkim(spaced.as_bytes(), &dns), DkimVerdict::Fail);
+    }
+
+    #[test]
+    fn body_length_ignores_a_trailer_and_rejects_an_oversize_count() {
+        let mut rng = rand::thread_rng();
+        let private = RsaPrivateKey::new(&mut rng, 1024).unwrap();
+        let public = rsa::RsaPublicKey::from(&private);
+        let der = public.to_public_key_der().unwrap();
+        let record = format!("v=DKIM1; k=rsa; p={}", STANDARD.encode(der.as_bytes()));
+        let covered = relaxed_body(b"Hello there\r\n");
+        let bh = STANDARD.encode(Sha256::digest(&covered));
+        let limit = covered.len();
+        let unsigned = format!(
+            "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.com; s=sel; h=from:subject; l={limit}; bh={bh}; b="
+        );
+        let from = "From: Ana <ana@example.com>";
+        let subject = "Subject: Hello";
+        let mut signed = Vec::new();
+        signed.extend_from_slice(relaxed_field(from).as_bytes());
+        signed.extend_from_slice(relaxed_field(subject).as_bytes());
+        let emptied = empty_b_tag(&unsigned).unwrap();
+        signed.extend_from_slice(relaxed_field(&emptied).as_bytes());
+        let signature = SigningKey::<Sha256>::new(private).sign(&signed);
+        let b64 = STANDARD.encode(signature.to_bytes());
+        let message =
+            format!("{unsigned}{b64}\r\n{from}\r\n{subject}\r\n\r\nHello there\r\nfooter\r\n");
+        let dns = MapDns {
+            record: record.clone(),
+        };
+        assert_eq!(verify_dkim(message.as_bytes(), &dns), DkimVerdict::Pass);
+        let changed = message.replace("Hello there", "Hello There");
+        assert_eq!(verify_dkim(changed.as_bytes(), &dns), DkimVerdict::Fail);
+        let oversize = message.replace(&format!("l={limit}"), &format!("l={}", limit + 40));
+        assert_eq!(
+            verify_dkim(oversize.as_bytes(), &dns),
+            DkimVerdict::PermError
         );
     }
 }

@@ -17,6 +17,7 @@ mail-builder = { workspace = true }
 mail-parser = { workspace = true }
 mailune-protocol = { path = "../mailune-protocol" }
 rsa = { workspace = true }
+ed25519-dalek = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
