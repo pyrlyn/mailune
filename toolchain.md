@@ -7,6 +7,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | git | system | Version control | https://github.com/git/git |
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
+| dotnet | system | C# core and the Windows shell | https://github.com/dotnet/sdk |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -45,3 +46,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | @playwright/test | local | https://github.com/microsoft/playwright | Browser test that opens the shell and selects a thread |
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| MSTest.Sdk | local | https://github.com/microsoft/testfx | Tests for the C# core |
