@@ -1,0 +1,18 @@
+[package]
+name = "mailune-auth"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Account autoconfig and PKCE for Mailune"
+
+[dependencies]
+mailune-protocol = { path = "../mailune-protocol" }
+quick-xml = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

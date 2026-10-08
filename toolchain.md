@@ -12,6 +12,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | --- | --- | --- | --- |
 | anyhow | local | https://github.com/dtolnay/anyhow | Errors in `mailune-cli` only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
+| quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
 | serde | local | https://github.com/serde-rs/serde | Contract serialization |

@@ -33,6 +33,8 @@ cargo_metadata = "0.23.1"
 # mailune-cli tests: parse Rust sources for the forward-only FFI scaffold.
 # 3.0.6 checked on crates.io 2026-10-08. Parsing only; default features stay off.
 syn = { version = "3.0.6", default-features = false, features = ["full", "parsing"] }
+# mailune-auth: Mozilla autoconfig XML. 0.42.0 from `cargo search` on 2026-10-08.
+quick-xml = "0.42.0"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
