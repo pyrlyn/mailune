@@ -171,7 +171,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A33 | in progress | P2 | 3 | 0% | Cursor / grok 4.7 |
 | P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
-| B10 | in progress | P3 | 3 | 0% | Claude / opus-5.5 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | B11 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
 | P33 | in progress | P3 | 4 | 0% | Claude / opus-5.5 |
@@ -1502,14 +1501,6 @@ Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing 
 Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
 
 Execution plan: survey, then a client behind an injected transport on `batch9-store`. No sockets. Exchange Online stays on Graph.
-
-### B10. BoltFFI survey
-
-From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one tool. Crux has moved to it. Revisit after the UniFFI phase.
-
-Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
-
-Execution plan: `docs/boltffi.md` on `batch7-imap`. Do not replace UniFFI.
 
 ### S14. usearch for vectors
 

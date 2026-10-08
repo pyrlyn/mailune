@@ -583,3 +583,13 @@ Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails i
 Execution plan: new crate `mailune-capi`, the C ABI for the Vala shell, shaped like ketch-capi. One opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, so both bindings run the same code; records cross as JSON in an `{"ok"}` / `{"error"}` envelope (serde derives added to the `mailune-ffi` records, JSON Schema behind its `schema` feature). Answers are `malloc`ed (libc) so `g_free` frees them; every export catches panics and is one expression, and the syn test in `mailune-cli` now walks `mailune-capi` `no_mangle` functions too. Commit `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with a Vala test, and `schema/payloads.schema.json`; drift tests regenerate the header with the cbindgen library and the schema from the records. valac is not installed, so the Meson test is not run here.
 
 What landed: New crate `mailune-capi`: one opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, records as contract JSON in an `ok`/`error` envelope, `malloc`ed answers, a panic guard in `respond`. Committed `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with `tests/capi.vala`, and `schema/payloads.schema.json`; drift tests regenerate the header and the schema of the records and fail on any difference. The forward-only syn test now covers `no_mangle` exports in `mailune-capi`. A C program linked against the cdylib was run by hand; valac is not installed, so the Meson test was not run.
+
+### B10. BoltFFI survey
+
+From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one tool. Crux has moved to it. Revisit after the UniFFI phase.
+
+Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
+
+Execution plan: `docs/boltffi.md`. Facts from crates.io, the BoltFFI README and docs, and the Crux repository, each with its URL and the 2026-10-08 check date; a comparison against `mailune-ffi` and `mailune-capi`; a decision and triggers to revisit. Do not replace UniFFI.
+
+What landed: `docs/boltffi.md` compares BoltFFI 0.31.0 with the UniFFI 0.32.2 bindings (B2) and the C ABI (B6), with primary sources checked on 2026-10-08. Decision: no switch now. The native C# target is BoltFFI's real gain; the vendor speed numbers are marked unverified and do not matter for coarse calls; the C target is experimental and sync-only; minor releases break every few weeks. Triggers to revisit are listed.

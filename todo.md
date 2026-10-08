@@ -165,7 +165,6 @@
 - W13. Windows release
 - A33. Paid hosted AI tier
 - P27. EWS for on-premises Exchange
-- B10. BoltFFI survey
 - S14. usearch for vectors
 - B11. Shared view-model core
 - P33. Calendar view
