@@ -16,6 +16,7 @@ mod message;
 mod parse;
 mod quirks;
 mod remote;
+mod screen;
 mod unsubscribe;
 
 pub use auth::{
@@ -36,6 +37,7 @@ pub use quirks::{
     quirks,
 };
 pub use remote::{RemoteContent, inspect_url};
+pub use screen::{SenderScreen, screen_sender};
 pub use unsubscribe::{Unsubscribe, parse_list_unsubscribe};
 
 /// Failure from parsing or building one message.
