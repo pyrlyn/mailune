@@ -18,6 +18,7 @@ mod prompts;
 mod redact;
 mod reply;
 mod router;
+mod rules;
 mod style;
 mod summary;
 mod triage;
@@ -40,6 +41,7 @@ pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use reply::suggest_replies;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use rules::{Rule, RuleAction, RuleMessage, parse_rule, preview};
 pub use style::StyleBook;
 pub use summary::{SummaryCache, SummaryKind, summarize};
 pub use triage::{TriageInput, categorize};
@@ -178,6 +180,12 @@ pub enum Error {
     /// A cassette's output was not the recorded text.
     #[error("evaluation output drifted")]
     Drift,
+    /// The sentence is not an archive, star, or move rule.
+    #[error("this sentence is not a rule")]
+    NotARule,
+    /// A rule must not send mail.
+    #[error("a rule cannot send mail")]
+    RuleCannotSend,
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
