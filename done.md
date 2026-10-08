@@ -563,3 +563,13 @@ Done when: a tool call has a scope, a preview, an undo record, and an audit line
 Execution plan: `mailune-ai` `agent.rs`: a typed `ToolCall` parsed from strict JSON, an `Agent` that checks the A9 policy and a granted `Scope`, builds a `Preview` and an `UndoRecord`, and appends an `AuditLine` for every decision. `commit` returns submissions for the app; the queue is untouched.
 
 What landed: A typed `ToolCall` (summarize, archive, delete, send) is parsed from strict JSON and checked against the A9 policy and a granted scope. Each call gets a preview, an undo record (moves back to the original mailbox) and content-free audit lines. Send and delete are refused at commit until the app passes `Confirmation::Confirmed`; forward has no contract submission and is denied.
+
+### A29. Local MCP server
+
+Depends on: A28. Reuse: `rmcp` from `rust.md`.
+
+Done when: a read-only tool is exposed and a send tool stays behind the in-app approval flag. No network listener in tests.
+
+Execution plan: New crate `mailune-mcp` on rmcp 3.5: a `summarize` tool (read-only hint) and a `send` tool, each forwarding one `Agent::request` call. `mailune-ai` gains `request`, `held` and `approve` so a caller that cannot confirm gets send held for the app. Test drives the server over a tokio duplex.
+
+What landed: New crate `mailune-mcp` (rmcp 3.5.1). `summarize` is read-only and runs through the A28 policy and scope; `send` is held for in-app approval (`Agent::approve` with `Confirmation::Confirmed`), and an MCP client has no argument that confirms. The test drives the server over an in-memory duplex, so no listener opens.

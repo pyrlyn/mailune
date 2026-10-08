@@ -14,8 +14,8 @@ mod router;
 mod triage;
 
 pub use agent::{
-    Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Scope, ToolCall, UndoRecord,
-    needs_confirmation, parse_call,
+    Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Requested, Scope, ToolCall,
+    UndoRecord, needs_confirmation, parse_call,
 };
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};

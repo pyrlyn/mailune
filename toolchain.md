@@ -34,3 +34,5 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
+| rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime; `mailune-mcp` tests over an in-memory duplex |

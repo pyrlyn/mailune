@@ -53,7 +53,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A19 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A25 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A27 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
-| A29 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -560,14 +559,6 @@ Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; o
 Done when: a text attachment becomes a summary through the scripted engine. No network.
 
 Execution plan: `mailune-ai` only.
-
-### A29. Local MCP server
-
-Depends on: A28. Reuse: `rmcp` from `rust.md`.
-
-Done when: a read-only tool is exposed and a send tool stays behind the in-app approval flag. No network listener in tests.
-
-Execution plan: new crate `mailune-mcp`. One forwarded call per export.
 
 ### A31. Voice dictation
 

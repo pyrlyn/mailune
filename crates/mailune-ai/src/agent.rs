@@ -214,6 +214,21 @@ pub struct Agent {
     next: u64,
     audit: Vec<AuditLine>,
     undo: Vec<UndoRecord>,
+    held: Vec<Pending>,
+}
+
+/// What a request from a caller that cannot confirm became.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Requested {
+    /// Ran: the app applies these submissions.
+    Applied(Vec<Submission>),
+    /// Waits for the person to approve it in the app.
+    Held {
+        /// Id to pass to [`Agent::approve`].
+        call: u64,
+        /// What the app shows.
+        preview: Preview,
+    },
 }
 
 impl Agent {
@@ -225,6 +240,7 @@ impl Agent {
             next: 0,
             audit: Vec::new(),
             undo: Vec::new(),
+            held: Vec::new(),
         }
     }
 
@@ -297,6 +313,58 @@ impl Agent {
             self.undo.push(pending.undo);
         }
         Ok(submissions(pending.call))
+    }
+
+    /// Proposes `call` for a caller that cannot confirm, such as an MCP
+    /// client. A call that needs confirmation is held for the app, never run.
+    ///
+    /// # Errors
+    ///
+    /// As [`Agent::propose`].
+    pub fn request(&mut self, call: ToolCall) -> Result<Requested, Error> {
+        let pending = self.propose(call)?;
+        if pending.preview.needs_confirmation {
+            let held = Requested::Held {
+                call: pending.id,
+                preview: pending.preview.clone(),
+            };
+            self.held.push(pending);
+            return Ok(held);
+        }
+        self.commit(pending, Confirmation::NotAsked)
+            .map(Requested::Applied)
+    }
+
+    /// Calls waiting for the app, oldest first.
+    pub fn held(&self) -> &[Pending] {
+        &self.held
+    }
+
+    /// The app's answer for held call `id`. An unconfirmed answer leaves it held.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::ToolDenied`] when no call with that id is held, and
+    /// [`Error::NeedsConfirmation`] when `confirmation` is not
+    /// [`Confirmation::Confirmed`].
+    pub fn approve(
+        &mut self,
+        id: u64,
+        confirmation: Confirmation,
+    ) -> Result<Vec<Submission>, Error> {
+        let index = self
+            .held
+            .iter()
+            .position(|pending| pending.id == id)
+            .ok_or(Error::ToolDenied)?;
+        if confirmation != Confirmation::Confirmed {
+            let call = &self.held[index].call;
+            let (tool, threads) = (call.tool(), call.threads().len());
+            self.log(id, Some(tool), threads, Outcome::Unconfirmed);
+            return Err(Error::NeedsConfirmation);
+        }
+        let pending = self.held.remove(index);
+        self.commit(pending, confirmation)
     }
 
     /// Reverses the newest committed call that changed something.
@@ -396,7 +464,7 @@ fn submissions(call: ToolCall) -> Vec<Submission> {
 mod tests {
     use mailune_protocol::{MailboxId, Submission, ThreadId};
 
-    use super::{Agent, Confirmation, Outcome, Scope, ToolCall, parse_call};
+    use super::{Agent, Confirmation, Outcome, Requested, Scope, ToolCall, parse_call};
     use crate::{Error, Policy, Tool};
 
     fn scope() -> Scope {
@@ -506,6 +574,41 @@ mod tests {
         assert!(!audit.contains("secret"));
         assert!(!audit.contains("ana@acme.io"));
         assert!(audit.contains("outcome=unconfirmed"));
+    }
+
+    #[test]
+    fn a_caller_that_cannot_confirm_gets_send_held_for_the_app() {
+        let mut agent = agent([Tool::Send, Tool::Summarize]);
+        let read = agent
+            .request(ToolCall::Summarize {
+                thread: ThreadId::new("t1"),
+            })
+            .unwrap();
+        assert!(matches!(read, Requested::Applied(ref s) if s.len() == 1));
+        let held = agent
+            .request(ToolCall::Send {
+                to: vec![],
+                subject: "Hi".into(),
+                body: "Body".into(),
+            })
+            .unwrap();
+        let Requested::Held { call, preview } = held else {
+            panic!("send ran without the app");
+        };
+        assert!(preview.needs_confirmation);
+        assert_eq!(agent.held().len(), 1);
+        assert!(matches!(
+            agent.approve(call, Confirmation::NotAsked),
+            Err(Error::NeedsConfirmation)
+        ));
+        assert_eq!(agent.held().len(), 1);
+        assert!(matches!(
+            agent.approve(99, Confirmation::Confirmed),
+            Err(Error::ToolDenied)
+        ));
+        let sent = agent.approve(call, Confirmation::Confirmed).unwrap();
+        assert!(matches!(sent[0], Submission::Send { .. }));
+        assert!(agent.held().is_empty());
     }
 
     #[test]
