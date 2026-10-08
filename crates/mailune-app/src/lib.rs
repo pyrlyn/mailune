@@ -4,7 +4,11 @@
 //! Token bytes are read through [`SecretStore`] and never placed on a `Debug`
 //! or log path.
 
+mod views;
+
 use mailune_protocol::{AccountId, Secret, SecretId, SecretStore};
+
+pub use views::{ComposerDraft, OpenThread, SettingsSnapshot, ThreadList, Views};
 
 /// Failure returned by assembly.
 #[derive(Debug, thiserror::Error)]

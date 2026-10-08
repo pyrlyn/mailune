@@ -1,0 +1,18 @@
+{
+  "historyId": "100",
+  "history": [
+    {
+      "id": "100",
+      "messagesAdded": [
+        {
+          "message": {
+            "id": "m1",
+            "threadId": "t1",
+            "snippet": "See you at the dock",
+            "labelIds": ["INBOX", "UNREAD", "STARRED", "CATEGORY_SOCIAL"]
+          }
+        }
+      ]
+    }
+  ]
+}

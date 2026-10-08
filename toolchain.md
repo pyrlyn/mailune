@@ -18,7 +18,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
 | serde | local | https://github.com/serde-rs/serde | Contract serialization |
-| serde_json | local | https://github.com/serde-rs/json | Schema snapshot value |
+| serde_json | local | https://github.com/serde-rs/json | Schema snapshot value and scenario replay JSON |
 | cargo_metadata | local | https://github.com/oli-obk/cargo_metadata | Crate-boundary test over `cargo metadata` |
 | syn | local | https://github.com/dtolnay/syn | `//!` header check and forward-only FFI scaffold |
 | thiserror | local | https://github.com/dtolnay/thiserror | One error enum per library crate |
@@ -28,6 +28,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | ammonia | local | https://github.com/rust-ammonia/ammonia | HTML sanitizer for the message body |
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
-| rand | local | https://github.com/rust-random/rand | DKIM test key generation |
+| rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
+| pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
+| libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |

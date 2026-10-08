@@ -4,12 +4,16 @@
 //! with the caller; SRV and MX results are values they pass in.
 
 mod autoconfig;
+mod lookup;
+mod oauth;
 mod pkce;
 
 pub use autoconfig::{
     Autoconfig, MxRecord, ServerEndpoint, ServerProtocol, SocketSecurity, SrvRecord, SrvService,
     endpoint_from_mx, endpoint_from_srv, parse_mozilla_xml, parse_well_known_json,
 };
+pub use lookup::{ConfigSource, discover};
+pub use oauth::{Issued, Redirect, RedirectListener, Session, TokenIssuer};
 pub use pkce::{Pkce, s256_challenge};
 
 /// Failure returned by discovery.
@@ -23,4 +27,14 @@ pub enum Error {
     /// The message does not include the verifier.
     #[error("PKCE verifier is not valid: {0}")]
     Pkce(String),
+    /// ISPDB, SRV, and MX produced no server.
+    ///
+    /// The text names the domain or the reason. It is not a password.
+    #[error("autoconfig lookup failed: {0}")]
+    Lookup(String),
+    /// The redirect or the token exchange was rejected.
+    ///
+    /// The text is a reason. It must not include an authorization code or a token.
+    #[error("oauth failed: {0}")]
+    Oauth(String),
 }

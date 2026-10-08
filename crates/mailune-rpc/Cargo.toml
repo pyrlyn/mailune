@@ -1,15 +1,18 @@
 [package]
-name = "mailune-testkit"
+name = "mailune-rpc"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "In-memory host fakes and submission scenarios"
+description = "Typed JSON-RPC methods that forward to a handler"
 
 [dependencies]
 mailune-protocol = { path = "../mailune-protocol" }
+schemars = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true
