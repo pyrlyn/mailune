@@ -40,14 +40,14 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| M12 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| M11 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| M14 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| M19 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -75,7 +75,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M17 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| M17 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -416,7 +416,7 @@ Depends on: M7.
 
 Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
 
-Execution plan: `desktop/macos` only.
+Execution plan: `desktop/macos` only. Port `SettingsView` with Codable `Preferences` for accounts, appearance, notifications, reading, compose and sync, a `PreferencesStore` protocol, a `FakePreferencesStore` that round-trips through JSON, and a `UserDefaults` store for the app (no secrets). Reuse the existing `settings.*` keys. The compose undo window feeds M10's `Composer`.
 
 ### P32. Relay client
 
@@ -528,7 +528,7 @@ Depends on: M8. Citation ranking is on another branch.
 
 Done when: filter tokens narrow a fixture list, and Ask shows a citation that points at a fixture id.
 
-Execution plan: `desktop/macos` only. Do not edit `mailune-core`.
+Execution plan: `desktop/macos` only. Do not edit `mailune-core`. `SearchQuery` mirrors the core's `parse_query` grammar (`from:`, `label:`, `has:attachment`, `is:unread`, quoted and free text; `to:` and `before:` are reported as not answerable by a `ThreadRow`) and narrows the M8 fixture rows. Ask mirrors the core's rule that an answer is shown only with a citation of a retrieved passage: a fixture answerer picks the message sentence with the most shared words and cites its message id. Search field on the thread list, Ask sheet with the citation; strings from gettext.
 
 ### M13. macOS onboarding
 
@@ -544,7 +544,7 @@ Depends on: M8.
 
 Done when: mailto, a dock badge, share, and Spotlight sit behind fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
-Execution plan: `desktop/macos` only.
+Execution plan: `desktop/macos` only. Test the app's logic, not the fakes: mailto URLs parse into a composer `Draft` (RFC 6068 to, cc, subject, body); the dock badge shows the unread count; share builds text from a message; Spotlight indexes subject and sender only. Each sits behind a protocol with a fake for tests and an AppKit or CoreSpotlight implementation for the app. No `keyring::` or `Security.framework`.
 
 ### M15. App Intents
 
@@ -568,7 +568,7 @@ Depends on: M9, M10. The summary and reply engines are on another branch.
 
 Done when: the reader shows a summary and reply chips from fixtures, and settings shows a privacy line. No model call.
 
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
+Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. A fixture `assist.json` gives each thread a summary and three reply suggestions (the A11/A13 shapes); the reader shows them, and a reply chip opens the composer with the reply prefilled. Settings shows a privacy line (AI runs on this Mac by default; encrypted mail never goes to a cloud model). No model call.
 
 ### R3. Swift CI
 
@@ -648,7 +648,7 @@ Depends on: M8, B7.
 
 Done when: one XCUITest opens the thread list from fixture data and sees a subject. If the test runner cannot launch the app, commit the test and say why.
 
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`.
+Execution plan: `desktop/macos` only. Add a `MailuneUITests` XCUITest target to `project.yml` that launches the app and finds a subject from the M8 contract fixture by accessibility identifier. Run it through `xcodebuild test`; if the runner cannot launch the app here, commit the test and record why.
 
 ### M18. macOS release script
 
