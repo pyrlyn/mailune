@@ -14,9 +14,9 @@ public struct ComposerView: View {
 
     /// The fake outbox is ticked here because nothing else runs its clock
     /// until the core's queue replaces it.
-    public init(outbox: FakeOutbox, undoWindow: TimeInterval = 10) {
+    public init(outbox: FakeOutbox, undoWindow: TimeInterval = 10, draft: Draft = Draft()) {
         self.outbox = outbox
-        _composer = State(initialValue: Composer(outbox: outbox, undoWindow: undoWindow))
+        _composer = State(initialValue: Composer(outbox: outbox, undoWindow: undoWindow, draft: draft))
     }
 
     public var body: some View {

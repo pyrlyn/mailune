@@ -1,4 +1,5 @@
 import MailuneModel
+import MailunePlatform
 import MailuneUI
 import SwiftUI
 
@@ -8,7 +9,7 @@ struct MailuneApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ShellView(preferences: preferences)
+            ShellView(preferences: preferences, host: .live())
         }
         Settings {
             SettingsView(store: preferences)

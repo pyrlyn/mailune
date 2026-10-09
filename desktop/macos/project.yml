@@ -47,6 +47,15 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Mailune
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+    # XcodeGen writes this plist on every generate; it is not committed.
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleURLTypes:
+          - CFBundleURLName: app.mailune.mailto
+            CFBundleURLSchemes: [mailto]
   MailuneTests:
     type: bundle.unit-test
     platform: macOS

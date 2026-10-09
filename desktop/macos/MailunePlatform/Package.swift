@@ -8,8 +8,11 @@ let package = Package(
     products: [
         .library(name: "MailunePlatform", targets: ["MailunePlatform"])
     ],
+    dependencies: [
+        .package(path: "../MailuneModel"),
+    ],
     targets: [
-        .target(name: "MailunePlatform"),
+        .target(name: "MailunePlatform", dependencies: ["MailuneModel"]),
         .testTarget(name: "MailunePlatformTests", dependencies: ["MailunePlatform"]),
     ]
 )

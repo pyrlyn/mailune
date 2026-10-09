@@ -1,4 +1,5 @@
 import MailuneModel
+import MailunePlatform
 import SwiftUI
 
 /// Three panes, a toolbar, ⌘K, and a command palette.
@@ -11,10 +12,13 @@ public struct ShellView: View {
     @State private var outbox = FakeOutbox()
     @State private var search = ""
     @State private var asking = false
+    @State private var startDraft = Draft()
     private let preferences: any PreferencesStore
+    private let host: HostServices
 
-    public init(preferences: any PreferencesStore = FakePreferencesStore()) {
+    public init(preferences: any PreferencesStore = FakePreferencesStore(), host: HostServices = .fake()) {
         self.preferences = preferences
+        self.host = host
     }
 
     private var openMessage: MailMessage? {
@@ -47,6 +51,7 @@ public struct ShellView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
+                    startDraft = Draft()
                     composing = true
                 } label: {
                     // The app target's asset catalog holds this image.
@@ -59,12 +64,34 @@ public struct ShellView: View {
                 Button(Copy.text("search.ask")) { asking = true }
             }
             ToolbarItem(placement: .primaryAction) {
+                Button(Copy.text("sheets.share")) {
+                    if let message = openMessage {
+                        host.sharing.share(ShareContent.text(for: message))
+                    }
+                }
+                .disabled(openMessage == nil)
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
         }
         .sheet(isPresented: $composing) {
-            ComposerView(outbox: outbox, undoWindow: TimeInterval(preferences.current().undoSendSeconds))
+            ComposerView(
+                outbox: outbox,
+                undoWindow: TimeInterval(preferences.current().undoSendSeconds),
+                draft: startDraft
+            )
+        }
+        .onOpenURL { url in
+            if let draft = MailtoLink.draft(from: url) {
+                startDraft = draft
+                composing = true
+            }
+        }
+        .task {
+            UnreadBadge.update(host.dock, rows: ThreadFixtures.all)
+            host.spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all))
         }
         .sheet(isPresented: $asking) {
             AskView { citation in
