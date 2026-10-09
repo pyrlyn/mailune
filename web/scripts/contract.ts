@@ -66,7 +66,8 @@ export function mergedSchema(): Schema {
     add(root, rest);
   }
   return {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+    // The dialect schemars wrote, copied so every root keeps the same one.
+    $schema: schemas.Envelope.$schema,
     title: "Contract",
     type: "object",
     properties: Object.fromEntries(ROOTS.map((root) => [root, { $ref: `#/$defs/${root}` }])),
