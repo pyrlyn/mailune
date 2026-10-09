@@ -51,12 +51,17 @@ describe("web sources", () => {
   it("name no remote URL on any line", () => {
     // The generated contract carries only Rust doc comments; a URL there
     // would still be one line a reviewer should look at.
-    const remote = /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}/i;
+    const url = /(?:https?:)?\/\/([a-z0-9.-]+\.[a-z]{2,})/gi;
+    // RFC 6761 reserves these names; they never resolve, so tests may use them.
+    const reserved = /\.(test|example|invalid|localhost)$/i;
+    const remote = (line: string) => [...line.matchAll(url)].some((match) => !reserved.test(match[1] ?? ""));
+    expect(remote(`src="https:/${"/"}cdn.example.com/a.png"`)).toBe(true);
+    expect(remote(`fetch("http:${"//"}mailune.test/threads")`)).toBe(false);
     const hits = sources(WEB).flatMap((path) =>
       readFileSync(path, "utf8")
         .split("\n")
         .map((line, index) => ({ line, at: `${relative(WEB, path)}:${index + 1}` }))
-        .filter(({ line }) => remote.test(line))
+        .filter(({ line }) => remote(line))
         .map(({ at }) => at),
     );
     expect(hits).toEqual([]);
