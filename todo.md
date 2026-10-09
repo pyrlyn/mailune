@@ -2,7 +2,6 @@
 
 - C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 - C11. Threat model and trust boundaries document (core, AI, MCP)
-- F4. mailune-config: typed TOML, layering, committed JSON Schema
 - F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 - F10. Gettext catalogs for core-originated strings
 - R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
@@ -27,16 +26,8 @@
 - S12. Storage benchmarks
 - P18. JMAP push
 - B3. Swift package
-- M1. Xcode project
-- M2. Swift design tokens
-- M3. macOS icons
-- M4. macOS localisation
 - M5. macOS host integrations
-- M7. macOS shell
-- M8. macOS thread list
 - M12. macOS settings
-- M9. macOS reader
-- M10. macOS composer
 - M6. Apple on-device model
 - M11. macOS search
 - M13. macOS onboarding
@@ -114,9 +105,5 @@
 - X8. Extract llm-testkit
 - D13. Android release
 - I8. TestFlight pipeline
-- R11. Windows signing workflow
-- R12. Flatpak workflow
-- R13. TestFlight workflow
-- R14. Play workflow
 - W13. Windows release
 - S14. usearch for vectors

@@ -28,6 +28,7 @@ The source for this plan, with the feature matrix, the reuse inventory and a fil
 | `mailune-crypto` | Adapter: OpenPGP | pgp |
 | `mailune-smime` | Adapter: S/MIME at the CMS layer (verify, decrypt, sign, encrypt) | cms, x509-cert, rsa |
 | `mailune-auth` | Adapter: OAuth PKCE, account autoconfig | oauth2 or the cox-mcp auth code |
+| `mailune-config` | Adapter: typed layered TOML config and its committed JSON Schema | figment, toml |
 | `mailune-app` | Assembly: owns config and the runtime, folds Events into view models | tokio |
 | `mailune-ffi`, `-capi`, `-rpc`, `-wasm`, `-cli`, `-mcp`, `-server` | Surfaces that only forward calls | uniffi, cbindgen, axum, wasm-bindgen, clap, rmcp |
 | `mailune-testkit` | Fakes for every trait, scenario builder | wiremock |

@@ -46,6 +46,14 @@ fn only_store_depends_on_diesel() {
 }
 
 #[test]
+fn only_config_depends_on_figment_or_toml() {
+    let meta = metadata();
+    for dep in ["figment", "toml", "toml_edit"] {
+        assert_only_owner(&meta, dep, "mailune-config");
+    }
+}
+
+#[test]
 fn only_ffi_depends_on_uniffi() {
     assert_only_owner(&metadata(), "uniffi", "mailune-ffi");
 }

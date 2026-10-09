@@ -7,6 +7,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | git | system | Version control | https://github.com/git/git |
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
+| Xcode | system (App Store) | Swift, SwiftPM and `xcodebuild` for the macOS shell under `desktop/macos` (arm64 only) | https://developer.apple.com/xcode/ |
+| XcodeGen | mise (`mise exec xcodegen@2.46.0` in `desktop/macos/scripts/test.sh`; not in `mise.toml`, which Linux CI installs) | Generates `Mailune.xcodeproj` from `desktop/macos/project.yml` | https://github.com/yonaskolb/XcodeGen |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
 | java | mise (`desktop/android/mise.toml`) | Runs Gradle for the Android shell | https://openjdk.org |
 | gradle | mise (`desktop/android/mise.toml`) | Builds and tests `desktop/android` | https://github.com/gradle/gradle |
@@ -65,6 +67,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
 | proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| figment | local | https://github.com/SergioBenitez/Figment | `mailune-config` layer merge; `Jail` in its tests |
+| toml | local | https://github.com/toml-rs/toml | `mailune-config` parses each layer alone so errors keep file:line |
 
 Gradle (`desktop/android`):
 
