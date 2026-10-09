@@ -50,9 +50,18 @@ fn only_ffi_depends_on_uniffi() {
     assert_only_owner(&metadata(), "uniffi", "mailune-ffi");
 }
 
+/// Two crates serve HTTP: the self-hosted server and the push relay. Nothing
+/// else listens on a socket, so axum stays out of every other crate.
 #[test]
-fn only_server_depends_on_axum() {
-    assert_only_owner(&metadata(), "axum", "mailune-server");
+fn only_the_servers_depend_on_axum() {
+    let meta = metadata();
+    let users = crates_depending_on(&meta, "axum");
+    assert!(
+        users
+            .iter()
+            .all(|name| ["mailune-server", "mailune-push"].contains(name)),
+        "axum is only allowed in mailune-server and mailune-push, found in {users:?}"
+    );
 }
 
 /// `mailune-core` is pure. The allowlist is the contract plus `thiserror`;
