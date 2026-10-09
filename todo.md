@@ -26,8 +26,6 @@
 - T4. Queue property tests
 - A31. Voice dictation
 - E1. mailune-server
-- E2. Web frontend scaffold
-- E3. Web tokens and icons
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
@@ -54,9 +52,6 @@
 - P32. Relay client
 - T6. Performance budgets
 - R8. Integration compose file
-- E5. Web shell and thread list
-- E6. Web reader
-- E7. Web composer
 - E8. Web AI surfaces
 - E9. Web offline cache
 - E11. Web end-to-end test

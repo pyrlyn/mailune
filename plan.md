@@ -32,8 +32,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E2 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| E3 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -60,9 +58,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E5 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
-| E6 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
-| E7 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | E8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -354,22 +349,6 @@ Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound e
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
 
-### E2. Web frontend scaffold
-
-Depends on: B8. Reuse: Vite, React, TypeScript.
-
-Done when: `web/` builds and a vitest checks that a generated payload type round-trips. No live server required for the test.
-
-Execution plan: `web/` with Vite, React and TypeScript on npm, Node pinned in `mise.toml`. `web/scripts/contract.ts` turns the committed contract JSON Schema snapshot of `mailune-protocol` into `web/src/contract.gen.ts` with json-schema-to-typescript. Vitest checks the generated file has not drifted and that an `Event` round-trips through JSON and validates against the same schema (Ajv). UI strings come from the English web catalog `scripts/i18n.py` writes. New npm packages get `toolchain.md` rows.
-
-### E3. Web tokens and icons
-
-Depends on: E2.
-
-Done when: colors, type, and spacing are CSS variables, and one icon is an inline SVG. No remote image URL on one source line.
-
-Execution plan: `web/src/tokens.css` (colour, type, spacing variables) and an inline SVG inbox icon. A vitest reads the variables, renders the icon, and scans every `web/` source line for a remote URL.
-
 ### E4. Web localisation catalogs
 
 Depends on: E2.
@@ -497,30 +476,6 @@ Depends on: the IMAP client already on this branch. P7's sync code is on another
 Done when: a compose file names Stalwart and Dovecot, and a test reads that file. `nextest` does not start Docker and does not open a socket. Do not edit `.github/workflows/ci.yml`.
 
 Execution plan: `docker-compose.yml` plus one test in `mailune-cli`.
-
-### E5. Web shell and thread list
-
-Depends on: E3, E1.
-
-Done when: three panes render a fixture thread list, and choosing a row shows that thread. A vitest covers the selection.
-
-Execution plan: three panes (mailboxes, list, reading) over fixture `ThreadRow`s typed by the generated contract. E1 (`mailune-server`) is in PR #5, so no socket is used. A happy-dom vitest clicks a row and checks the reading pane.
-
-### E6. Web reader
-
-Depends on: E5, P3.
-
-Done when: a message body renders in a sandboxed iframe from srcdoc with a strict CSP. No remote image URL on one source line.
-
-Execution plan: a reader iframe with an empty `sandbox` and `srcdoc` carrying a `default-src 'none'` CSP. The body is the output of `mailune-mime::sanitize_html` for a hostile message, pinned as an insta snapshot in `mailune-mime` that the web test loads, so no sanitiser is written in TypeScript. The test checks scripts, remote images and navigation stay blocked.
-
-### E7. Web composer
-
-Depends on: E5.
-
-Done when: recipient, subject, and body round-trip, and send stays disabled until a confirm control is on.
-
-Execution plan: a composer whose recipient, subject and body round-trip through the generated `save_draft` submission. Send stays disabled until a confirm checkbox is on, and any edit turns the confirmation off again. A happy-dom vitest covers both.
 
 ### E8. Web AI surfaces
 
