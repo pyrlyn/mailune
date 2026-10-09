@@ -1014,6 +1014,26 @@ Execution plan: `desktop/macos` only, plus one test in `mailune-testkit`. Port `
 
 What landed: `ThreadList`: a `List` (lazy; only on-screen rows are built) with the four contract categories as tabs, an unread dot, a trailing swipe that archives, and multi-select. Rows decode from `MailuneModel/Fixtures/threads.json`, a contract `Event::Snapshot`; `mailune-testkit` parses the same file as `Event`, so the Swift fixture cannot drift from `ThreadRow`. New key `mail_list.category` has de, fr and ja translations.
 
+### M9. macOS reader
+
+Depends on: M8, P3, C6.
+
+Done when: a message renders with quotes collapsed, one attachment, and a security badge. Remote content and JavaScript stay off.
+
+Execution plan: `desktop/macos` only, on `m9-reader-composer` stacked on `m1-macos-chain`. No remote image URL. Port the reader from `batch7-imap` and fix it: the badge derives from a typed security state (DKIM verdict, signature check, encryption) instead of a literal; the body is the core's plain text with no web view; blocked remote content arrives as counts. Tests: quotes collapse and expand, one attachment, every badge rule, the blocked-remote banner, and a hosted view-tree walk that fails on any web view.
+
+What landed: `MailuneModel/Message.swift`: `SecurityState` mirrors `mailune-mime`'s `DkimVerdict` plus the signature check and encryption; `SecurityBadge` is computed from it and a failed check outranks everything (so a forged, encrypted message shows "Authentication failed"). `RemoteSummary` carries what the core's remote policy blocked as counts, so the shell never holds a URL. `ReaderPresentation` collapses the core-split quote by default and lists the attachment. `ReaderView` renders plain text with a quote toggle (⇧⌘Q), an attachment row, the badge, and an "Images blocked" banner with the tracker count. `ReaderViewTests` hosts the reader in a window and fails if any view class is a web view; planting a `WKWebView` made it fail, so the check is live. The fixture is `messages.json`; the real security state arrives over the core binding once B3 lands. New `reader.*` keys have de, fr and ja translations.
+
+### M10. macOS composer
+
+Depends on: M7, P13, S13.
+
+Done when: recipient chips, a body, one attachment, send later, and undo send round-trip through a fake. Send stays off until confirm.
+
+Execution plan: `desktop/macos` only, on the same stacked branch as M9. Port the composer from `batch7-imap` and fix it: a `Composer` state machine (editing → confirming → held) where only `confirmSend` reaches the outbox, a fake outbox with an injected time, send later and undo send as one hold window. Tests: chips, send off until confirm, undo inside and after the window, send later, and a past send-later time.
+
+What landed: `MailuneModel/Composer.swift`: `Composer` parses typed text into recipient chips (rejecting non-addresses and duplicates), holds subject, body, one attachment and an optional send-later time. `requestSend` asks for confirmation and `confirmSend` is the only call that reaches the `Outbox`; the draft is held until the later of the undo window (10 s) and the send-later time, so `undo` restores the whole draft until it goes out. `FakeOutbox` stands in for the core's queue until B3. `ComposerView` (⌘N from the shell) shows chips, a file picker for one attachment, a send-later toggle and date, a confirmation dialog before send, and Undo while held; it cannot be dismissed while a message is held. Contact suggestions (S13) are not shown yet: they need the core binding. New `compose.*` keys have de, fr and ja translations.
+
 ### R11. Windows signing workflow
 
 Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.

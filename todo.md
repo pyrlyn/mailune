@@ -35,8 +35,6 @@
 - B3. Swift package
 - M5. macOS host integrations
 - M12. macOS settings
-- M9. macOS reader
-- M10. macOS composer
 - M6. Apple on-device model
 - M11. macOS search
 - M13. macOS onboarding

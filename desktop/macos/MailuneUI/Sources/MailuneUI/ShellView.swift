@@ -7,16 +7,14 @@ public struct ShellView: View {
     @State private var selected: Set<String> = []
     @State private var palette = false
     @State private var query = ""
+    @State private var composing = false
+    @State private var outbox = FakeOutbox()
 
     public init() {}
 
-    private var detailTitle: String {
-        guard selected.count == 1, let id = selected.first,
-              let thread = ThreadFixtures.all.first(where: { $0.id == id })
-        else {
-            return Copy.text("app.no_conversation_open")
-        }
-        return thread.subject
+    private var openMessage: MailMessage? {
+        guard selected.count == 1, let id = selected.first else { return nil }
+        return MessageFixtures.message(forThread: id)
     }
 
     public var body: some View {
@@ -29,18 +27,35 @@ public struct ShellView: View {
             ThreadList(selected: $selected)
                 .navigationSplitViewColumnWidth(min: 260, ideal: 320)
         } detail: {
-            Text(detailTitle)
-                .font(MailuneType.title)
-                .foregroundStyle(MailuneColor.ink)
-                .padding(MailuneSpace.m)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .background(MailuneColor.canvas)
+            if let message = openMessage {
+                ReaderView(message: message).id(message.id)
+            } else {
+                Text(Copy.text("app.no_conversation_open"))
+                    .font(MailuneType.title)
+                    .foregroundStyle(MailuneColor.ink)
+                    .padding(MailuneSpace.m)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .background(MailuneColor.canvas)
+            }
         }
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    composing = true
+                } label: {
+                    // The app target's asset catalog holds this image.
+                    Image("ToolbarCompose")
+                }
+                .accessibilityLabel(Copy.text("app.compose"))
+                .keyboardShortcut("n", modifiers: .command)
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
+        }
+        .sheet(isPresented: $composing) {
+            ComposerView(outbox: outbox)
         }
         .sheet(isPresented: $palette) {
             CommandPalette(query: $query) { command in

@@ -1128,3 +1128,55 @@ msgstr ""
 msgctxt "mail_list.category"
 msgid "Category"
 msgstr ""
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr ""
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr ""
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr ""
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr ""
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr ""
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr ""
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr ""
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr ""
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr ""
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr ""
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr ""
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr ""
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr ""

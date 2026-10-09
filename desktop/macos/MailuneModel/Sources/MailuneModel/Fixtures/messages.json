@@ -1,0 +1,35 @@
+[
+  {
+    "id": "m1",
+    "thread": "t1",
+    "from": { "name": "Ana Ruiz", "email": "ana@acme.example" },
+    "subject": "Quarterly plan",
+    "body": "Hi,\n\nThe draft is attached. Could you send comments by Friday?\n\nAna",
+    "quoted": "On Monday, Ben Ito wrote:\n> Can you share the plan before the review?",
+    "attachments": [{ "name": "quarterly-plan.pdf", "size": 182344 }],
+    "security": { "dkim": "pass", "signature": "valid", "encrypted": false },
+    "remote": { "blocked": 2, "tracker_pixels": 1 }
+  },
+  {
+    "id": "m2",
+    "thread": "t2",
+    "from": { "name": "Ben Ito", "email": "ben@ito.example" },
+    "subject": "Lunch on Thursday",
+    "body": "Same place as last time works for me.",
+    "quoted": null,
+    "attachments": [],
+    "security": { "dkim": "pass", "signature": "none", "encrypted": false },
+    "remote": { "blocked": 0, "tracker_pixels": 0 }
+  },
+  {
+    "id": "m3",
+    "thread": "t3",
+    "from": { "name": null, "email": "receipts@shop.example" },
+    "subject": "Your receipt",
+    "body": "Order 4471 has shipped.",
+    "quoted": null,
+    "attachments": [],
+    "security": { "dkim": "fail", "signature": "none", "encrypted": false },
+    "remote": { "blocked": 5, "tracker_pixels": 2 }
+  }
+]
