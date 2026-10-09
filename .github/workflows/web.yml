@@ -1,0 +1,64 @@
+name: web
+
+# Type checks, tests and builds the web client in web/.
+#
+# pyrlyn/ci@27290ae30105592f683c236fc76dcc2ee4348bdf has no Node or web
+# workflow (its changes.yml classifies Rust, Swift and .NET only), so this
+# job installs the tools pinned in mise.toml itself. The web tests read the
+# gettext catalogs and two Rust snapshots, so a change to those runs it too.
+# This workflow is not a required check; ci.yml is unchanged.
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - web/**
+      - i18n/**
+      - scripts/i18n.py
+      - mise.toml
+      - crates/mailune-protocol/src/snapshots/**
+      - crates/mailune-mime/src/snapshots/**
+      - .github/workflows/web.yml
+  pull_request:
+    paths: *paths
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # `npm test` calls `mise run i18n`, which would otherwise install every
+      # tool in mise.toml, Rust included.
+      MISE_DISABLE_TOOLS: rust
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Node runs the web tooling; translate-toolkit runs scripts/i18n.py,
+      # which writes the catalog the web client reads. Rust is not needed.
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install_args: node pipx:translate-toolkit
+
+      - name: Install packages
+        run: npm ci --no-audit --no-fund
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
