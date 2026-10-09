@@ -41,10 +41,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M13 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R3 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -72,11 +70,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I1 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I3 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
-| I4 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
-| I5 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | I6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I9 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -509,14 +503,6 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M13. macOS onboarding
-
-Depends on: M12, P14, P15.
-
-Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
-
-Execution plan: `desktop/macos` only. Mirror `mailune-auth`'s P14 and P15 shapes in Swift until B3: `ServerEndpoint` (IMAP or SMTP, host, port, TLS/STARTTLS/plain) from a fixture autoconfig source behind a lookup protocol, and an OAuth session (state, PKCE S256 challenge, a redirect listener and token issuer protocol with fakes). Plain-text-only servers are refused. The new account goes into the M12 preferences store; the token goes only into an in-memory secret vault fake, never into preferences. No network, no keychain.
-
 ### M15. App Intents
 
 Depends on: M11.
@@ -532,14 +518,6 @@ Depends on: M9, M10.
 Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
 
 Execution plan: `desktop/macos` only.
-
-### R3. Swift CI
-
-Depends on: M1. Required Rust checks already exist.
-
-Done when: a new workflow runs `xcodebuild test` for macOS arm64. Do not add an Intel slice. Do not edit `.github/workflows/ci.yml`.
-
-Execution plan: `.github/workflows/swift.yml` only, plus `desktop/macos/scripts`. Run `desktop/macos/scripts/test.sh` on the `xcode-27` runner (Apple Silicon) with pyrlyn/ci's `setup-xcode` action and mise (translate-toolkit for the catalogs, XcodeGen through `mise exec`), pinned like the existing workflows. Trigger on pushes to main and on pull requests that touch the macOS shell, i18n or the workflow. `ci.yml` and the required checks are not changed. The UI test joins only if a hosted runner runs it reliably. actionlint must pass.
 
 ### L1. C library build
 
@@ -613,14 +591,6 @@ Done when: a script builds a DMG layout and an appcast fixture. If the signing i
 
 Execution plan: `desktop/macos` only.
 
-### I1. iOS target
-
-Depends on: M7.
-
-Done when: the shared model and UI build for the iOS simulator on arm64. A compact stack and an iPad split are both present. No Intel slice.
-
-Execution plan: `desktop/macos` project only. MailuneModel, MailuneUI and MailunePlatform also target iOS 26; AppKit code is macOS-only. A `MailuneIOS` app target (arm64 simulator, no Intel slice) shows `AdaptiveMailbox`: a compact `NavigationStack` and, at regular width, the shared three-pane split. `scripts/test.sh` builds it for the iOS simulator, checks the slice, and runs the model tests on an iOS simulator.
-
 ### I2. iOS host
 
 Depends on: I1, M5.
@@ -628,30 +598,6 @@ Depends on: I1, M5.
 Done when: keychain, background refresh, and notifications sit behind fakes. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
-
-### I3. iOS thread list
-
-Depends on: I1, M8.
-
-Done when: the phone list has a swipe action, pull to refresh, and selection, fed by fixtures.
-
-Execution plan: `desktop/macos` only. A phone thread list in the compact stack: swipe to archive, pull to refresh through a `ThreadSource` protocol (fixture source), and selection that pushes the reader. Archive and refresh logic live in the shared model so macOS and iOS use the same rules.
-
-### I4. iOS reader
-
-Depends on: I3, M9.
-
-Done when: the phone reader shows a fixture message with remote content off.
-
-Execution plan: `desktop/macos` only. No remote image URL. The phone stack opens the shared M9 `ReaderView`, so the plain-text body, collapsed quote, badge and blocked-remote banner are the same code on iOS; the macOS no-web-view test covers it, and the iOS build compiles it.
-
-### I5. iOS composer
-
-Depends on: I1, M10.
-
-Done when: the phone composer round-trips recipient, subject, and body, and send stays off until confirm.
-
-Execution plan: `desktop/macos` only. The phone stack opens the shared M10 `ComposerView` (same `Composer` confirm-then-hold design, no second model); the layout adapts to compact width. Tests: recipient, subject and body round-trip through the fake outbox, and nothing reaches it before confirm.
 
 ### I6. iOS model policy
 
