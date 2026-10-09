@@ -159,7 +159,7 @@ pub(crate) mod tests {
     #[test]
     fn a_certificate_names_its_subject_and_address() {
         let ada = cert("ada");
-        assert!(ada.subject().contains("CN=ada"), "{}", ada.subject());
+        assert!(ada.subject().contains("CN=ada"));
         assert_eq!(ada.emails(), ["ada@example.com"]);
         assert!(ada.key_id().is_some());
         let der = ada.to_der().unwrap();

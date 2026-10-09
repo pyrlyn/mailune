@@ -35,6 +35,8 @@ async fn main() -> anyhow::Result<()> {
         .with_context(|| format!("cannot listen on {addr}"))?;
     let token = server::Token::generate();
     eprintln!(
+        // Plain ws is the loopback default; a non-loopback install needs TLS
+        // terminated in front of it, which is outside this binary. nosemgrep
         "mailune-server: ws://{}{}\nmailune-server: token {}",
         listener.local_addr()?,
         server::RPC_PATH,
