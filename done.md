@@ -1043,3 +1043,13 @@ Done when: one Playwright test opens the shell, selects a fixture thread, and se
 Execution plan: `@playwright/test` with one spec under `web/e2e/` that starts the Vite preview, clicks a fixture thread and reads the subject. Browsers are installed with `npx playwright install chromium`; if that fails the spec is committed and the reason recorded. The R7 workflow runs it only if the browser install is clean; vitest stays the required path.
 
 What landed: `web/e2e/shell.spec.ts` opens the production build on a loopback preview, chooses a fixture thread and sees its subject; a second test reloads offline after the service worker took control. Chromium is the revision `@playwright/test` 1.64.0 pins; it was already cached locally and installs cleanly in CI.
+
+### E4. Web localisation catalogs
+
+Depends on: E2.
+
+Done when: one English catalog and one other catalog load by language code, and a missing key falls back to English.
+
+Execution plan: `web/src/i18n.ts` keeps English bundled and loads another catalog that `scripts/i18n.py` already writes (`target/i18n/web/<lang>.json`) on demand through `import.meta.glob`, matched by language code: exact, then the primary subtag, else English. A lookup tries the chosen catalog, then English, then shows the key. `main.tsx` loads `navigator.language` before the first render and sets `<html lang>`. A vitest covers loading by code, the subtag match, the unknown-code default and the English fallback. No new translation toolchain.
+
+What landed: `web/src/i18n.ts` reads the catalogs `scripts/i18n.py` already writes to `target/i18n/web`. English stays bundled; another language loads on demand by code (exact, then primary subtag, else English), about 9 kB per catalog. A key the chosen catalog leaves out comes from English, then shows itself. `main.tsx` loads `navigator.language` before the first render, sets `<html lang>`, and stays in English if loading fails. Vitest covers loading, matching and fallback; a Playwright test opens the shell in a German browser. No new translation toolchain.

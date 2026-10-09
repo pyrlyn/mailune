@@ -26,7 +26,6 @@
 - T4. Queue property tests
 - A31. Voice dictation
 - E1. mailune-server
-- E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
 - B2. UniFFI records
