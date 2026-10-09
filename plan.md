@@ -8,14 +8,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | --- | --- | --- | --- | --- | --- |
 | C1 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| F4 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | F5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | F10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X3 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
 | X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
@@ -37,16 +36,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| M10 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -120,10 +111,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X8 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
@@ -148,14 +135,6 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
-
-### F4. mailune-config: typed TOML, layering, committed JSON Schema
-
-Depends on: F2, X1. Reuse: X1 layered-config (from cox-config/src/load.rs, rtok src/config/validate.rs).
-
-Done when: Unknown keys reported with file:line; schema staleness test; only this module imports figment/toml. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: new crate `mailune-config`. `figment` and `toml` are already in the workspace rust inventory. `X1` is not in this repo. Tests load inside `figment::Jail`. Commit on `batch8-ai`.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
@@ -213,7 +192,9 @@ Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
 
 Done when: aulo or cox migrated; redaction test moves with it. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `telemetry-setup`. Commit there. Do not push.
+Execution plan: `packages/crates` worktree, crate `telemetry-setup` (T21 there), extracted from `aulo-telemetry` with its redaction and logging tests; the application name, filter variable and extra token patterns become settings. Then aulo moves onto it in its own pull request.
+
+Progress: the crate is in pyrlyn/crates-packages PR #43 with aulo's redaction tests and green checks. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. Gap: aulo cannot migrate until `telemetry-setup` is on crates.io, because a shared crate is consumed as a registry version with a local `paths` override, never a bare path. Publishing it is the creator's call.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
@@ -385,59 +366,11 @@ Done when: an XCFramework script targets macOS arm64 only, and a SwiftPM package
 
 Execution plan: `desktop/macos` packaging only.
 
-### M1. Xcode project
-
-Depends on: B3.
-
-Done when: XcodeGen generates MailuneModel, MailuneUI, and MailunePlatform for macOS arm64. No Intel target.
-
-Execution plan: `desktop/macos` only.
-
-### M2. Swift design tokens
-
-Depends on: M1.
-
-Done when: colors, type, spacing, radii, and motion are Swift constants used by one view.
-
-Execution plan: `desktop/macos` only.
-
-### M3. macOS icons
-
-Depends on: M1.
-
-Done when: one app icon and one toolbar icon are local SVG or asset-catalog entries. No remote image URL.
-
-Execution plan: `desktop/macos` only.
-
-### M4. macOS localisation
-
-Depends on: M1.
-
-Done when: one string is in an English catalog and a second catalog, and a missing key falls back to English.
-
-Execution plan: `desktop/macos` only.
-
 ### M5. macOS host integrations
 
 Depends on: M1, B2.
 
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
-
-Execution plan: `desktop/macos` only.
-
-### M7. macOS shell
-
-Depends on: M2, M3.
-
-Done when: a NavigationSplitView shows three panes, a toolbar, one keyboard shortcut, and a command palette. Preview or a unit test builds the view.
-
-Execution plan: `desktop/macos` only. Stay under 500 lines.
-
-### M8. macOS thread list
-
-Depends on: M7, B7.
-
-Done when: the list is lazy, has a swipe action, multi-select, one indicator, and category tabs, fed by fixture data.
 
 Execution plan: `desktop/macos` only.
 
@@ -488,22 +421,6 @@ Depends on: B1. The shared abi-drift crate is not in this repo.
 Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
 
 Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
-
-### M9. macOS reader
-
-Depends on: M8, P3, C6.
-
-Done when: a message renders with quotes collapsed, one attachment, and a security badge. Remote content and JavaScript stay off.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`. No remote image URL.
-
-### M10. macOS composer
-
-Depends on: M7, P13, S13.
-
-Done when: recipient chips, a body, one attachment, send later, and undo send round-trip through a fake. Send stays off until confirm.
-
-Execution plan: `desktop/macos` only.
 
 ### M6. Apple on-device model
 
@@ -1048,38 +965,6 @@ Depends on: I1, R13. Reuse: the R13 App Store Connect workflow, based on the pyr
 Done when: a TestFlight upload can run from that workflow. A real upload waits on R13.
 
 Execution plan: `desktop/macos` on `batch7-imap` only. No real TestFlight upload.
-
-### R11. Windows signing workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
-
-### R12. Flatpak workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
-
-### R13. TestFlight workflow
-
-Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
-
-Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
-
-### R14. Play workflow
-
-Depends on: R10. Reuse: none yet.
-
-Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
 
 ### W13. Windows release
 
