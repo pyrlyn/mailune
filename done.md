@@ -953,3 +953,36 @@ Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new
 Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and APPEND with a synchronizing literal, answering COPYUID and APPENDUID under UIDPLUS. Client mutate.rs: store_flags, copy_messages, move_messages (MOVE, else COPY + Deleted + UID EXPUNGE, refused without UIDPLUS) and append; validate flags and mailbox names; bound COPYUID expansion.
 
 What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.
+
+### S14. usearch for vectors
+
+From ideas. The in-SQLite KNN is S8.
+
+Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
+
+Execution plan: `crates/mailune-store/benches/knn.rs` (divan), nothing else in the store.
+
+1. Fixture: 100k messages, the mailbox size in `docs/architecture.md`, with one chunk each and 384-dimension vectors (a small local embedding model's size). Seeded once through the public repository API; on Apple targets the store is SQLCipher-keyed like production.
+2. Benches: `Store::nearest` (S8, exact cosine scan) and a usearch cosine HNSW index over the same vectors, top 10.
+3. Small test: a handful of vectors where usearch and `nearest` agree on the top hit, so `nextest` stays fast and the comparison uses the same metric.
+4. Budget: T6 is not on `main`, so there is no search budget yet. The only stated number is 50 ms for a thread-list page at 100k messages; it is used as the stand-in and flagged for the creator.
+5. usearch 2.26.4 and divan 0.1.21 are dev-dependencies only, with `toolchain.md` rows. Ported from `batch9-store` `beb2986`, which targets an older store API and 32-dimension vectors.
+
+Result (Apple M3 Max, release, SQLCipher store, top 10 of 100k 384-dimension vectors):
+
+- S8 `Store::nearest`: 1.44 s median.
+- Exact cosine scan over the same vectors already in memory: 79 ms.
+- usearch HNSW: 1.1 ms.
+
+S8 misses the 50 ms stand-in budget about 29 times over. Most of its time is loading and decrypting the rows on every query, not the arithmetic.
+
+Decision (creator): keep the exact scan, with the vectors cached in memory. No usearch in production.
+
+What landed:
+
+- **The comparison.** `benches/knn.rs` compared S8, an in-memory exact scan and usearch, with the numbers above. The bench and the usearch dev-dependency were then removed: with the switch declined they had no ongoing use, and usearch compiled C++ (through cxx) into every non-wasm CI test build.
+- **The cache.** `Store::nearest` now scans decoded vectors kept in memory (`vector_cache.rs`). Scores and their order are identical to the uncached scan, pinned by a test against the old implementation.
+- **Freshness.** This connection's `put_embedding` updates the cache in place; a write from another connection moves `PRAGMA data_version`, and the next query drops the cache. The reader sits in `open.rs` so S7 can build on it.
+- **Limits.** Memory only, capped at 256 MiB (a larger set is scanned once and dropped). Vector buffers are zeroized on drop and when they grow, and `Store::clear_vector_cache` frees them on demand.
+- **After the cache, 100k messages (T6 bench):** a cached search takes 71 ms (was 1.44 s) against T6's proposed 100 ms budget. The first search after open, which fills the cache, takes 1.31 s; warming the cache in the background is in `ideas.md`.
+

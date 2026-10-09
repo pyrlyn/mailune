@@ -129,7 +129,6 @@
 - R14. Play workflow
 - W13. Windows release
 - B10. BoltFFI survey
-- S14. usearch for vectors
 - B11. Shared view-model core
 - P33. Calendar view
 - P34. Shared inboxes
