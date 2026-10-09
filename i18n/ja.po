@@ -251,6 +251,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "スレッド表示"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "会話"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "標準"
@@ -490,6 +494,14 @@ msgstr "レイアウト"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "ライト"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "メールボックス"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "メッセージ"
 
 msgctxt "kit.motion"
 msgid "MOTION"

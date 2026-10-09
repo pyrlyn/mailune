@@ -251,6 +251,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr ""
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr ""
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr ""
@@ -487,6 +491,14 @@ msgstr ""
 
 msgctxt "settings.light"
 msgid "Light"
+msgstr ""
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr ""
+
+msgctxt "app.message"
+msgid "Message"
 msgstr ""
 
 msgctxt "kit.motion"

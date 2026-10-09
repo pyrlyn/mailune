@@ -1,11 +1,6 @@
-import { InboxIcon } from "./icons";
-import { t } from "./i18n";
+import { Shell } from "./Shell";
+import { fixtureThreads } from "./fixture";
 
 export function App() {
-  return (
-    <h1>
-      <InboxIcon />
-      {t("app.mail")}
-    </h1>
-  );
+  return <Shell threads={fixtureThreads} />;
 }
