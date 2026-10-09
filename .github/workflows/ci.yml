@@ -83,5 +83,15 @@ jobs:
       package-args: --workspace --exclude mailune-cli
       full-package-args: --workspace --exclude mailune-cli
       clippy-args: --locked
+      # mailune-store builds bundled SQLite, so cc-rs needs a C compiler for
+      # Android. The runner image ships the NDK; its clang wrappers carry an
+      # API level, so cc-rs does not find them by the bare triple.
+      setup-command: |
+        if [ "$TARGET" = aarch64-linux-android ]; then
+          bin="${ANDROID_NDK_LATEST_HOME:?no Android NDK on the runner}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          test -x "$bin/aarch64-linux-android26-clang"
+          echo "CC_aarch64_linux_android=$bin/aarch64-linux-android26-clang" >> "$GITHUB_ENV"
+          echo "AR_aarch64_linux_android=$bin/llvm-ar" >> "$GITHUB_ENV"
+        fi
       build-command: cargo build --workspace --exclude mailune-cli --lib $FEATURE_ARGS --locked --target "$TARGET"
       skip: ${{ needs.changes.result == 'success' && needs.changes.outputs.docs_only == 'true' }}

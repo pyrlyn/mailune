@@ -1136,3 +1136,71 @@ msgstr "{0} s"
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
 msgstr "{0} · von {1}"
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr "Befehle"
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr "Befehl eingeben"
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr "Gehe zu {0}"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "Kategorie"
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr "Zitierten Text anzeigen"
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr "Zitierten Text ausblenden"
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr "Anhang: {0}"
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr "Tracking-Pixel: {0}"
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr "Authentifizierung fehlgeschlagen"
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr "Verschlüsselt"
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr "Signiert"
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr "Absender bestätigt"
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr "Absender nicht bestätigt"
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr "Datei anhängen"
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr "Diese Nachricht senden?"
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr "{0} entfernen"
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr "Keine E-Mail-Adresse: {0}"
