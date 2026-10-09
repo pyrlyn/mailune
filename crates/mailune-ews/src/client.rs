@@ -282,7 +282,9 @@ fn envelope(id: String, message: Message) -> MailEnvelope {
     }
 }
 
+// These tests write through mailune-store, which has no SQLite on wasm32.
 #[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 mod tests {
     use mailune_protocol::{AccountId, HttpResponse, MailboxId, MessageId, Secret};
     use mailune_store::{Account, Counts, Mailbox, Store, StoredMessage};
