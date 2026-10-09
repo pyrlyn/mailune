@@ -1124,3 +1124,7 @@ msgstr ""
 msgctxt "shell.go_to"
 msgid "Go to {0}"
 msgstr ""
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr ""

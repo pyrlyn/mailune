@@ -9,7 +9,7 @@ let package = Package(
         .library(name: "MailuneModel", targets: ["MailuneModel"])
     ],
     targets: [
-        .target(name: "MailuneModel"),
+        .target(name: "MailuneModel", resources: [.process("Fixtures")]),
         .testTarget(name: "MailuneModelTests", dependencies: ["MailuneModel"]),
     ]
 )

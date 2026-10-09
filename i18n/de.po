@@ -1128,3 +1128,7 @@ msgstr "Befehl eingeben"
 msgctxt "shell.go_to"
 msgid "Go to {0}"
 msgstr "Gehe zu {0}"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "Kategorie"

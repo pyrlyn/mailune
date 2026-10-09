@@ -1,0 +1,82 @@
+{
+  "snapshot": {
+    "threads": [
+      {
+        "id": "t1",
+        "account": "a1",
+        "from": { "name": "Ana Ruiz", "email": "ana@acme.example" },
+        "subject": "Quarterly plan",
+        "snippet": "The draft is attached; comments by Friday?",
+        "stamp": "09:12",
+        "message_count": 3,
+        "unread": true,
+        "flagged": false,
+        "important": true,
+        "pinned": false,
+        "snoozed": false,
+        "draft": false,
+        "has_attachment": true,
+        "category": "primary",
+        "mailbox": "inbox",
+        "labels": []
+      },
+      {
+        "id": "t2",
+        "account": "a1",
+        "from": { "name": "Ben Ito", "email": "ben@ito.example" },
+        "subject": "Lunch on Thursday",
+        "snippet": "Same place as last time works for me.",
+        "stamp": "Yesterday",
+        "message_count": 2,
+        "unread": false,
+        "flagged": false,
+        "important": false,
+        "pinned": false,
+        "snoozed": false,
+        "draft": false,
+        "has_attachment": false,
+        "category": "primary",
+        "mailbox": "inbox",
+        "labels": []
+      },
+      {
+        "id": "t3",
+        "account": "a1",
+        "from": { "name": null, "email": "receipts@shop.example" },
+        "subject": "Your receipt",
+        "snippet": "Order 4471 has shipped.",
+        "stamp": "Mon",
+        "message_count": 1,
+        "unread": true,
+        "flagged": false,
+        "important": false,
+        "pinned": false,
+        "snoozed": false,
+        "draft": false,
+        "has_attachment": false,
+        "category": "updates",
+        "mailbox": "inbox",
+        "labels": []
+      },
+      {
+        "id": "t4",
+        "account": "a1",
+        "from": { "name": "Climbing club", "email": "club@crag.example" },
+        "subject": "Saturday meet-up",
+        "snippet": "Bring your own rope.",
+        "stamp": "Sun",
+        "message_count": 1,
+        "unread": false,
+        "flagged": false,
+        "important": false,
+        "pinned": false,
+        "snoozed": false,
+        "draft": false,
+        "has_attachment": false,
+        "category": "social",
+        "mailbox": "inbox",
+        "labels": []
+      }
+    ]
+  }
+}

@@ -352,4 +352,17 @@ mod tests {
         assert_eq!(steps.len(), 2);
         assert!(matches!(steps[0], Submission::Send { .. }));
     }
+
+    #[test]
+    fn macos_thread_fixture_is_a_contract_snapshot() {
+        let text = include_str!(
+            "../../../desktop/macos/MailuneModel/Sources/MailuneModel/Fixtures/threads.json"
+        );
+        let Event::Snapshot { threads } = serde_json::from_str(text).unwrap() else {
+            panic!("the macOS fixture is not a Snapshot event");
+        };
+        assert_eq!(threads.len(), 4);
+        assert!(threads.iter().any(|row| row.has_attachment));
+        assert!(threads.iter().any(|row| row.from.name.is_none()));
+    }
 }

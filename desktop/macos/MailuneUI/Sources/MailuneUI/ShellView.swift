@@ -4,10 +4,20 @@ import SwiftUI
 /// Three panes, a toolbar, ⌘K, and a command palette.
 public struct ShellView: View {
     @State private var mailbox: Mailbox? = .inbox
+    @State private var selected: Set<String> = []
     @State private var palette = false
     @State private var query = ""
 
     public init() {}
+
+    private var detailTitle: String {
+        guard selected.count == 1, let id = selected.first,
+              let thread = ThreadFixtures.all.first(where: { $0.id == id })
+        else {
+            return Copy.text("app.no_conversation_open")
+        }
+        return thread.subject
+    }
 
     public var body: some View {
         NavigationSplitView {
@@ -16,14 +26,10 @@ public struct ShellView: View {
             }
             .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         } content: {
-            Text(Copy.text(mailbox?.titleKey ?? Mailbox.inbox.titleKey))
-                .font(MailuneType.title)
-                .foregroundStyle(MailuneColor.ink)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .padding(MailuneSpace.m)
-                .navigationSplitViewColumnWidth(min: 220, ideal: 280)
+            ThreadList(selected: $selected)
+                .navigationSplitViewColumnWidth(min: 260, ideal: 320)
         } detail: {
-            Text(Copy.text("app.no_conversation_open"))
+            Text(detailTitle)
                 .font(MailuneType.title)
                 .foregroundStyle(MailuneColor.ink)
                 .padding(MailuneSpace.m)

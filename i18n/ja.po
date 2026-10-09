@@ -1126,3 +1126,7 @@ msgstr "コマンドを入力"
 msgctxt "shell.go_to"
 msgid "Go to {0}"
 msgstr "{0}へ移動"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "カテゴリ"
