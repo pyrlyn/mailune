@@ -32,7 +32,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| E4 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -351,7 +351,7 @@ Depends on: E2.
 
 Done when: one English catalog and one other catalog load by language code, and a missing key falls back to English.
 
-Execution plan: `web/` only. Do not add a translation toolchain.
+Execution plan: `web/src/i18n.ts` keeps English bundled and loads another catalog that `scripts/i18n.py` already writes (`target/i18n/web/<lang>.json`) on demand through `import.meta.glob`, matched by language code: exact, then the primary subtag, else English. A lookup tries the chosen catalog, then English, then shows the key. `main.tsx` loads `navigator.language` before the first render and sets `<html lang>`. A vitest covers loading by code, the subtag match, the unknown-code default and the English fallback. No new translation toolchain.
 
 ### S12. Storage benchmarks
 
