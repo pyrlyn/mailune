@@ -263,7 +263,8 @@ mod tests {
     const BATCH_MESSAGES: &str = include_str!("../fixtures/batch-messages.txt");
 
     fn multipart(body: &str) -> HttpResponse {
-        HttpResponse::new(200, body.replace('\n', "\r\n"))
+        // A Windows checkout may already have turned the fixture into CRLF.
+        HttpResponse::new(200, body.replace("\r\n", "\n").replace('\n', "\r\n"))
             .header("Content-Type", "multipart/mixed; boundary=batch_abc")
     }
 
