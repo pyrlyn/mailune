@@ -196,6 +196,49 @@ mod tests {
         assert!(cleaned.text.contains("Hi"));
     }
 
+    /// The web reader (`web/src/message.ts`) renders this snapshot, so the
+    /// browser test exercises this sanitiser's output instead of a second
+    /// sanitiser written in TypeScript.
+    #[test]
+    fn a_hostile_message_for_the_web_reader_matches_the_snapshot() {
+        let pixel = remote("tracker.example/pixel.png");
+        let page = remote("example.com/notes");
+        let sheet = remote("tracker.example/style.css");
+        let beacon = remote("tracker.example/beacon");
+        let html = [
+            format!("<style>p {{ background: url({pixel}) }}</style>"),
+            format!("<script>fetch('{beacon}')</script>"),
+            "<p onclick=\"steal()\" style=\"color:red\">Hello <b>Ada</b>,</p>".to_string(),
+            format!("<p>The <a href=\"{page}\">build notes</a> are ready.</p>"),
+            format!("<img src=\"{pixel}\" width=\"1\" height=\"1\">"),
+            "<img src=\"//tracker.example/open.gif\">".to_string(),
+            format!("<img srcset=\"{pixel} 2x\" src=\"cid:&lt;logo@mail&gt;\" alt=\"logo\">"),
+            format!("<iframe src=\"{page}\"></iframe>"),
+            format!("<form action=\"{page}\"><input name=\"password\"></form>"),
+            "<a href=\"javascript:alert(1)\">click</a>".to_string(),
+            format!("<link rel=\"stylesheet\" href=\"{sheet}\">"),
+            "<p>Thanks,<br>Grace</p>".to_string(),
+        ]
+        .concat();
+        let cleaned = sanitize_html(&html).unwrap().html;
+        for gone in [
+            "<script",
+            "<style",
+            "<iframe",
+            "<form",
+            "<input",
+            "<link",
+            "onclick",
+            "style=",
+            "javascript:",
+            "tracker.example",
+        ] {
+            assert!(!cleaned.contains(gone), "{gone} survived: {cleaned}");
+        }
+        assert!(cleaned.contains("cid:logo@mail"));
+        insta::assert_snapshot!("web_reader_hostile", cleaned);
+    }
+
     #[test]
     fn a_link_is_not_treated_as_an_image() {
         let page = remote("example.com/notes");

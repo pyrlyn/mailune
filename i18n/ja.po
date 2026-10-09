@@ -251,6 +251,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "スレッド表示"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "会話"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "標準"
@@ -427,6 +431,10 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr "利用規約とプライバシーポリシーに同意します。"
 
+msgctxt "compose.confirm_send"
+msgid "I have checked the recipients and want to send this"
+msgstr "宛先を確認しました。送信します"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "アイコン"
@@ -490,6 +498,18 @@ msgstr "レイアウト"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "ライト"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "メールボックス"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "メッセージ"
+
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "メッセージ本文"
 
 msgctxt "kit.motion"
 msgid "MOTION"

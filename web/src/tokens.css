@@ -1,0 +1,62 @@
+/* Design tokens. Components read only these variables, so a theme is one
+   block here. System fonts only: a web font would be a remote fetch. */
+
+:root {
+  color-scheme: light dark;
+
+  --color-ink: #1c1b19;
+  --color-ink-muted: #5f5b55;
+  --color-paper: #fbfaf7;
+  --color-surface: #f1efe9;
+  --color-line: #dcd8cf;
+  --color-accent: #0f6e56;
+  --color-on-accent: #ffffff;
+  --color-unread: #0f6e56;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-size-small: 0.8125rem;
+  --font-size-body: 0.9375rem;
+  --font-size-title: 1.25rem;
+  --font-weight-regular: 400;
+  --font-weight-strong: 600;
+  --line-height: 1.45;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  --radius: 0.375rem;
+  --icon-size: 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-ink: #ecebe7;
+    --color-ink-muted: #a7a39b;
+    --color-paper: #171715;
+    --color-surface: #22211e;
+    --color-line: #3a3833;
+    --color-accent: #4fb896;
+    --color-on-accent: #0d1f19;
+    --color-unread: #4fb896;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
+}
+
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  color: var(--color-accent);
+}
