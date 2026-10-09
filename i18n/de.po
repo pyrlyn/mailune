@@ -1216,3 +1216,27 @@ msgstr "Anzeigename"
 msgctxt "settings.seconds"
 msgid "{0} seconds"
 msgstr "{0} Sekunden"
+
+msgctxt "ai.summary"
+msgid "Summary"
+msgstr "Zusammenfassung"
+
+msgctxt "ai.action_items"
+msgid "To do"
+msgstr "Zu erledigen"
+
+msgctxt "ai.made_on_device"
+msgid "Made on this Mac"
+msgstr "Auf diesem Mac erstellt"
+
+msgctxt "ai.made_in_cloud"
+msgid "Made by your cloud model"
+msgstr "Von deinem Cloud-Modell erstellt"
+
+msgctxt "ai.reply_with"
+msgid "Reply with “{0}”"
+msgstr "Mit „{0}“ antworten"
+
+msgctxt "settings.ai_privacy"
+msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
+msgstr "KI läuft auf diesem Mac. Verschlüsselte E-Mails werden nie an ein Cloud-Modell gesendet."

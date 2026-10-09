@@ -25,8 +25,9 @@ final class ReaderViewTests: XCTestCase {
         }
     }
 
+    /// Every view class in the tree; other suites check for web views with it.
     @MainActor
-    private static func classNames(in view: NSView) -> [String] {
+    static func classNames(in view: NSView) -> [String] {
         [String(describing: type(of: view))] + view.subviews.flatMap { classNames(in: $0) }
     }
 }

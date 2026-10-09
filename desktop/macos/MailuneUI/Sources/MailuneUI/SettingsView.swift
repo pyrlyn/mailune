@@ -54,6 +54,10 @@ public struct SettingsView: View {
                 }
                 Toggle(Copy.text("settings.sync_on_wi_fi"), isOn: $settings.wifiOnly)
             }
+            Section(Copy.text("settings.privacy_rules")) {
+                Label(Copy.text("settings.ai_privacy"), systemImage: "lock.shield")
+                    .accessibilityIdentifier("settings-ai-privacy")
+            }
         }
         .formStyle(.grouped)
         .font(MailuneType.body)

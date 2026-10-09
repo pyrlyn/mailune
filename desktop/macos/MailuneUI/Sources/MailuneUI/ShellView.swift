@@ -38,7 +38,14 @@ public struct ShellView: View {
                 .navigationSplitViewColumnWidth(min: 260, ideal: 320)
         } detail: {
             if let message = openMessage {
-                ReaderView(message: message).id(message.id)
+                ReaderView(
+                    message: message,
+                    assist: AssistPolicy.visible(AssistFixtures.assist(forThread: message.thread), for: message)
+                ) { text in
+                    startDraft = .reply(to: message, body: text)
+                    composing = true
+                }
+                .id(message.id)
             } else {
                 Text(Copy.text("app.no_conversation_open"))
                     .font(MailuneType.title)
