@@ -1208,3 +1208,11 @@ msgstr "„{0}“ ist nicht lesbar"
 msgctxt "search.unsupported"
 msgid "“{0}” can’t be searched here yet"
 msgstr "Nach „{0}“ kann hier noch nicht gesucht werden"
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr "Anzeigename"
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr "{0} Sekunden"

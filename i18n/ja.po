@@ -1206,3 +1206,11 @@ msgstr "「{0}」を読み取れません"
 msgctxt "search.unsupported"
 msgid "“{0}” can’t be searched here yet"
 msgstr "「{0}」はここではまだ検索できません"
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr "表示名"
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr "{0}秒"

@@ -11,8 +11,11 @@ public struct ShellView: View {
     @State private var outbox = FakeOutbox()
     @State private var search = ""
     @State private var asking = false
+    private let preferences: any PreferencesStore
 
-    public init() {}
+    public init(preferences: any PreferencesStore = FakePreferencesStore()) {
+        self.preferences = preferences
+    }
 
     private var openMessage: MailMessage? {
         guard selected.count == 1, let id = selected.first else { return nil }
@@ -61,7 +64,7 @@ public struct ShellView: View {
             }
         }
         .sheet(isPresented: $composing) {
-            ComposerView(outbox: outbox)
+            ComposerView(outbox: outbox, undoWindow: TimeInterval(preferences.current().undoSendSeconds))
         }
         .sheet(isPresented: $asking) {
             AskView { citation in

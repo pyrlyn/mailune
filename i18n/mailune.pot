@@ -1204,3 +1204,11 @@ msgstr ""
 msgctxt "search.unsupported"
 msgid "“{0}” can’t be searched here yet"
 msgstr ""
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr ""
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr ""
