@@ -787,6 +787,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr "候補"
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr "返信の候補"
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr "要約"
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr "サーフェス"
@@ -1058,6 +1066,10 @@ msgstr "たった今更新しました"
 msgctxt "data.updates"
 msgid "Updates"
 msgstr "更新情報"
+
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
+msgstr "候補を使う"
 
 msgctxt "settings.vacation_responder"
 msgid "Vacation responder"
