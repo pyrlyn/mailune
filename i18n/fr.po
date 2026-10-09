@@ -433,7 +433,7 @@ msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 "J'accepte les conditions d'utilisation et la politique de confidentialité."
 
-msgctxt "compose.confirm_send"
+msgctxt "compose.confirm_recipients"
 msgid "I have checked the recipients and want to send this"
 msgstr "J’ai vérifié les destinataires et je veux l’envoyer"
 
