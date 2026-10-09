@@ -96,3 +96,56 @@
   border-radius: var(--radius);
   background: var(--color-paper);
 }
+
+.pane .compose {
+  margin-bottom: var(--space-3);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  text-align: center;
+}
+
+.composer {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 48rem;
+}
+
+.composer label {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-small);
+}
+
+.composer input[type="text"],
+.composer textarea {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.composer .confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.composer button {
+  justify-self: start;
+  border: 0;
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.composer button:disabled {
+  background: var(--color-line);
+  color: var(--color-ink-muted);
+  cursor: not-allowed;
+}

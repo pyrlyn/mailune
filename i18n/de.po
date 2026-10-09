@@ -432,6 +432,10 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr "Ich stimme den Nutzungsbedingungen und der Datenschutzerklärung zu."
 
+msgctxt "compose.confirm_send"
+msgid "I have checked the recipients and want to send this"
+msgstr "Ich habe die Empfänger geprüft und möchte das senden"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "SYMBOLE"

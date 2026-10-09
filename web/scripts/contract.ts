@@ -4,14 +4,18 @@
 // vitest fails while the two disagree.
 
 import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compile, type JSONSchema } from "json-schema-to-typescript";
 
-const SNAPSHOT = new URL(
+// Plain paths, not URL objects: a DOM test environment replaces `URL`, and
+// node:fs only accepts its own.
+const SCRIPT = fileURLToPath(import.meta.url);
+const SNAPSHOT = join(
+  dirname(SCRIPT),
   "../../crates/mailune-protocol/src/snapshots/mailune_protocol__tests__contract_json_schema_matches_the_snapshot.snap",
-  import.meta.url,
 );
-const OUTPUT = new URL("../src/contract.gen.ts", import.meta.url);
+const OUTPUT = join(dirname(SCRIPT), "../src/contract.gen.ts");
 const ROOTS = ["Envelope", "Event", "Submission"] as const;
 
 type Schema = JSONSchema & { $defs?: Record<string, JSONSchema> };
@@ -86,6 +90,6 @@ export async function renderContract(): Promise<string> {
   });
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (process.argv[1] === SCRIPT) {
   writeFileSync(OUTPUT, await renderContract());
 }

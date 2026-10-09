@@ -1,13 +1,9 @@
 import { readFileSync } from "node:fs";
-import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
-import { contractSchemas, renderContract } from "../scripts/contract.ts";
+import { renderContract } from "../scripts/contract.ts";
 import type { Event, Submission } from "./contract.gen";
 import { t } from "./i18n";
-
-function validator(root: "Event" | "Submission") {
-  return new Ajv2020({ strict: false }).compile(contractSchemas()[root]);
-}
+import { validator } from "./schema.test-utils";
 
 describe("generated contract types", () => {
   it("match the mailune-protocol schema snapshot", async () => {

@@ -39,3 +39,16 @@ export function pane(container: HTMLElement, label: string): HTMLElement {
   }
   return found;
 }
+
+/** Types into a controlled field the way a browser does, so React sees the change. */
+export async function type(field: Element | null | undefined, value: string): Promise<void> {
+  if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+    throw new Error("nothing to type into");
+  }
+  const prototype = Object.getPrototypeOf(field) as object;
+  const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
+  await act(async () => {
+    setter?.call(field, value);
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+}

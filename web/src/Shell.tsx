@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Address, ThreadRow } from "./contract.gen";
+import { Composer } from "./Composer";
+import type { Address, Submission, ThreadRow } from "./contract.gen";
 import { Reader } from "./Reader";
 import { InboxIcon } from "./icons";
 import { t } from "./i18n";
@@ -23,13 +24,16 @@ function sender(address: Address): string {
 export function Shell({
   threads,
   bodies = {},
+  onSubmit = () => {},
 }: {
   threads: ThreadRow[];
   bodies?: Readonly<Record<string, SanitizedHtml>>;
+  onSubmit?: (submission: Submission) => void;
 }) {
   const mailboxes = mailboxesOf(threads);
   const [mailbox, setMailbox] = useState(mailboxes[0] ?? "inbox");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [composing, setComposing] = useState(false);
   const listed = threads.filter((thread) => thread.mailbox === mailbox);
   const open = threads.find((thread) => thread.id === openId) ?? null;
   const body = open ? bodies[open.id] : undefined;
@@ -41,6 +45,9 @@ export function Shell({
           <InboxIcon />
           {t("app.mail")}
         </h1>
+        <button type="button" className="compose" onClick={() => setComposing(true)}>
+          {t("app.compose")}
+        </button>
         <ul>
           {mailboxes.map((id) => (
             <li key={id}>
@@ -64,7 +71,10 @@ export function Shell({
                 className="row"
                 data-unread={thread.unread || undefined}
                 aria-current={thread.id === openId ? "true" : undefined}
-                onClick={() => setOpenId(thread.id)}
+                onClick={() => {
+                  setOpenId(thread.id);
+                  setComposing(false);
+                }}
               >
                 <span className="row-from">{sender(thread.from)}</span>
                 <span className="row-stamp">{thread.stamp}</span>
@@ -76,7 +86,15 @@ export function Shell({
         </ul>
       </section>
       <main className="pane" aria-label={t("app.message")}>
-        {open ? (
+        {composing ? (
+          <Composer
+            onDraft={onSubmit}
+            onSend={(submission) => {
+              onSubmit(submission);
+              setComposing(false);
+            }}
+          />
+        ) : open ? (
           <article>
             <h2>{open.subject}</h2>
             <p className="meta">
