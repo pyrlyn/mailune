@@ -1,0 +1,14 @@
+{
+  "value": [
+    {
+      "id": "p1", "displayName": "Ada Lovelace",
+      "scoredEmailAddresses": [
+        { "address": "ada@contoso.com", "relevanceScore": 30.0 },
+        { "address": "ada.l@example.com", "relevanceScore": 4.0 }
+      ]
+    },
+    { "id": "p2", "displayName": "", "scoredEmailAddresses": [ { "address": "adam@fabrikam.com", "relevanceScore": 2.0 } ] },
+    { "id": "p3", "displayName": "No Mail", "scoredEmailAddresses": [] },
+    { "id": "p4", "displayName": "Adaline", "scoredEmailAddresses": [ { "address": "adaline@example.com", "relevanceScore": 1.0 } ] }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "methodResponses": [
+    ["Mailbox/get", {
+      "accountId": "acc-1", "state": "mb-1", "notFound": [],
+      "list": [
+        { "id": "mb-inbox", "name": "Inbox", "parentId": null, "role": "inbox" },
+        { "id": "mb-archive", "name": "Archive", "parentId": null, "role": "archive" }
+      ]
+    }, "c0"],
+    ["Email/changes", {
+      "accountId": "acc-1", "oldState": "e-1", "newState": "e-2",
+      "hasMoreChanges": false, "created": ["m3"], "updated": ["m2"], "destroyed": []
+    }, "c1"],
+    ["Email/get", {
+      "accountId": "acc-1", "state": "e-2", "notFound": [],
+      "list": [
+        { "id": "m3", "threadId": "t2", "mailboxIds": { "mb-inbox": true },
+          "keywords": {}, "from": [{ "name": "Bob", "email": "bob@example.com" }],
+          "to": [{ "name": null, "email": "me@example.com" }], "cc": [],
+          "subject": "Invoice", "preview": "Attached",
+          "receivedAt": "2026-03-03T08:00:00Z", "hasAttachment": false }
+      ]
+    }, "c2"],
+    ["Email/get", {
+      "accountId": "acc-1", "state": "e-2", "notFound": [],
+      "list": [
+        { "id": "m2", "threadId": "t1", "mailboxIds": { "mb-archive": true },
+          "keywords": { "$seen": true }, "from": [{ "name": "Ada", "email": "ada@example.com" }],
+          "to": [{ "name": null, "email": "me@example.com" }], "cc": [],
+          "subject": "Re: Dock", "preview": "Tomorrow works",
+          "receivedAt": "2026-03-02T09:00:00Z", "hasAttachment": true }
+      ]
+    }, "c3"]
+  ],
+  "sessionState": "sess-1"
+}

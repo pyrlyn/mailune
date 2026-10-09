@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <h:ServerVersionInfo MajorVersion="15" MinorVersion="2" MajorBuildNumber="1544" MinorBuildNumber="4" Version="V2017_07_11" xmlns:h="http://schemas.microsoft.com/exchange/services/2006/types"/>
+  </s:Header>
+  <s:Body>
+    <m:SyncFolderItemsResponse xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
+      <m:ResponseMessages>
+        <m:SyncFolderItemsResponseMessage ResponseClass="Success">
+          <m:ResponseCode>NoError</m:ResponseCode>
+          <m:SyncState>state-2</m:SyncState>
+          <m:IncludesLastItemInRange>true</m:IncludesLastItemInRange>
+          <m:Changes>
+            <t:Create>
+              <t:Message>
+                <t:ItemId Id="m3" ChangeKey="ck3"/>
+                <t:ParentFolderId Id="AAMkInbox" ChangeKey="f1"/>
+                <t:Subject>Photos</t:Subject>
+                <t:DateTimeReceived>2023-11-14T22:16:40Z</t:DateTimeReceived>
+                <t:ConversationId Id="conv-2"/>
+                <t:From>
+                  <t:Mailbox><t:Name>Bob</t:Name><t:EmailAddress>bob@example.com</t:EmailAddress></t:Mailbox>
+                </t:From>
+                <t:IsRead>false</t:IsRead>
+              </t:Message>
+            </t:Create>
+            <t:Delete>
+              <t:ItemId Id="m2" ChangeKey="ck2"/>
+            </t:Delete>
+            <t:ReadFlagChange>
+              <t:ItemId Id="m1" ChangeKey="ck1b"/>
+              <t:IsRead>true</t:IsRead>
+            </t:ReadFlagChange>
+          </m:Changes>
+        </m:SyncFolderItemsResponseMessage>
+      </m:ResponseMessages>
+    </m:SyncFolderItemsResponse>
+  </s:Body>
+</s:Envelope>

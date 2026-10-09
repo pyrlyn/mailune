@@ -1,0 +1,17 @@
+--batch_abc
+Content-Type: application/http
+Content-ID: <response-item0>
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+
+{"id":"m3","threadId":"t2","labelIds":["INBOX","CATEGORY_SOCIAL","Label_1"],"snippet":"Photos attached","historyId":"1250","internalDate":"1700000200000","payload":{"headers":[{"name":"From","value":"bob@example.com"},{"name":"Subject","value":"Photos"}]}}
+--batch_abc
+Content-Type: application/http
+Content-ID: <response-item1>
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+
+{"id":"m4","threadId":"t2","labelIds":["INBOX","UNREAD"],"snippet":"One more","historyId":"1290","internalDate":"1700000300000","payload":{"headers":[{"name":"From","value":"bob@example.com"},{"name":"Subject","value":"Re: Photos"}]}}
+--batch_abc--

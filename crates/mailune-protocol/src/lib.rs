@@ -9,6 +9,7 @@ mod envelope;
 mod event;
 mod flags;
 mod host;
+mod http;
 mod ids;
 mod mailbox;
 mod submission;
@@ -22,6 +23,7 @@ pub use host::{
     ModelCapability, ModelPrompt, Net, NetworkPath, NetworkState, Notification, Notifier,
     PlatformModel, Secret, SecretId, SecretKind, SecretStore,
 };
+pub use http::{Http, HttpRequest, HttpResponse, Method};
 pub use ids::{AccountId, MailboxId, MessageId, ThreadId};
 pub use mailbox::MailboxRole;
 pub use submission::Submission;

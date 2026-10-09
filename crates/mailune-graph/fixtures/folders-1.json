@@ -1,0 +1,8 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('me')/mailFolders",
+  "value": [
+    { "id": "AAMkInbox=", "displayName": "Inbox", "parentFolderId": "AAMkRoot", "childFolderCount": 0, "unreadItemCount": 2, "totalItemCount": 3, "wellKnownName": "inbox" },
+    { "id": "AAMkArchive", "displayName": "Archive", "parentFolderId": "AAMkRoot", "childFolderCount": 1, "unreadItemCount": 0, "totalItemCount": 0 }
+  ],
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/mailFolders?$top=100&$skip=2"
+}

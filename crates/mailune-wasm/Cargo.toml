@@ -1,0 +1,29 @@
+[package]
+name = "mailune-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Browser surface: protocol types, MIME parse, threading and the query parser as wasm-bindgen exports"
+
+# No `cdylib` here: the Android cross build has no linker. The web build
+# asks for one with `cargo rustc --crate-type cdylib`.
+
+[dependencies]
+mailune-core = { path = "../mailune-core" }
+mailune-jmap = { path = "../mailune-jmap" }
+mailune-mime = { path = "../mailune-mime" }
+mailune-protocol = { path = "../mailune-protocol" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+wasm-bindgen = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom-02 = { workspace = true }
+
+[dev-dependencies]
+mailune-testkit = { path = "../mailune-testkit" }
+
+[lints]
+workspace = true

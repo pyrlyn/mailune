@@ -1,0 +1,18 @@
+{
+  "capabilities": {
+    "urn:ietf:params:jmap:core": { "maxObjectsInGet": 500 },
+    "urn:ietf:params:jmap:mail": {},
+    "urn:ietf:params:jmap:submission": {}
+  },
+  "accounts": { "acc-1": { "name": "me@example.com", "isPersonal": true } },
+  "primaryAccounts": {
+    "urn:ietf:params:jmap:mail": "acc-1",
+    "urn:ietf:params:jmap:submission": "acc-1"
+  },
+  "username": "me@example.com",
+  "apiUrl": "https://jmap.example.com/api/",
+  "downloadUrl": "https://jmap.example.com/download/{accountId}/{blobId}/{name}",
+  "uploadUrl": "https://jmap.example.com/upload/{accountId}/",
+  "eventSourceUrl": "https://jmap.example.com/events/",
+  "state": "sess-1"
+}

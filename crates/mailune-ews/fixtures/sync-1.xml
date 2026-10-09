@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <h:ServerVersionInfo MajorVersion="15" MinorVersion="2" MajorBuildNumber="1544" MinorBuildNumber="4" Version="V2017_07_11" xmlns:h="http://schemas.microsoft.com/exchange/services/2006/types"/>
+  </s:Header>
+  <s:Body>
+    <m:SyncFolderItemsResponse xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
+      <m:ResponseMessages>
+        <m:SyncFolderItemsResponseMessage ResponseClass="Success">
+          <m:ResponseCode>NoError</m:ResponseCode>
+          <m:SyncState>state-1</m:SyncState>
+          <m:IncludesLastItemInRange>false</m:IncludesLastItemInRange>
+          <m:Changes>
+            <t:Create>
+              <t:Message>
+                <t:ItemId Id="m1" ChangeKey="ck1"/>
+                <t:ParentFolderId Id="AAMkInbox" ChangeKey="f1"/>
+                <t:Subject>Dock</t:Subject>
+                <t:DateTimeReceived>2023-11-14T22:13:20Z</t:DateTimeReceived>
+                <t:DateTimeSent>2023-11-14T22:13:18Z</t:DateTimeSent>
+                <t:Categories><t:String>Work</t:String></t:Categories>
+                <t:HasAttachments>false</t:HasAttachments>
+                <t:ToRecipients>
+                  <t:Mailbox><t:Name>Me</t:Name><t:EmailAddress>me@example.org</t:EmailAddress></t:Mailbox>
+                </t:ToRecipients>
+                <t:ConversationId Id="conv-1"/>
+                <t:From>
+                  <t:Mailbox><t:Name>Ada Lovelace</t:Name><t:EmailAddress>ada@example.com</t:EmailAddress></t:Mailbox>
+                </t:From>
+                <t:IsRead>false</t:IsRead>
+                <t:Flag><t:FlagStatus>Flagged</t:FlagStatus></t:Flag>
+              </t:Message>
+            </t:Create>
+            <t:Create>
+              <t:Message>
+                <t:ItemId Id="m2" ChangeKey="ck2"/>
+                <t:ParentFolderId Id="AAMkInbox" ChangeKey="f1"/>
+                <t:Subject>Re: Dock</t:Subject>
+                <t:DateTimeReceived>2023-11-14T22:15:00Z</t:DateTimeReceived>
+                <t:HasAttachments>true</t:HasAttachments>
+                <t:ConversationId Id="conv-1"/>
+                <t:From>
+                  <t:Mailbox><t:Name>Me</t:Name><t:EmailAddress>me@example.org</t:EmailAddress></t:Mailbox>
+                </t:From>
+                <t:IsRead>true</t:IsRead>
+              </t:Message>
+            </t:Create>
+          </m:Changes>
+        </m:SyncFolderItemsResponseMessage>
+      </m:ResponseMessages>
+    </m:SyncFolderItemsResponse>
+  </s:Body>
+</s:Envelope>

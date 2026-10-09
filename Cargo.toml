@@ -47,6 +47,19 @@ mail-builder = { version = "1.0.0", default-features = false }
 quick-xml = "0.42.0"
 # mailune-auth: PKCE S256. Same major as ketch and cox.
 sha2 = "0.11"
+# mailune-ews: typed EWS operations and SOAP (de)serialization, no HTTP client.
+ews = "0.1.2"
+# mailune-push: the relay's webhook router. Serving features are added by the binary.
+axum = { version = "0.8.9", default-features = false, features = ["query"] }
+# mailune-push tests drive the router in process with `oneshot`; no socket. mailune-mcp: rmcp's
+# runtime; its tests drive the server over an in-memory duplex.
+tokio = "1.53.2"
+tower = "0.5.3"
+# mailune-wasm: the browser surface.
+wasm-bindgen = "0.2.129"
+# mailune-wasm on wasm32: rsa (DKIM, in mailune-mime) pulls getrandom 0.2,
+# which needs its `js` backend in the browser.
+getrandom-02 = { package = "getrandom", version = "0.2.17", features = ["js"] }
 # mailune-auth: unpadded base64url for the PKCE verifier and challenge.
 base64 = "0.23"
 # mailune-mime: HTML sanitizer. 4.2.1 checked on crates.io 2026-10-08.
@@ -66,10 +79,21 @@ chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 icalendar = "0.17.14"
 # mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.
 pgp = { version = "0.20.0", default-features = false }
+# mailune-store: typed SQLite access and embedded migrations. Same 2.3 line as aulo and ketch.
+# 32-column-tables because the messages table is wider than 16 columns.
+diesel = { version = "2.3.14", default-features = false, features = ["sqlite", "32-column-tables"] }
+diesel_migrations = { version = "2.3.2", default-features = false, features = ["sqlite"] }
+# mailune-store: the SQLite C library. Each target picks `bundled` or `bundled-sqlcipher` in the
+# store manifest. 0.38.2 is inside diesel 2.3's accepted range and matches aulo and ketch.
+libsqlite3-sys = { version = "0.38.2", default-features = false }
+# mailune-store: wipes the SQLCipher key text after the PRAGMA. Already in the tree through rsa.
+zeroize = "1.9.1"
+# mailune-store: blob encryption. 0.10.3 is already in the tree through pgp.
+aes-gcm = { version = "0.10.3", default-features = false, features = ["aes", "alloc"] }
+# mailune-store tests: a scratch directory per test database.
+tempfile = "3.27.0"
 # mailune-mcp: MCP server types and stdio JSON-RPC. 3.5.1 checked on crates.io 2026-10-08.
 rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros"] }
-# mailune-mcp: rmcp's runtime; tests drive the server over an in-memory duplex. 1.53.2 checked on crates.io 2026-10-08.
-tokio = "1.53.2"
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 

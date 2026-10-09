@@ -1,0 +1,7 @@
+{
+  "threads": [
+    { "id": "t2", "snippet": "Photos attached", "historyId": "1203" },
+    { "id": "t1", "snippet": "See you at the dock", "historyId": "1201" }
+  ],
+  "resultSizeEstimate": 2
+}
