@@ -58,11 +58,11 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| E8 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
+| E9 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
+| E11 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| R7 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -483,7 +483,7 @@ Depends on: E6, E7. Summary, replies, and compose assist already exist in `mailu
 
 Done when: the reader shows a summary and reply chips from fixture data, and the composer shows an assist result. No model call.
 
-Execution plan: `web/` only. Do not edit `mailune-ai`.
+Execution plan: fixture summary, reply chips and an assist result in `web/`, shaped after `mailune-ai`'s public result types (no JSON Schema exists for them, so a typed fixture mirrors the Rust fields and says where they come from). The reader shows the summary and chips, the composer shows the assist result; nothing calls a model. A happy-dom vitest covers both.
 
 ### E9. Web offline cache
 
@@ -491,7 +491,7 @@ Depends on: E5.
 
 Done when: a service worker caches the latest thread list and serves it when the test marks the network offline. No real push server.
 
-Execution plan: `web/` only.
+Execution plan: a service worker in `web/src/sw.ts` that answers the thread-list request network-first and falls back to the cached copy when offline; the cache logic is a pure module tested in vitest with an in-memory Cache and a fetch that the test marks offline. No push server.
 
 ### E11. Web end-to-end test
 
@@ -499,7 +499,7 @@ Depends on: E5, B7.
 
 Done when: one Playwright test opens the shell, selects a fixture thread, and sees the subject. If the browser cannot be installed, commit the spec and say why.
 
-Execution plan: `web/` only.
+Execution plan: `@playwright/test` with one spec under `web/e2e/` that starts the Vite preview, clicks a fixture thread and reads the subject. Browsers are installed with `npx playwright install chromium`; if that fails the spec is committed and the reason recorded. The R7 workflow runs it only if the browser install is clean; vitest stays the required path.
 
 ### E12. Server container
 
@@ -515,7 +515,7 @@ Depends on: E2.
 
 Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
 
-Execution plan: `.github/workflows/web.yml` only.
+Execution plan: `.github/workflows/web.yml` only, triggered on changes to `web/`, `i18n/`, `scripts/i18n.py`, `mise.toml` and the two Rust snapshots the web tests read. It installs the pinned mise tools, runs `npm ci`, `npm run typecheck`, `npm test` and `npm run build`; actions pinned by SHA like the existing workflows; actionlint run locally.
 
 ### B6. C ABI
 
