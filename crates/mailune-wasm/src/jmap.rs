@@ -2,8 +2,8 @@
 
 use mailune_jmap::JmapClient;
 use mailune_protocol::Secret;
-use serde_json::Value;
 
+use crate::json;
 use crate::replay::{Replay, run};
 
 pub(crate) fn mailbox_ids(session_url: &str, replies: Vec<String>) -> Result<String, String> {
@@ -11,13 +11,9 @@ pub(crate) fn mailbox_ids(session_url: &str, replies: Vec<String>) -> Result<Str
     // Recorded replies need no credential; the fetch transport will carry
     // the real one.
     let mut client = JmapClient::new(&http, Secret::new(""));
-    run(client.load_session(session_url))?.map_err(|error| error.to_string())?;
-    let (mailboxes, _state) = run(client.mailboxes())?.map_err(|error| error.to_string())?;
-    let ids = mailboxes
-        .into_iter()
-        .map(|mailbox| Value::String(mailbox.id.as_str().to_string()))
-        .collect();
-    Ok(Value::Array(ids).to_string())
+    run(client.mailbox_ids(session_url))?
+        .map(|ids| json::mailbox_ids(&ids))
+        .map_err(|error| error.to_string())
 }
 
 #[cfg(test)]

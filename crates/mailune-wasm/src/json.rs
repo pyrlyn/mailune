@@ -3,7 +3,7 @@
 
 use mailune_core::{Container, Term, Threadable};
 use mailune_mime::{MimeMessage, PartRole};
-use mailune_protocol::Envelope;
+use mailune_protocol::{Envelope, MailboxId};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
@@ -25,6 +25,15 @@ struct ThreadInput {
 pub(crate) fn envelope(text: &str) -> Result<String, String> {
     let envelope: Envelope = serde_json::from_str(text).map_err(|error| error.to_string())?;
     serde_json::to_string(&envelope).map_err(|error| error.to_string())
+}
+
+pub(crate) fn mailbox_ids(ids: &[MailboxId]) -> String {
+    Value::Array(
+        ids.iter()
+            .map(|id| Value::String(id.as_str().to_string()))
+            .collect(),
+    )
+    .to_string()
 }
 
 pub(crate) fn mime(message: &MimeMessage) -> String {
