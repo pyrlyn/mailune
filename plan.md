@@ -38,16 +38,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| M10 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -399,59 +391,11 @@ Done when: an XCFramework script targets macOS arm64 only, and a SwiftPM package
 
 Execution plan: `desktop/macos` packaging only.
 
-### M1. Xcode project
-
-Depends on: B3.
-
-Done when: XcodeGen generates MailuneModel, MailuneUI, and MailunePlatform for macOS arm64. No Intel target.
-
-Execution plan: `desktop/macos` only.
-
-### M2. Swift design tokens
-
-Depends on: M1.
-
-Done when: colors, type, spacing, radii, and motion are Swift constants used by one view.
-
-Execution plan: `desktop/macos` only.
-
-### M3. macOS icons
-
-Depends on: M1.
-
-Done when: one app icon and one toolbar icon are local SVG or asset-catalog entries. No remote image URL.
-
-Execution plan: `desktop/macos` only.
-
-### M4. macOS localisation
-
-Depends on: M1.
-
-Done when: one string is in an English catalog and a second catalog, and a missing key falls back to English.
-
-Execution plan: `desktop/macos` only.
-
 ### M5. macOS host integrations
 
 Depends on: M1, B2.
 
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
-
-Execution plan: `desktop/macos` only.
-
-### M7. macOS shell
-
-Depends on: M2, M3.
-
-Done when: a NavigationSplitView shows three panes, a toolbar, one keyboard shortcut, and a command palette. Preview or a unit test builds the view.
-
-Execution plan: `desktop/macos` only. Stay under 500 lines.
-
-### M8. macOS thread list
-
-Depends on: M7, B7.
-
-Done when: the list is lazy, has a swipe action, multi-select, one indicator, and category tabs, fed by fixture data.
 
 Execution plan: `desktop/macos` only.
 
@@ -558,22 +502,6 @@ Depends on: B1. The shared abi-drift crate is not in this repo.
 Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
 
 Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
-
-### M9. macOS reader
-
-Depends on: M8, P3, C6.
-
-Done when: a message renders with quotes collapsed, one attachment, and a security badge. Remote content and JavaScript stay off.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`. No remote image URL.
-
-### M10. macOS composer
-
-Depends on: M7, P13, S13.
-
-Done when: recipient chips, a body, one attachment, send later, and undo send round-trip through a fake. Send stays off until confirm.
-
-Execution plan: `desktop/macos` only.
 
 ### M6. Apple on-device model
 
