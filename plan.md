@@ -15,7 +15,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X3 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
 | X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
@@ -218,7 +218,9 @@ Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
 
 Done when: aulo or cox migrated; redaction test moves with it. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `telemetry-setup`. Commit there. Do not push.
+Execution plan: `packages/crates` worktree, crate `telemetry-setup` (T21 there), extracted from `aulo-telemetry` with its redaction and logging tests; the application name, filter variable and extra token patterns become settings. Then aulo moves onto it in its own pull request.
+
+Progress: the crate is in pyrlyn/crates-packages PR #43 with aulo's redaction tests and green checks. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. Gap: aulo cannot migrate until `telemetry-setup` is on crates.io, because a shared crate is consumed as a registry version with a local `paths` override, never a bare path. Publishing it is the creator's call.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
