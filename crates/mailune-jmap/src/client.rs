@@ -301,7 +301,9 @@ fn query_args(account: &str, mailbox: Option<&MailboxId>, limit: u32) -> Value {
     })
 }
 
+// These tests write through mailune-store, which has no SQLite on wasm32.
 #[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 mod tests {
     use mailune_protocol::{AccountId, HttpResponse, MailboxId, MessageId, Secret, ThreadId};
     use mailune_store::{Account, Counts, Mailbox, Store, StoredMessage};
