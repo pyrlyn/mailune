@@ -953,3 +953,43 @@ Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new
 Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and APPEND with a synchronizing literal, answering COPYUID and APPENDUID under UIDPLUS. Client mutate.rs: store_flags, copy_messages, move_messages (MOVE, else COPY + Deleted + UID EXPUNGE, refused without UIDPLUS) and append; validate flags and mailbox names; bound COPYUID expansion.
 
 What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.
+
+### R11. Windows signing workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/windows-sign.yml` (pyrlyn/ci PR #57, commit `1941a53`). It packs one unpacked layout with `makeappx`, signs it with `signtool` and an Authenticode `.pfx` from `WINDOWS_CERTIFICATE`/`WINDOWS_CERTIFICATE_PWD`, verifies the signature, and uploads the MSIX. Missing secrets stop the run before anything is packed. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R12. Flatpak workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/flatpak.yml` (pyrlyn/ci PR #57, commit `1941a53`). It installs `flatpak-builder`, builds the caller's manifest with the runtime installed from Flathub, and uploads one `.flatpak` bundle. No signing secret. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R13. TestFlight workflow
+
+Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
+
+Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/testflight.yml` (pyrlyn/ci PR #57, commit `1941a53`). The certificate is checked with the `macos-sign` action (`discover`), and the IPA is uploaded with `xcrun altool` using the App Store Connect API key trio. A pull request never uploads. The caller's build command must produce a signed IPA. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R14. Play workflow
+
+Depends on: R10. Reuse: none yet.
+
+Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
