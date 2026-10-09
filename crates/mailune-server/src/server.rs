@@ -175,8 +175,8 @@ mod tests {
     /// Starts the server on an ephemeral loopback port and returns its URL.
     async fn start() -> String {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-        // A loopback test server: TLS is not what these tests check. nosemgrep
-        let url = format!("ws://{}{RPC_PATH}", listener.local_addr().unwrap());
+        // A loopback test server: TLS is not what these tests check.
+        let url = format!("ws://{}{RPC_PATH}", listener.local_addr().unwrap()); // nosemgrep
         tokio::spawn(serve(listener, Token(TOKEN.into()), Echo));
         url
     }

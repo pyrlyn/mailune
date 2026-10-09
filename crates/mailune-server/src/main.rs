@@ -36,8 +36,8 @@ async fn main() -> anyhow::Result<()> {
     let token = server::Token::generate();
     eprintln!(
         // Plain ws is the loopback default; a non-loopback install needs TLS
-        // terminated in front of it, which is outside this binary. nosemgrep
-        "mailune-server: ws://{}{}\nmailune-server: token {}",
+        // terminated in front of it, which is outside this binary.
+        "mailune-server: ws://{}{}\nmailune-server: token {}", // nosemgrep
         listener.local_addr()?,
         server::RPC_PATH,
         token.reveal()
