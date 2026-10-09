@@ -1,16 +1,15 @@
 //! Embedding store: vectors per message chunk, nearest neighbours by cosine.
 //!
-//! The scan runs in Rust over one account's vectors for one model. That is
-//! the S8 baseline; S14 benchmarks it against an index before anything
-//! replaces it.
-
-use std::cmp::Ordering;
+//! The scan is exact cosine in Rust over one account's vectors for one model (S8). S14 measured
+//! it against a usearch index and the creator kept the exact scan; the vectors stay decoded in
+//! memory (`vector_cache`) so a query no longer reloads and decrypts every row.
 
 use diesel::prelude::*;
 use mailune_protocol::{AccountId, MessageId};
 
-use crate::open::database_error;
+use crate::open::{data_version, database_error};
 use crate::schema::embeddings;
+use crate::vector_cache::{SetKey, VectorSet};
 use crate::{Error, Store};
 
 /// One chunk of one message.
@@ -50,6 +49,18 @@ impl Store {
             .collect();
         let dim = i32::try_from(vector.len()).unwrap_or(i32::MAX);
         let index = i32::try_from(chunk.chunk).unwrap_or(i32::MAX);
+        let cached = self.vectors.holds(account.as_str(), model);
+        // Only a cached set needs the row's old dimension to stay in step.
+        let old_dim: Option<i32> = if cached {
+            embeddings::table
+                .find((account.as_str(), chunk.message.as_str(), index, model))
+                .select(embeddings::dim)
+                .first(&mut self.conn)
+                .optional()
+                .map_err(database_error)?
+        } else {
+            None
+        };
         diesel::insert_into(embeddings::table)
             .values((
                 embeddings::account_id.eq(account.as_str()),
@@ -68,14 +79,28 @@ impl Store {
             .do_update()
             .set((embeddings::dim.eq(dim), embeddings::vector.eq(&bytes)))
             .execute(&mut self.conn)
-            .map(drop)
-            .map_err(database_error)
+            .map_err(database_error)?;
+        if cached {
+            let old_dim = old_dim.map(|old| usize::try_from(old).unwrap_or(usize::MAX));
+            self.vectors
+                .record_write(account.as_str(), model, chunk, old_dim, vector);
+        }
+        Ok(())
+    }
+
+    /// Drops the in-memory vectors, for example when the OS reports memory pressure. The next
+    /// [`Store::nearest`] loads them again.
+    pub fn clear_vector_cache(&mut self) {
+        self.vectors.clear();
     }
 
     /// The `limit` chunks closest to `query` by cosine, best first.
     ///
     /// Vectors of another dimension and zero vectors are skipped: they cannot
     /// be compared. Ties keep a stable order by message id and chunk.
+    ///
+    /// The first query for an account, model and dimension loads its vectors into memory (see
+    /// `vector_cache`); later ones scan memory until another connection writes.
     ///
     /// # Errors
     ///
@@ -91,6 +116,15 @@ impl Store {
         if query_norm == 0.0 || limit == 0 {
             return Ok(Vec::new());
         }
+        self.vectors.sync(data_version(&mut self.conn)?);
+        let key = SetKey {
+            account: account.as_str().to_owned(),
+            model: model.to_owned(),
+            dim: query.len(),
+        };
+        if let Some(set) = self.vectors.get(&key) {
+            return Ok(set.nearest(query, query_norm, limit));
+        }
         let dim = i32::try_from(query.len()).unwrap_or(i32::MAX);
         let rows: Vec<(String, i32, Vec<u8>)> = embeddings::table
             .filter(embeddings::account_id.eq(account.as_str()))
@@ -103,53 +137,19 @@ impl Store {
             ))
             .load(&mut self.conn)
             .map_err(database_error)?;
-        let mut scored: Vec<Neighbour> = rows
-            .into_iter()
-            .filter_map(|(message, chunk, bytes)| {
-                let score = cosine(query, query_norm, &bytes)?;
-                Some(Neighbour {
-                    chunk: ChunkRef {
-                        message: MessageId::new(message),
-                        chunk: u32::try_from(chunk).unwrap_or(0),
-                    },
-                    score,
-                })
-            })
-            .collect();
-        scored.sort_by(|left, right| {
-            right
-                .score
-                .partial_cmp(&left.score)
-                .unwrap_or(Ordering::Equal)
-                .then_with(|| {
-                    left.chunk
-                        .message
-                        .as_str()
-                        .cmp(right.chunk.message.as_str())
-                })
-                .then_with(|| left.chunk.chunk.cmp(&right.chunk.chunk))
-        });
-        scored.truncate(limit);
-        Ok(scored)
+        let set = VectorSet::from_rows(query.len(), rows);
+        if !self.vectors.fits(&set) {
+            return Ok(set.nearest(query, query_norm, limit));
+        }
+        Ok(self
+            .vectors
+            .insert(key, set)
+            .nearest(query, query_norm, limit))
     }
 }
 
 pub(crate) fn norm(values: impl Iterator<Item = f32>) -> f32 {
     values.map(|value| value * value).sum::<f32>().sqrt()
-}
-
-fn cosine(query: &[f32], query_norm: f32, bytes: &[u8]) -> Option<f32> {
-    let (chunks, rest) = bytes.as_chunks::<4>();
-    if !rest.is_empty() || chunks.len() != query.len() {
-        return None;
-    }
-    let stored = || chunks.iter().map(|raw| f32::from_le_bytes(*raw));
-    let stored_norm = norm(stored());
-    if stored_norm == 0.0 {
-        return None;
-    }
-    let dot: f32 = stored().zip(query).map(|(left, right)| left * right).sum();
-    Some(dot / (stored_norm * query_norm))
 }
 
 #[cfg(test)]
@@ -226,51 +226,6 @@ mod tests {
         let hits = store.nearest(&acc, "a", &[0.0, 1.0], 5).unwrap();
         assert_eq!(hits.len(), 1);
         assert!((hits[0].score - 1.0).abs() < 1e-6);
-    }
-
-    /// S14 compares the two in `benches/knn.rs`; this pins that they rank by the same metric.
-    #[test]
-    fn nearest_and_a_usearch_cosine_index_agree_on_the_top_hits() {
-        let vectors: [[f32; 3]; 4] = [
-            [1.0, 0.0, 0.0],
-            [0.9, 0.1, 0.0],
-            [0.0, 1.0, 0.0],
-            [-1.0, 0.0, 0.2],
-        ];
-        let query = [1.0, 0.05, 0.0];
-        let (_dir, mut store) = seeded();
-        let index = usearch::Index::new(&usearch::IndexOptions {
-            dimensions: query.len(),
-            metric: usearch::MetricKind::Cos,
-            quantization: usearch::ScalarKind::F32,
-            ..usearch::IndexOptions::default()
-        })
-        .unwrap();
-        index.reserve(vectors.len()).unwrap();
-        for (key, vector) in (0_u64..).zip(&vectors) {
-            let id = format!("m{key}");
-            store.upsert_message(&message(&id, &id, 1, false)).unwrap();
-            store
-                .put_embedding(&account(), &chunk(&id, 0), "a", vector)
-                .unwrap();
-            index.add(key, vector).unwrap();
-        }
-
-        let ours: Vec<String> = store
-            .nearest(&account(), "a", &query, 2)
-            .unwrap()
-            .into_iter()
-            .map(|hit| hit.chunk.message.as_str().to_owned())
-            .collect();
-        let theirs: Vec<String> = index
-            .search(&query, 2)
-            .unwrap()
-            .keys
-            .iter()
-            .map(|key| format!("m{key}"))
-            .collect();
-        assert_eq!(ours, ["m0", "m1"]);
-        assert_eq!(theirs, ours);
     }
 
     #[test]
