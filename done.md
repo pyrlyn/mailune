@@ -1033,3 +1033,43 @@ Done when: recipient chips, a body, one attachment, send later, and undo send ro
 Execution plan: `desktop/macos` only, on the same stacked branch as M9. Port the composer from `batch7-imap` and fix it: a `Composer` state machine (editing → confirming → held) where only `confirmSend` reaches the outbox, a fake outbox with an injected time, send later and undo send as one hold window. Tests: chips, send off until confirm, undo inside and after the window, send later, and a past send-later time.
 
 What landed: `MailuneModel/Composer.swift`: `Composer` parses typed text into recipient chips (rejecting non-addresses and duplicates), holds subject, body, one attachment and an optional send-later time. `requestSend` asks for confirmation and `confirmSend` is the only call that reaches the `Outbox`; the draft is held until the later of the undo window (10 s) and the send-later time, so `undo` restores the whole draft until it goes out. `FakeOutbox` stands in for the core's queue until B3. `ComposerView` (⌘N from the shell) shows chips, a file picker for one attachment, a send-later toggle and date, a confirmation dialog before send, and Undo while held; it cannot be dismissed while a message is held. Contact suggestions (S13) are not shown yet: they need the core binding. New `compose.*` keys have de, fr and ja translations.
+
+### R11. Windows signing workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/windows-sign.yml` (pyrlyn/ci PR #57, commit `1941a53`). It packs one unpacked layout with `makeappx`, signs it with `signtool` and an Authenticode `.pfx` from `WINDOWS_CERTIFICATE`/`WINDOWS_CERTIFICATE_PWD`, verifies the signature, and uploads the MSIX. Missing secrets stop the run before anything is packed. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R12. Flatpak workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/flatpak.yml` (pyrlyn/ci PR #57, commit `1941a53`). It installs `flatpak-builder`, builds the caller's manifest with the runtime installed from Flathub, and uploads one `.flatpak` bundle. No signing secret. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R13. TestFlight workflow
+
+Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
+
+Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/testflight.yml` (pyrlyn/ci PR #57, commit `1941a53`). The certificate is checked with the `macos-sign` action (`discover`), and the IPA is uploaded with `xcrun altool` using the App Store Connect API key trio. A pull request never uploads. The caller's build command must produce a signed IPA. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R14. Play workflow
+
+Depends on: R10. Reuse: none yet.
+
+Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
