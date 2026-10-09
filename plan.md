@@ -135,7 +135,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| S14 | in progress | P3 | 3 | 10% | Cursor / claude-opus-5.5 |
+| S14 | in progress | P3 | 3 | 70% | Cursor / claude-opus-5.5 |
 | B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P33 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P34 | in progress | P3 | 5 | 0% | Cursor / grok 4.7 |
@@ -1184,7 +1184,27 @@ From ideas. The in-SQLite KNN is S8.
 
 Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
 
-Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
+Execution plan: `crates/mailune-store/benches/knn.rs` (divan), nothing else in the store.
+
+1. Fixture: 100k messages, the mailbox size in `docs/architecture.md`, with one chunk each and 384-dimension vectors (a small local embedding model's size). Seeded once through the public repository API; on Apple targets the store is SQLCipher-keyed like production.
+2. Benches: `Store::nearest` (S8, exact cosine scan) and a usearch cosine HNSW index over the same vectors, top 10.
+3. Small test: a handful of vectors where usearch and `nearest` agree on the top hit, so `nextest` stays fast and the comparison uses the same metric.
+4. Budget: T6 is not on `main`, so there is no search budget yet. The only stated number is 50 ms for a thread-list page at 100k messages; it is used as the stand-in and flagged for the creator.
+5. usearch 2.26.4 and divan 0.1.21 are dev-dependencies only, with `toolchain.md` rows. Ported from `batch9-store` `beb2986`, which targets an older store API and 32-dimension vectors.
+
+Result (Apple M3 Max, release, SQLCipher store, top 10 of 100k 384-dimension vectors):
+
+- S8 `Store::nearest`: 1.44 s median.
+- Exact cosine scan over the same vectors already in memory: 79 ms.
+- usearch HNSW: 1.1 ms.
+
+S8 misses the 50 ms stand-in budget about 29 times over. Most of its time is loading and decrypting the rows on every query, not the arithmetic.
+
+Gap: the Done-when calls for a switch when S8 misses its budget, and the switch is the creator's call. The options are:
+
+- an in-memory usearch index, which is approximate and must not be persisted unencrypted, because vectors can leak content;
+- an exact scan over a cached in-memory matrix, near 50 ms;
+- setting a real search budget in T6 first.
 
 ### B11. Shared view-model core
 
