@@ -20,9 +20,7 @@ final class OnboardingViewTests: XCTestCase {
     @MainActor
     func testOnboardingBuildsWithoutWriting() {
         let store = FakePreferencesStore()
-        let host = NSHostingView(rootView: OnboardingView(store: store, vault: MemorySecretVault()))
-        host.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(host.fittingSize.width, 0)
+        XCTAssertGreaterThan(Hosting.render(OnboardingView(store: store, vault: MemorySecretVault())).bounds.width, 0)
         XCTAssertNil(store.data)
     }
 }

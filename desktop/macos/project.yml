@@ -1,5 +1,6 @@
 # XcodeGen spec for the macOS app. Mailune.xcodeproj is generated from this
-# file and is not committed. Apple Silicon only: no target builds an Intel slice.
+# file and is not committed. Apple Silicon only: no target builds an Intel slice,
+# and the iOS simulator build is arm64 too.
 # MailuneCore (the Rust XCFramework) is not wired yet: it waits on B3, so the
 # model package serves fixture data.
 name: Mailune
@@ -7,6 +8,7 @@ options:
   bundleIdPrefix: app.mailune
   deploymentTarget:
     macOS: "26.0"
+    iOS: "26.0"
   createIntermediateGroups: true
   # MailuneUI's catalogs are generated from i18n/, never written by hand.
   preGenCommand: scripts/catalogs.sh
@@ -33,6 +35,7 @@ targets:
     platform: macOS
     sources:
       - path: App
+      - path: Shared
     dependencies:
       - package: MailuneModel
       - package: MailuneUI
@@ -79,6 +82,29 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Mailune
+  MailuneIOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: iOS
+      - path: Shared
+    dependencies:
+      - package: MailuneModel
+      - package: MailuneUI
+      - package: MailunePlatform
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios
+        PRODUCT_NAME: MailuneIOS
+        # The icon set is macOS-only so far; iOS builds without an app icon.
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Mailune
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
 schemes:
   Mailune:
     build:
@@ -98,3 +124,7 @@ schemes:
     test:
       targets:
         - MailuneUITests
+  MailuneIOS:
+    build:
+      targets:
+        MailuneIOS: all
