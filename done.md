@@ -1013,3 +1013,43 @@ Done when: the list is lazy, has a swipe action, multi-select, one indicator, an
 Execution plan: `desktop/macos` only, plus one test in `mailune-testkit`. Port `ThreadList` (lazy `List`, category tabs, unread mark, swipe to archive, multi-select) fed by a fixture that is a contract `Event::Snapshot` (the B7 JSON shape); the testkit test parses the same file as `Event`.
 
 What landed: `ThreadList`: a `List` (lazy; only on-screen rows are built) with the four contract categories as tabs, an unread dot, a trailing swipe that archives, and multi-select. Rows decode from `MailuneModel/Fixtures/threads.json`, a contract `Event::Snapshot`; `mailune-testkit` parses the same file as `Event`, so the Swift fixture cannot drift from `ThreadRow`. New key `mail_list.category` has de, fr and ja translations.
+
+### R11. Windows signing workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/windows-sign.yml` (pyrlyn/ci PR #57, commit `1941a53`). It packs one unpacked layout with `makeappx`, signs it with `signtool` and an Authenticode `.pfx` from `WINDOWS_CERTIFICATE`/`WINDOWS_CERTIFICATE_PWD`, verifies the signature, and uploads the MSIX. Missing secrets stop the run before anything is packed. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R12. Flatpak workflow
+
+Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
+
+Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/flatpak.yml` (pyrlyn/ci PR #57, commit `1941a53`). It installs `flatpak-builder`, builds the caller's manifest with the runtime installed from Flathub, and uploads one `.flatpak` bundle. No signing secret. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R13. TestFlight workflow
+
+Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
+
+Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/testflight.yml` (pyrlyn/ci PR #57, commit `1941a53`). The certificate is checked with the `macos-sign` action (`discover`), and the IPA is uploaded with `xcrun altool` using the App Store Connect API key trio. A pull request never uploads. The caller's build command must produce a signed IPA. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R14. Play workflow
+
+Depends on: R10. Reuse: none yet.
+
+Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
+
+Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
+
+What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
