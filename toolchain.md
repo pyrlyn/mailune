@@ -21,7 +21,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | anyhow | local | https://github.com/dtolnay/anyhow | Errors in the `mailune-cli` and `mailune-server` binaries only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
-| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests |
+| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests; blob-store content addresses |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
@@ -42,6 +42,18 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
 | libfuzzer-sys | local | https://github.com/rust-fuzz/libfuzzer | libFuzzer harness for the fuzz targets |
+| diesel | local | https://github.com/diesel-rs/diesel | Typed SQLite access in `mailune-store` |
+| diesel_migrations | local | https://github.com/diesel-rs/diesel | Embedded schema migrations in `mailune-store` |
+| libsqlite3-sys | local | https://github.com/rusqlite/rusqlite | Bundled SQLCipher on Apple targets, bundled SQLite elsewhere |
+| zeroize | local | https://github.com/RustCrypto/utils | Wipes the SQLCipher key text after the PRAGMA |
+| tempfile | local | https://github.com/Stebalien/tempfile | Scratch directories for store tests |
+| aes-gcm | local | https://github.com/RustCrypto/AEADs | Seals blob-store bodies with a caller-supplied key |
+| ews | local | https://github.com/thunderbird/ews-rs | Typed EWS operations and SOAP for on-premises Exchange (MPL-2.0, unmodified) |
+| axum | local | https://github.com/tokio-rs/axum | Push relay webhook router; `mailune-server`: HTTP and the WebSocket upgrade |
+| tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime in `mailune-mcp`; push relay router tests (dev); `mailune-server` runtime and TCP listener |
+| tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |
+| wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
+| getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
 | libc | local | https://github.com/rust-lang/libc | `mailune-capi`: `malloc`ed answers GLib can `g_free` |
 | cbindgen | local (dev) | https://github.com/mozilla/cbindgen | `mailune-capi`: header drift test |
@@ -49,11 +61,10 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | x509-cert | local | https://github.com/RustCrypto/formats/tree/master/x509-cert | `mailune-smime`: signer and recipient certificates |
 | aes | local | https://github.com/RustCrypto/block-ciphers | `mailune-smime`: AES content cipher |
 | cbc | local | https://github.com/RustCrypto/block-modes | `mailune-smime`: CBC mode for S/MIME content |
-| axum | local | https://github.com/tokio-rs/axum | `mailune-server`: HTTP and the WebSocket upgrade |
-| tokio | local | https://github.com/tokio-rs/tokio | `mailune-server`: async runtime and TCP listener; `mailune-mcp`: rmcp runtime, tests over an in-memory duplex |
 | tokio-tungstenite | local (dev) | https://github.com/snapview/tokio-tungstenite | `mailune-server` tests: real WebSocket client; the line axum already uses |
 | futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
 | proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
+| rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
 
 Gradle (`desktop/android`):
 
@@ -61,4 +72,3 @@ Gradle (`desktop/android`):
 | --- | --- | --- | --- |
 | org.jetbrains.kotlin.jvm | local | https://github.com/JetBrains/kotlin | Kotlin JVM plugin for the `core` module |
 | kotlin-test | local | https://github.com/JetBrains/kotlin | JUnit 5 tests for the `core` module |
-| rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |

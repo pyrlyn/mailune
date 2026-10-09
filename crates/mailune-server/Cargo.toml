@@ -9,12 +9,13 @@ description = "Self-hosted server: the core behind JSON-RPC over WebSocket"
 
 [dependencies]
 anyhow = { workspace = true }
-axum = { workspace = true }
+# The workspace entry is minimal; the server adds what it serves with.
+axum = { workspace = true, features = ["http1", "tokio", "ws"] }
 base64 = { workspace = true }
 mailune-protocol = { path = "../mailune-protocol" }
 mailune-rpc = { path = "../mailune-rpc" }
 rand = { workspace = true }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["macros", "net", "rt-multi-thread"] }
 
 [dev-dependencies]
 futures-util = { workspace = true }

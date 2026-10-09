@@ -1,0 +1,10 @@
+DROP TABLE contacts;
+DROP TABLE ops;
+DROP TABLE sync_state;
+DROP TABLE flags;
+DROP TABLE parts;
+DROP TABLE memberships;
+DROP TABLE messages;
+DROP TABLE threads;
+DROP TABLE mailboxes;
+DROP TABLE accounts;

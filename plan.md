@@ -24,29 +24,14 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P12 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| S1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P17 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P21 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
-| P22 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P23 | in progress | P1 | 5 | 0% | Cursor / grok 4.7 |
-| P24 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P25 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -66,12 +51,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P31 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A32 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| A20 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -80,7 +61,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -145,7 +125,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| P27 | in progress | P2 | 5 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
@@ -298,46 +277,6 @@ Done when: BODY.PEEK partial and BINARY requests return the requested bytes from
 
 Execution plan: `mailune-imap` only.
 
-### P12. Persist the operation queue
-
-Depends on: the in-memory queue in `mailune-core` and S2.
-
-Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
-
-Execution plan: a load/save API on `mailune-store`, called by a test. Do not edit the queue's decision rules except to expose the pending set if it is still private.
-
-### S1. mailune-store
-
-Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.
-
-Done when: a file-backed SQLite database opens with WAL and a key argument. The key is a byte slice from the caller, never logged. If SQLCipher does not compile here, use bundled SQLite and say why in the commit message.
-
-Execution plan: new crate `mailune-store`. No network and no keychain.
-
-### S2. Schema v1 migrations
-
-Depends on: S1. Reuse: Diesel migrations.
-
-Done when: embedded migrations create accounts, mailboxes, messages, memberships, threads, parts, flags, sync_state, ops, and contacts.
-
-Execution plan: `mailune-store` only. No raw SQL outside migration files.
-
-### S3. Repository API
-
-Depends on: S2. Reuse: Diesel's typed DSL.
-
-Done when: upserts, a thread query, cursor paging, and counts go through the typed DSL.
-
-Execution plan: `mailune-store` only.
-
-### S4. Blob store
-
-Depends on: S1. Reuse: `sha2` already in the workspace.
-
-Done when: bodies are content-addressed, encrypted with a caller-supplied key, and evicted when a quota is exceeded.
-
-Execution plan: `mailune-store` only.
-
 ### S5. FTS5 index
 
 Depends on: S3. Reuse: FTS5.
@@ -353,22 +292,6 @@ Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crat
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
 Execution plan: `mailune-store` only.
-
-### S8. Embedding store
-
-Depends on: S3. Reuse: cosine in Rust. Do not use sqlite-vec.
-
-Done when: vectors stored in SQLite return the nearest neighbours by cosine.
-
-Execution plan: `mailune-store` only.
-
-### S9. Hybrid retrieval fusion
-
-Depends on: S6. Reuse: the search parser already in `mailune-core`.
-
-Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
-
-Execution plan: `mailune-core` only. Do not depend on `mailune-store`.
 
 ### A31. Voice dictation
 
@@ -410,14 +333,6 @@ Done when: benches measure 100k inserts, a list page, and a search. A small test
 
 Execution plan: `mailune-store` only. Commit on `batch9-store`.
 
-### P17. JMAP read sync
-
-Depends on: S3, P12. Reuse: the JMAP fixtures in `mailune-fixture`.
-
-Done when: session, Mailbox/Email/Thread get, `/changes`, and `/query` parse from a scripted body and upsert through the existing repository. No TCP.
-
-Execution plan: new crate `mailune-jmap`. Link `jmap-client` only if it accepts an injected transport. If it opens a socket, do not link it and say why in the commit.
-
 ### P18. JMAP push
 
 Depends on: P17.
@@ -425,62 +340,6 @@ Depends on: P17.
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
 
 Execution plan: `mailune-jmap` only.
-
-### P19. JMAP mutations and send
-
-Depends on: P17.
-
-Done when: a scripted exchange applies a flag change and an EmailSubmission. No SMTP socket.
-
-Execution plan: `mailune-jmap` only.
-
-### P20. JMAP MaskedEmail and Sieve
-
-Depends on: P19.
-
-Done when: a scripted exchange creates a MaskedEmail and lists a Sieve script. No network.
-
-Execution plan: `mailune-jmap` only.
-
-### P21. Gmail read sync
-
-Depends on: P15, S3. Do not add `google-gmail1`.
-
-Done when: threads, labels, a historyId incremental diff, and a batch fetch parse from a scripted body and upsert through the repository. No TCP.
-
-Execution plan: new crate `mailune-gmail`. An injected transport. Link `reqwest` only if tests never dial out.
-
-### P22. Gmail mutations
-
-Depends on: P21, P2.
-
-Done when: batchModify labels, send, and a draft run against the scripted transport. No TCP.
-
-Execution plan: `mailune-gmail` only.
-
-### P23. Graph mail sync
-
-Depends on: P15, S3. Do not add `graph-rs-sdk`.
-
-Done when: folders, a delta query, and `$select` parse from a scripted body and upsert through the repository. No TCP.
-
-Execution plan: new crate `mailune-graph`.
-
-### P24. Graph mutations and send
-
-Depends on: P23.
-
-Done when: move, flag or category changes, sendMail, and `$batch` run against the scripted transport. No TCP.
-
-Execution plan: `mailune-graph` only.
-
-### P25. Graph calendar and contacts
-
-Depends on: P23.
-
-Done when: availability and contact autocomplete parse from a scripted body. No TCP.
-
-Execution plan: `mailune-graph` only.
 
 ### B3. Swift package
 
@@ -554,14 +413,6 @@ Done when: settings cover accounts, appearance, notifications, reading, compose,
 
 Execution plan: `desktop/macos` only.
 
-### P31. Push relay
-
-Depends on: P21, P23. Reuse: `axum`.
-
-Done when: a Gmail or Graph webhook becomes an empty wake. A body that carries a token, subject, or mail text is refused. The relay stores no token and no mail.
-
-Execution plan: new crate `mailune-push`. Commit on `batch9-store`. No real APNs or FCM.
-
 ### P32. Relay client
 
 Depends on: P31, P16.
@@ -570,22 +421,6 @@ Done when: a device registers and a wake marks that account due for sync. No soc
 
 Execution plan: `mailune-push` only.
 
-### A32. Embedding pipeline
-
-Depends on: S8, S10. The local engine crate is on another branch.
-
-Done when: text is chunked, two scripted embedders are scored, and the winner's vectors are stored. No model download.
-
-Execution plan: `mailune-store` only. Do not edit `mailune-ai` or `mailune-mime`.
-
-### A20. Ask with citations
-
-Depends on: S9, A32. The router lives in `mailune-ai`, which another agent is editing.
-
-Done when: a question returns an answer whose citations point at retrieved ids. No cloud model.
-
-Execution plan: `mailune-core` only. Do not edit `mailune-ai`.
-
 ### T6. Performance budgets
 
 Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
@@ -593,14 +428,6 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
 Execution plan: `mailune-store` benches and one test.
-
-### B9. WASM subset
-
-Depends on: P1, P4, S6.
-
-Done when: protocol types, MIME parse, threading, and the query parser agree with a native parity test. If the wasm32 target is not installed, do not install it; say so in the commit.
-
-Execution plan: new crate `mailune-wasm`. Stay under 500 production lines.
 
 ### E5. Web shell and thread list
 
@@ -665,14 +492,6 @@ Depends on: E2.
 Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
 
 Execution plan: `.github/workflows/web.yml` only.
-
-### E10. WASM JMAP calls
-
-Depends on: B9, P17. The web shell is on another branch.
-
-Done when: the wasm crate runs one scripted JMAP query and returns the same mailbox ids as the native parser. No browser page in this task.
-
-Execution plan: `mailune-wasm` and `mailune-jmap` only. Do not edit `web/`. The web shell hook is `batch8-ai`: a fixture query shows mailbox ids. Do not edit `mailune-wasm` from that branch.
 
 ### M9. macOS reader
 
@@ -1266,14 +1085,6 @@ Done when: an MSIX is signed and a winget manifest installs it. Signing waits on
 
 Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
 
-### P27. EWS for on-premises Exchange
-
-Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing a client.
-
-Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
-
-Execution plan: survey, then a client behind an injected transport on `batch9-store`. No sockets. Exchange Online stays on Graph.
-
 ### S14. usearch for vectors
 
 From ideas. The in-SQLite KNN is S8.
@@ -1281,4 +1092,3 @@ From ideas. The in-SQLite KNN is S8.
 Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
 
 Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
-

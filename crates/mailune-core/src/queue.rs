@@ -207,6 +207,18 @@ impl Queue {
             .collect()
     }
 
+    /// Pending ops with the time each was queued, oldest first.
+    ///
+    /// A store saves this set and replays it through [`Queue::enqueue`] on
+    /// the next launch, so the decision rules stay in this type.
+    pub fn pending_ops(&self) -> Vec<(&IdempotencyKey, &Op, SystemTime)> {
+        self.ops
+            .iter()
+            .filter(|item| item.status == Status::Pending)
+            .map(|item| (&item.key, &item.op, item.at))
+            .collect()
+    }
+
     /// Pending snooze, reminder, or reply-later for `thread`. The latest one
     /// wins, so undoing it reveals the previous pending schedule.
     pub fn schedule(&self, thread: &ThreadId) -> Option<(When, SystemTime)> {

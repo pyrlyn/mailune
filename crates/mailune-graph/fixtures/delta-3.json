@@ -1,0 +1,14 @@
+{
+  "value": [
+    {
+      "id": "m1", "conversationId": "conv-1", "subject": "Dock",
+      "from": { "emailAddress": { "name": "Ada Lovelace", "address": "ada@example.com" } },
+      "receivedDateTime": "2023-11-14T22:13:20Z",
+      "isRead": true, "isDraft": false, "flag": { "flagStatus": "notFlagged" },
+      "hasAttachments": false, "bodyPreview": "See you at the dock",
+      "parentFolderId": "AAMkInbox=", "categories": []
+    },
+    { "id": "m3", "@removed": { "reason": "deleted" } }
+  ],
+  "@odata.deltaLink": "https://graph.microsoft.com/v1.0/me/mailFolders/AAMkInbox%3D/messages/delta?$deltatoken=t2"
+}

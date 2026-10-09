@@ -684,6 +684,216 @@ Execution plan: `docs/jmap-sharing.md`, design only. Read RFC 9670, RFC 8621 and
 
 What landed: `docs/jmap-sharing.md`. Shared inboxes: read through RFC 8621 shared accounts, with RFC 9670 Principals for owners and ShareNotifications for notices; the sharing editor appears only when the account has `urn:ietf:params:jmap:mail:share` (draft-ietf-jmap-mail-sharing-02) and `mayShare`; assignment and status as keywords, with keyword sharing between users marked unverified. Comments: recorded that RFC 9670 cannot carry them (no JMAP comment type in any RFC or draft), so they become Emails in a shared `Comments` mailbox threaded by `In-Reply-To`, with the costs listed. Sources cited with URLs, checked 2026-10-08. No Mailune server in the path.
 
+### S1. mailune-store
+
+Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.
+
+Done when: a file-backed SQLite database opens with WAL and a key argument. The key is a byte slice from the caller, never logged. If SQLCipher does not compile here, use bundled SQLite and say why in the commit message.
+
+Execution plan: new crate `mailune-store`: `Store::open(path, key)` with a 32-byte raw key, PRAGMA key through a silenced connection, then WAL, foreign keys and busy timeout. SQLCipher on Apple targets (CommonCrypto); bundled SQLite elsewhere refuses a key. Tests use tempfile.
+
+What landed: `mailune-store` opens a file-backed SQLite database in WAL mode. `Store::open(path, Some(key))` takes a raw 32-byte key, sends it as `PRAGMA key` from a zeroized buffer on a connection whose instrumentation is silenced, and maps a wrong key to `WrongKey`. Apple targets link `libsqlite3-sys` 0.38.2 `bundled-sqlcipher` against CommonCrypto; Linux, Windows and Android use `bundled` SQLite because SQLCipher there needs an OpenSSL build the CI runners do not have, and those builds refuse a key with `CipherUnavailable` instead of silently storing plaintext. The crate is empty on wasm32.
+
+### S2. Schema v1 migrations
+
+Depends on: S1. Reuse: Diesel migrations.
+
+Done when: embedded migrations create accounts, mailboxes, messages, memberships, threads, parts, flags, sync_state, ops, and contacts.
+
+Execution plan: one embedded migration `schema_v1` in `crates/mailune-store/migrations`, a hand-written `schema.rs`, and `Store::open` running pending migrations. A test touches every column through the DSL.
+
+What landed: `crates/mailune-store/migrations/2026-10-08-000001_schema_v1` creates accounts, mailboxes, threads, messages, memberships, parts, flags, sync_state, ops and contacts, keyed on `(account_id, id)` because provider ids are only unique per account. `Store::open` runs the embedded migrations through `diesel_migrations` 2.3.2. `schema.rs` is hand-written; a test selects every column through the DSL so a drift between it and `up.sql` fails.
+
+### S3. Repository API
+
+Depends on: S2. Reuse: Diesel's typed DSL.
+
+Done when: upserts, a thread query, cursor paging, and counts go through the typed DSL.
+
+Execution plan: `repo.rs` in `mailune-store`: upserts for accounts, mailboxes and messages (memberships, keywords and the thread row in one transaction), a keyset-paged thread list per mailbox, a thread's messages, mailbox counts, and the sync cursor per scope.
+
+What landed: `Store` gains `upsert_account`, `upsert_mailbox`, `upsert_message` (memberships, keywords and the thread row refreshed in one transaction; a message that changes thread leaves no empty thread), `thread_page` with a `(latest_at, id)` keyset cursor, `thread_messages`, `mailbox_counts`, and `set_sync_state`/`sync_state`. All of it is Diesel's typed DSL; recipient lists are one JSON column.
+
+### S4. Blob store
+
+Depends on: S1. Reuse: `sha2` already in the workspace.
+
+Done when: bodies are content-addressed, encrypted with a caller-supplied key, and evicted when a quota is exceeded.
+
+Execution plan: `blob.rs` in `mailune-store` plus a `blobs` migration: SHA-256 address, AES-256-GCM (aes-gcm 0.10.3, already in the tree) with the address as associated data, LRU eviction by a use counter when the quota is passed.
+
+What landed: `Store::blobs(key, quota)` returns a `Blobs` handle. `put` addresses bytes by the SHA-256 of the plaintext, seals them with AES-256-GCM under the caller's 32-byte key (nonce from the digest, address as associated data), and evicts least-recently-used blobs until the quota fits; `get` refuses a wrong key or a swapped row with `BlobKey`. Recency is a counter, not the clock. Blobs live in a `blobs` table added by a second migration.
+
+### P12. Persist the operation queue
+
+Depends on: the in-memory queue in `mailune-core` and S2.
+
+Done when: pending ops round-trip through `mailune-store` and replay onto the existing state machine. The state machine stays in `mailune-core`. `mailune-core` must not depend on the store.
+
+Execution plan: `Queue::pending_ops()` in `mailune-core` exposes the pending set (no rule change). `Store::save_ops`/`load_ops` in `mailune-store` write it to the `ops` table with nanosecond times; a test replays the rows through `Queue::enqueue`.
+
+What landed: `mailune-core` exposes `Queue::pending_ops()` (key, op, queued time), with no change to the queue's rules. `mailune-store` adds `save_ops`, which replaces the `ops` table with that set, and `load_ops`, which reads it back oldest first. Times are stored as nanoseconds, so a replayed op compares equal and the undo window still runs from the original queue time. A test reopens the file, replays through `Queue::enqueue`, and checks pending keys, location, schedule, idempotent re-replay and undo. `mailune-core` still has no store dependency.
+
+### S8. Embedding store
+
+Depends on: S3. Reuse: cosine in Rust. Do not use sqlite-vec.
+
+Done when: vectors stored in SQLite return the nearest neighbours by cosine.
+
+Execution plan: `vector.rs` in `mailune-store` plus an `embeddings` migration: f32 little-endian vectors per (message, chunk, model); `nearest` scans one account and model and sorts by cosine in Rust. No sqlite-vec.
+
+What landed: An `embeddings` table (third migration) keeps one little-endian f32 vector per message chunk and model, cascading with the message. `Store::put_embedding` upserts a vector; `Store::nearest` scans one account and model, skips other dimensions and zero vectors, and returns the top chunks by cosine with a stable tie order. Store unit tests now share one fixture module.
+
+### S9. Hybrid retrieval fusion
+
+Depends on: S6. Reuse: the search parser already in `mailune-core`.
+
+Done when: two ranked lists fuse with reciprocal rank fusion at k=60 and the filters from the query parser still apply. No database in this function.
+
+Execution plan: `fusion.rs` in `mailune-core`: `fuse(lexical, semantic, query)` sums `1/(60 + rank)` per list, then applies the parser's field terms (from, to, has, is, label, before) to each candidate's fields. No store dependency.
+
+What landed: `mailune_core::fuse` fuses a lexical and a semantic ranked list with reciprocal rank fusion at `RRF_K = 60` (a repeated id counts once per list), then keeps only candidates that pass the parsed query's field terms; free-text terms are left to the retrievers. Ties break by message id. No database and no store dependency.
+
+### P17. JMAP read sync
+
+Depends on: S3, P12. Reuse: the JMAP fixtures in `mailune-fixture`.
+
+Done when: session, Mailbox/Email/Thread get, `/changes`, and `/query` parse from a scripted body and upsert through the existing repository. No TCP.
+
+Execution plan: an `Http` transport trait in `mailune-protocol` and a `ScriptedHttp` fake in `mailune-testkit`; new crate `mailune-jmap` with the request envelope, session, Mailbox/Email/Thread get, `/changes`, `/query`, and a one-request sync step. A test upserts the scripted batches through `mailune-store` (dev-dependency only). jmap-client is not linked.
+
+What landed: New crate `mailune-jmap`. `mailune-protocol` gains an `Http` transport trait (`HttpRequest` redacts `Authorization` from `Debug`) and `mailune-testkit` a `ScriptedHttp` fake; `mailune-core` gains `parse_rfc3339` for `receivedAt`. `JmapClient` loads the session, gets mailboxes, emails and threads, runs `Email/query` and `Email/changes`, and `sync` does one step in a single request with result references, falling back to a full listing on `cannotCalculateChanges`. A test applies two scripted steps to `mailune-store` through the repository and resumes from the saved state. jmap-client 0.4.3 is not linked: reqwest is a required dependency and it sends its own requests.
+
+### P19. JMAP mutations and send
+
+Depends on: P17.
+
+Done when: a scripted exchange applies a flag change and an EmailSubmission. No SMTP socket.
+
+Execution plan: `mutate.rs` in `mailune-jmap`: keyword and mailbox patches through `Email/set`, and `EmailSubmission/set` with `onSuccessUpdateEmail` filing the draft in Sent. Scripted responses only.
+
+What landed: `JmapClient::set_keywords` and `move_email` send `Email/set` path patches (`keywords/$seen`, `mailboxIds/<id>`), so a replay is idempotent; `notUpdated` becomes `Error::Rejected`. `submit` sends `EmailSubmission/set` under the submission capability and, through `onSuccessUpdateEmail`, clears `$draft` and files the email in Sent; `notCreated` is refused. Scripted exchanges only, no SMTP.
+
+### P20. JMAP MaskedEmail and Sieve
+
+Depends on: P19.
+
+Done when: a scripted exchange creates a MaskedEmail and lists a Sieve script. No network.
+
+Execution plan: `extras.rs` in `mailune-jmap`: `MaskedEmail/set` create under Fastmail's capability and `SieveScript/get` under RFC 9661's, both over the scripted transport.
+
+What landed: `JmapClient::create_masked_email` creates an enabled address through `MaskedEmail/set` under `https://www.fastmail.com/dev/maskedemail` (a `notCreated` refusal is `Error::Rejected`), and `sieve_scripts` lists scripts through `SieveScript/get` under `urn:ietf:params:jmap:sieve` (RFC 9661). Scripted exchanges only.
+
+### P21. Gmail read sync
+
+Depends on: P15, S3. Do not add `google-gmail1`.
+
+Done when: threads, labels, a historyId incremental diff, and a batch fetch parse from a scripted body and upsert through the repository. No TCP.
+
+Execution plan: new crate `mailune-gmail` with no reqwest or google-gmail1: requests are built by hand and sent through the injected `Http` trait. labels, threads.list, history.list across pages (404 means full sync), and batch GETs as multipart/mixed. Tests: scripted bodies upsert through `mailune-store` and resume from the saved historyId.
+
+What landed: New crate `mailune-gmail`: `GmailClient` over the injected `Http` transport (no reqwest, no google-gmail1). `labels`, `thread_ids`, `history` (follows `nextPageToken`, 404 returns `None` for a full sync, refuses a non-numeric historyId), `messages` and `threads` through the multipart/mixed batch endpoint (50 per batch, inner 404 skipped, ids outside [A-Za-z0-9_-] refused), and `sync(since, limit)`. Labels become mailboxes; `UNREAD` and `STARRED` become flags. Tests upsert scripted bodies through `mailune-store` and resume from the saved historyId. Deleted ids are returned; the store has no delete yet.
+
+### P22. Gmail mutations
+
+Depends on: P21, P2.
+
+Done when: batchModify labels, send, and a draft run against the scripted transport. No TCP.
+
+Execution plan: `mailune-gmail` only: `modify_labels` (messages.batchModify, 1000 ids per call), `send_raw` and `create_draft` carrying caller-built RFC 5322 bytes as base64url (workspace `base64`). Scripted-transport tests check the request bodies and status errors.
+
+What landed: `GmailClient::modify_labels` (messages.batchModify, chunked at 1000 ids; mark read = remove `UNREAD`, move = add target and remove source), `send_raw` (messages.send, base64url `raw`, optional `threadId`; documented as call-after-confirmation) returning `Sent { id, thread_id }`, and `create_draft` (drafts.create) returning `Draft { id, message }`. The caller builds the RFC 5322 bytes. Reuses the workspace `base64` crate. Scripted-transport tests check bodies, round-trip the raw bytes, and map a 400 to `Error::Status`.
+
+### P23. Graph mail sync
+
+Depends on: P15, S3. Do not add `graph-rs-sdk`.
+
+Done when: folders, a delta query, and `$select` parse from a scripted body and upsert through the repository. No TCP.
+
+Execution plan: new crate `mailune-graph` without graph-rs-sdk: folders (with child folders and nextLink paging) and a per-folder `messages/delta` with `$select`, resumed from a saved delta link; a 410 restarts the folder. Server links are followed only on the Graph host. Tests upsert scripted pages through `mailune-store`.
+
+What landed: New crate `mailune-graph` (no graph-rs-sdk; requests go through the injected `Http` transport). `GraphClient::folders` walks top-level and child folders across `@odata.nextLink` pages, parents first, with roles from `wellKnownName` when Graph sends it. `delta(folder, saved_link)` runs `messages/delta?$select=...` with `Prefer: odata.maxpagesize=50`, splits `@removed` items from changed ones, and returns the delta link to save; a 410 restarts from scratch. Every server link must start with `https://graph.microsoft.com/` or the call fails with `Error::ForeignLink`, so the token never leaves the Graph host. Page and folder counts are capped. Categories become keywords. Tests upsert scripted folders and two delta rounds through `mailune-store`.
+
+### P24. Graph mutations and send
+
+Depends on: P23.
+
+Done when: move, flag or category changes, sendMail, and `$batch` run against the scripted transport. No TCP.
+
+Execution plan: `mailune-graph` only: `update_message` (PATCH isRead, flag, categories), `move_message` (returns the new id), `send_mime` (sendMail MIME form, base64 text/plain), `update_messages` through `$batch` in chunks of 20 with per-request statuses. Scripted-transport tests.
+
+What landed: `GraphClient::update_message` sends a PATCH with only the set fields of `MessagePatch { is_read, flagged, categories }`; `move_message` posts to `/move` and returns the new id Graph assigns; `send_mime` uses sendMail's MIME form (base64, `text/plain`), documented as call-after-confirmation; `update_messages` sends PATCHes through `$batch` 20 at a time and returns a `BatchOutcome` per message in request order even when responses come back shuffled. Ids are percent-encoded in paths. Reuses the workspace `base64` crate.
+
+### P25. Graph calendar and contacts
+
+Depends on: P23.
+
+Done when: availability and contact autocomplete parse from a scripted body. No TCP.
+
+Execution plan: `mailune-graph` only: `schedule` (calendar/getSchedule, UTC via `Prefer: outlook.timezone`, slots from availabilityView, busy blocks from scheduleItems) and `autocomplete` (People API `$search`). A UTC formatter joins `parse_rfc3339` in `mailune-core`. Scripted-body tests.
+
+What landed: `GraphClient::schedule(emails, start, end, interval)` posts `calendar/getSchedule` with `Prefer: outlook.timezone="UTC"` and returns a `Schedule` per address: `slots` from `availabilityView` (free, tentative, busy, out of office, working elsewhere), `busy` blocks from `scheduleItems` (a block in another zone is dropped rather than guessed), and the error Graph gives for a calendar it cannot read. `autocomplete(prefix, limit)` searches the People API and returns each scored address, most relevant first; quotes and backslashes are stripped from the term. `mailune-core` gains `format_rfc3339_utc`, the inverse of `parse_rfc3339`.
+
+### P27. EWS for on-premises Exchange
+
+Depends on: P23, P12. Reuse: survey Thunderbird ews-rs (MPL-2.0) before writing a client.
+
+Done when: the survey says whether ews-rs can be reused, and Exchange Online still goes through Microsoft Graph. The client starts only after that survey.
+
+Execution plan: survey `ews` (thunderbird/ews-rs) with cited sources in `research.md`; it has no HTTP client, so reuse it. New crate `mailune-ews`: `SyncFolderItems` over the injected `Http` transport, mapped onto protocol types; Exchange Online endpoints refused. Scripted SOAP tests upsert through `mailune-store`.
+
+What landed: Survey in `research.md` ("EWS survey (P27)", sources checked 2026-10-08): `ews` 0.1.2 from thunderbird/ews-rs is typed EWS operations plus SOAP (de)serialization with no HTTP client, so it is reused unmodified; Exchange Online stays on Graph because Microsoft disables EWS there from October 2026. New crate `mailune-ews`: `EwsClient::new` refuses non-https endpoints, user info in the URL, and Exchange Online hosts; `sync_folder(folder, state, max)` sends `SyncFolderItems` through the injected `Http` transport and returns created/updated messages, deletions, read-flag changes, the next sync state, and whether the range is complete. A stale state is `Error::Response { code }`; SOAP faults on HTTP 500 are parsed. `ews` 0.1.2 panics on a non-fault document with no SOAP header, so such a document is refused before parsing. Bearer auth only (hybrid modern auth); NTLM and Basic are not supported.
+
+### P31. Push relay
+
+Depends on: P21, P23. Reuse: `axum`.
+
+Done when: a Gmail or Graph webhook becomes an empty wake. A body that carries a token, subject, or mail text is refused. The relay stores no token and no mail.
+
+Execution plan: new crate `mailune-push`: a pure screen (size cap, provider shape, no token-like or mail-content keys, no bearer/JWT values, Gmail Pub/Sub data limited to emailAddress and historyId) and an axum router `POST /hook/{provider}/{channel}` that turns a screened notice into an empty wake through a `Notifier` trait. Registry holds channel-to-device routes only. Tests drive the router with tower `oneshot`; no socket, no APNs or FCM.
+
+What landed: New crate `mailune-push`. `screen(provider, body)` accepts a notice only if it is under 16 KiB, has the provider's shape (Gmail Pub/Sub `message.data` whose decoded JSON holds only `emailAddress` and `historyId`; Graph `value` array), names no key containing "token" or a mail-content key (subject, body, bodyPreview, snippet, encryptedContent, ...), and has no bearer, `ya29.` or JWT-shaped value. `router(registry, notifier)` serves `POST /hook/{gmail|graph}/{channel}`: unknown provider or channel is 404, a refused body 422 (reason not echoed), an oversized one 413, Graph's `validationToken` handshake is echoed as `text/plain` with `nosniff`, and a screened notice wakes the channel's device with an empty push through the `Notifier` trait (202). `MemoryRegistry` holds only channel-to-device-handle routes. Tests drive the router in process with tower `oneshot`; no socket, no APNs or FCM. New deps: axum 0.8.9 (no default features), tokio 1.53.2 and tower 0.5.3 for tests.
+
+### A32. Embedding pipeline
+
+Depends on: S8, S10. The local engine crate is on another branch.
+
+Done when: text is chunked, two scripted embedders are scored, and the winner's vectors are stored. No model download.
+
+Execution plan: `mailune-store` only: an `Embedder` trait, `Store::embed_best` scores each candidate by mean reciprocal rank on labelled probes, skips a broken engine, and stores the winner's vectors through `put_embedding`. The test chunks text with `mailune-mime`'s `chunk_plain` (dev-dependency only) and scores two scripted embedders.
+
+What landed: `mailune-store` gains an `Embedder` trait (model name, `embed(texts)`) and `Store::embed_best(account, chunks, probes, candidates)`: each candidate embeds the chunks and the probe queries, is scored by mean reciprocal rank of each probe's relevant chunk (ties share the worst rank, so an embedder that cannot tell chunks apart scores low), and the best one's vectors are stored under its model name. A candidate that fails, returns the wrong count, mixes dimensions or sends a non-finite value is skipped and listed in `Choice::skipped`; none usable is `Error::NoEmbedder`. The test chunks bodies with `mailune-mime`'s `chunk_plain` (dev-dependency only; the store does not depend on mime), scores a word-hash embedder against a flat one and a broken one, and finds the right message through `nearest`. No model download; `mailune-ai` and `mailune-mime` untouched.
+
+### A20. Ask with citations
+
+Depends on: S9, A32. The router lives in `mailune-ai`, which another agent is editing.
+
+Done when: a question returns an answer whose citations point at retrieved ids. No cloud model.
+
+Execution plan: `mailune-core` only: an `Answerer` trait and `ask(question, fused hits, limit, text lookup, answerer)` that passes the top passages to the answerer and keeps only citations of retrieved ids; no passage or no valid citation is an error, not an unsourced answer. Tests use `fuse` output and scripted answerers.
+
+What landed: `mailune-core` gains `ask(question, hits, limit, text, answerer)` and an `Answerer` trait (the router in `mailune-ai` can implement it; `mailune-ai` untouched). The first `limit` fused hits that have text become `Passage`s; with none the answerer is not called (`Error::NothingRetrieved`). The draft's citations are filtered to retrieved ids, deduplicated, in citation order; an empty draft or one citing nothing retrieved is `Error::Uncited`, and a model failure is `Error::Answerer`. Tests run `fuse` output through scripted answerers that cite an invented id, a duplicate and an unretrieved hit. No cloud model.
+
+### B9. WASM subset
+
+Depends on: P1, P4, S6.
+
+Done when: protocol types, MIME parse, threading, and the query parser agree with a native parity test. If the wasm32 target is not installed, do not install it; say so in the commit.
+
+Execution plan: new crate `mailune-wasm`: wasm-bindgen exports that forward to protocol serde, `mailune_mime::parse`, `thread_messages` and `parse_query`, with JSON shapes kept in one module. Native parity tests compare each export with the native call. Build the module with `cargo rustc --crate-type cdylib` for wasm32 (target installed).
+
+What landed: New crate `mailune-wasm` (wasm-bindgen 0.2.129, already in the lock): `normalizeEnvelope` (protocol `Envelope` JSON round trip), `parseMime` (headers and part list), `threadMessages` (JSON in, thread trees out) and `parseQuery` (terms). Each export is one forwarding expression; the JSON shapes live in `json.rs`, so the domain crates stay serde-free. Native parity tests compare every export with the native call, errors included. The wasm32 target is installed: `cargo build --workspace --exclude mailune-cli --lib --target wasm32-unknown-unknown` passes and `cargo rustc -p mailune-wasm --target wasm32-unknown-unknown --crate-type cdylib --release` writes a 1.1 MB module. No `cdylib` in the manifest, because the Android cross build has no linker. rsa (in `mailune-mime`) pulls getrandom 0.2, which has no browser backend by default, so the crate enables getrandom's `js` feature on wasm32 only. 162 production lines.
+
+### E10. WASM JMAP calls
+
+Depends on: B9, P17. The web shell is on another branch.
+
+Done when: the wasm crate runs one scripted JMAP query and returns the same mailbox ids as the native parser. No browser page in this task.
+
+Execution plan: Add mailune-jmap to mailune-wasm; a private replay transport implements mailune_protocol::Http from recorded bodies and a poll-once runner drives the adapter future; export jmapMailboxIds(sessionUrl, replies) loads the session and lists mailbox ids as JSON; a parity test compares it with the native JmapClient over ScriptedHttp on the jmap fixtures; check the wasm32 workspace build.
+
+What landed: mailune-wasm depends on mailune-jmap. A private Replay transport implements mailune_protocol::Http from recorded bodies, and a poll-once runner drives the adapter future (it refuses a future that would wait). The export jmapMailboxIds(sessionUrl, replies) loads the JMAP session and returns the mailbox ids as a JSON array; it stays a single forwarding expression. Tests: the export returns the same ids as the native JmapClient over ScriptedHttp on the session.json and sync-initial.json fixtures, and a missing reply is an error. The wasm32 workspace build passes. A fetch-based transport for real browser calls is left for the web client task.
+
 ### A28. Agent tools
 
 Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.

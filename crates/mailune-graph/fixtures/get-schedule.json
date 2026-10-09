@@ -1,0 +1,28 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.scheduleInformation)",
+  "value": [
+    {
+      "scheduleId": "ada@contoso.com",
+      "availabilityView": "0221",
+      "scheduleItems": [
+        {
+          "isPrivate": false, "status": "busy", "subject": "Design review",
+          "start": { "dateTime": "2023-11-15T09:30:00.0000000", "timeZone": "UTC" },
+          "end": { "dateTime": "2023-11-15T10:30:00.0000000", "timeZone": "UTC" }
+        },
+        {
+          "isPrivate": true, "status": "tentative",
+          "start": { "dateTime": "2023-11-15T02:30:00.0000000", "timeZone": "Pacific Standard Time" },
+          "end": { "dateTime": "2023-11-15T03:00:00.0000000", "timeZone": "Pacific Standard Time" }
+        }
+      ],
+      "workingHours": { "daysOfWeek": ["monday"], "startTime": "08:00:00.0000000", "endTime": "17:00:00.0000000" }
+    },
+    {
+      "scheduleId": "bob@fabrikam.com",
+      "availabilityView": "",
+      "scheduleItems": [],
+      "error": { "message": "Unable to resolve the email address.", "responseCode": "ErrorMailRecipientNotFound" }
+    }
+  ]
+}

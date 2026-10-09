@@ -1,0 +1,13 @@
+{
+  "value": [
+    {
+      "id": "m3", "conversationId": "conv-2", "subject": "Photos",
+      "from": { "emailAddress": { "name": "Bob", "address": "bob@example.com" } },
+      "receivedDateTime": "2023-11-14T22:16:40Z",
+      "isRead": false, "isDraft": false, "flag": { "flagStatus": "notFlagged" },
+      "hasAttachments": true, "bodyPreview": "Photos attached",
+      "parentFolderId": "AAMkInbox=", "categories": []
+    }
+  ],
+  "@odata.deltaLink": "https://graph.microsoft.com/v1.0/me/mailFolders/AAMkInbox%3D/messages/delta?$deltatoken=t1"
+}

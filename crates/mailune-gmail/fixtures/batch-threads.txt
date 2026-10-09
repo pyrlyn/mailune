@@ -1,0 +1,17 @@
+--batch_abc
+Content-Type: application/http
+Content-ID: <response-item0>
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+
+{"id":"t2","historyId":"1203","messages":[{"id":"m3","threadId":"t2","labelIds":["INBOX","UNREAD","CATEGORY_SOCIAL","Label_1"],"snippet":"Photos attached","historyId":"1203","internalDate":"1700000200000","payload":{"headers":[{"name":"From","value":"bob@example.com"},{"name":"To","value":"me@gmail.com"},{"name":"Subject","value":"Photos"},{"name":"Date","value":"Tue, 14 Nov 2023 22:16:40 +0000"}],"parts":[{"filename":""},{"filename":"pier.jpg"}]}}]}
+--batch_abc
+Content-Type: application/http
+Content-ID: <response-item1>
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+
+{"id":"t1","historyId":"1201","messages":[{"id":"m1","threadId":"t1","labelIds":["INBOX","UNREAD","STARRED"],"snippet":"See you at the dock","historyId":"1200","internalDate":"1700000000000","payload":{"headers":[{"name":"From","value":"\"Lovelace, Ada\" <ada@example.com>"},{"name":"To","value":"me@gmail.com"},{"name":"Subject","value":"Dock"},{"name":"Date","value":"Tue, 14 Nov 2023 22:13:20 +0000"}]}},{"id":"m2","threadId":"t1","labelIds":["INBOX","SENT"],"snippet":"On my way","historyId":"1201","internalDate":"1700000100000","payload":{"headers":[{"name":"From","value":"me@gmail.com"},{"name":"To","value":"\"Lovelace, Ada\" <ada@example.com>"},{"name":"Subject","value":"Re: Dock"},{"name":"Date","value":"Tue, 14 Nov 2023 22:15:00 +0000"}]}}]}
+--batch_abc--

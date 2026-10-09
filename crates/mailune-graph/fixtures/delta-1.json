@@ -1,0 +1,24 @@
+{
+  "value": [
+    {
+      "id": "m1", "conversationId": "conv-1", "subject": "Dock",
+      "from": { "emailAddress": { "name": "Ada Lovelace", "address": "ada@example.com" } },
+      "toRecipients": [ { "emailAddress": { "name": "Me", "address": "me@contoso.com" } } ],
+      "ccRecipients": [],
+      "receivedDateTime": "2023-11-14T22:13:20Z", "sentDateTime": "2023-11-14T22:13:18Z",
+      "isRead": false, "isDraft": false, "flag": { "flagStatus": "notFlagged" },
+      "hasAttachments": false, "bodyPreview": "See you at the dock",
+      "parentFolderId": "AAMkInbox=", "categories": []
+    },
+    {
+      "id": "m2", "conversationId": "conv-1", "subject": "Re: Dock",
+      "from": { "emailAddress": { "name": "Me", "address": "me@contoso.com" } },
+      "toRecipients": [ { "emailAddress": { "name": "Ada Lovelace", "address": "ada@example.com" } } ],
+      "receivedDateTime": "2023-11-14T22:15:00Z",
+      "isRead": true, "isDraft": false, "flag": { "flagStatus": "flagged" },
+      "hasAttachments": true, "bodyPreview": "On my way",
+      "parentFolderId": "AAMkInbox=", "categories": ["Work"]
+    }
+  ],
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/mailFolders/AAMkInbox%3D/messages/delta?$skiptoken=s1"
+}
