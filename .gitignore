@@ -4,3 +4,4 @@ __pycache__/
 /desktop/macos/DerivedData/
 /desktop/macos/**/.build/
 /desktop/macos/**/.swiftpm/
+/desktop/macos/MailuneUI/Sources/MailuneUI/Catalogs/

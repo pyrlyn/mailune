@@ -8,6 +8,8 @@ options:
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
+  # MailuneUI's catalogs are generated from i18n/, never written by hand.
+  preGenCommand: scripts/catalogs.sh
 settings:
   base:
     SWIFT_VERSION: "6.0"

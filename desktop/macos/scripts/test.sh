@@ -5,6 +5,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 
+scripts/catalogs.sh
 for package in MailuneModel MailuneUI MailunePlatform; do
     swift test --package-path "$package"
 done

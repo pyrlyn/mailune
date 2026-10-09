@@ -9,6 +9,7 @@ struct MailuneApp: App {
                 .toolbar {
                     ToolbarItem {
                         Image("ToolbarCompose")
+                            .accessibilityLabel(Copy.text("app.compose"))
                     }
                 }
         }
