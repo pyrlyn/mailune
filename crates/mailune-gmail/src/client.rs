@@ -244,7 +244,9 @@ fn query_escape(value: &str) -> String {
     out
 }
 
+// These tests write through mailune-store, which has no SQLite on wasm32.
 #[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 mod tests {
     use mailune_protocol::{
         AccountId, HttpResponse, MailboxId, MailboxRole, MessageId, Secret, ThreadId,
