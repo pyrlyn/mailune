@@ -62,3 +62,35 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  # A separate job, so the vitest job above stays the signal: this one
+  # downloads Chromium (the revision @playwright/test pins in the lockfile)
+  # and its system libraries before running web/e2e against a loopback
+  # preview of the production build.
+  e2e:
+    name: web e2e
+    needs: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MISE_DISABLE_TOOLS: rust
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install_args: node pipx:translate-toolkit
+
+      - name: Install packages
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end
+        run: npm run e2e
