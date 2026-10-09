@@ -251,6 +251,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr ""
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr ""
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr ""
@@ -425,6 +429,10 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 
+msgctxt "compose.confirm_send"
+msgid "I have checked the recipients and want to send this"
+msgstr ""
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr ""
@@ -487,6 +495,18 @@ msgstr ""
 
 msgctxt "settings.light"
 msgid "Light"
+msgstr ""
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr ""
+
+msgctxt "app.message"
+msgid "Message"
+msgstr ""
+
+msgctxt "thread.message_body"
+msgid "Message body"
 msgstr ""
 
 msgctxt "kit.motion"

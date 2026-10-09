@@ -252,6 +252,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "Vue par conversation"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "Conversations"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "Normal"
@@ -429,6 +433,10 @@ msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 "J'accepte les conditions d'utilisation et la politique de confidentialité."
 
+msgctxt "compose.confirm_send"
+msgid "I have checked the recipients and want to send this"
+msgstr "J’ai vérifié les destinataires et je veux l’envoyer"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "ICÔNES"
@@ -492,6 +500,18 @@ msgstr "Mise en page"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "Clair"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "Boîtes aux lettres"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "Message"
+
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "Corps du message"
 
 msgctxt "kit.motion"
 msgid "MOTION"

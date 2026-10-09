@@ -26,8 +26,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -44,9 +42,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -282,22 +277,6 @@ Done when: a scripted recognizer returns text for the composer. Tests do not dow
 
 Execution plan: `mailune-ai` only.
 
-### E2. Web frontend scaffold
-
-Depends on: B8. Reuse: Vite, React, TypeScript.
-
-Done when: `web/` builds and a vitest checks that a generated payload type round-trips. No live server required for the test.
-
-Execution plan: `web/` only, plus the workspace files a package manager needs.
-
-### E3. Web tokens and icons
-
-Depends on: E2.
-
-Done when: colors, type, and spacing are CSS variables, and one icon is an inline SVG. No remote image URL on one source line.
-
-Execution plan: `web/` only.
-
 ### E4. Web localisation catalogs
 
 Depends on: E2.
@@ -361,30 +340,6 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
 Execution plan: `mailune-store` benches and one test.
-
-### E5. Web shell and thread list
-
-Depends on: E3, E1.
-
-Done when: three panes render a fixture thread list, and choosing a row shows that thread. A vitest covers the selection.
-
-Execution plan: `web/` only. Commit on `batch8-ai`.
-
-### E6. Web reader
-
-Depends on: E5, P3.
-
-Done when: a message body renders in a sandboxed iframe from srcdoc with a strict CSP. No remote image URL on one source line.
-
-Execution plan: `web/` only.
-
-### E7. Web composer
-
-Depends on: E5.
-
-Done when: recipient, subject, and body round-trip, and send stays disabled until a confirm control is on.
-
-Execution plan: `web/` only.
 
 ### E8. Web AI surfaces
 

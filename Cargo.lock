@@ -2278,6 +2278,7 @@ dependencies = [
  "encoding_rs",
  "html2text",
  "icalendar",
+ "insta",
  "mail-builder",
  "mail-parser",
  "mailune-protocol",

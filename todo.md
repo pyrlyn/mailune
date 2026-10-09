@@ -20,8 +20,6 @@
 - S5. FTS5 index
 - S7. Change feed
 - A31. Voice dictation
-- E2. Web frontend scaffold
-- E3. Web tokens and icons
 - E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
@@ -38,9 +36,6 @@
 - R3. Swift CI
 - P32. Relay client
 - T6. Performance budgets
-- E5. Web shell and thread list
-- E6. Web reader
-- E7. Web composer
 - E8. Web AI surfaces
 - E9. Web offline cache
 - E11. Web end-to-end test

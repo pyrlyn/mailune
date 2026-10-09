@@ -17,6 +17,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | vala | system (with GLib, GObject and json-glib) | Compiles `crates/mailune-capi/tests/capi.vala` against the VAPI | https://gitlab.gnome.org/GNOME/vala |
 | openssl | system | Regenerates the `mailune-smime` interop fixtures (`fixtures/regenerate.sh`); not needed to build or test | https://github.com/openssl/openssl |
 | docker (compose) | system | Runs the Stalwart and Dovecot integration servers in `docker-compose.yml` by hand; not needed to build or test | https://github.com/docker/compose |
+| node | mise | Runs Vite, Vitest and TypeScript for `web/` | https://github.com/nodejs/node |
+| npm | with node | Installs `web/` packages from `web/package-lock.json` | https://github.com/npm/cli |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -25,7 +27,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests; blob-store content addresses |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
-| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
+| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot; the sanitised-HTML fixture the web reader renders |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
 | serde | local | https://github.com/serde-rs/serde | Contract serialization |
 | serde_json | local | https://github.com/serde-rs/json | Schema snapshot value and scenario replay JSON |
@@ -76,3 +78,20 @@ Gradle (`desktop/android`):
 | --- | --- | --- | --- |
 | org.jetbrains.kotlin.jvm | local | https://github.com/JetBrains/kotlin | Kotlin JVM plugin for the `core` module |
 | kotlin-test | local | https://github.com/JetBrains/kotlin | JUnit 5 tests for the `core` module |
+
+npm (`web/package.json`):
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| react | local | https://github.com/facebook/react | Web client UI |
+| react-dom | local | https://github.com/facebook/react | Renders the web client into the page |
+| typescript | local (dev) | https://github.com/microsoft/TypeScript | Type checks `web/` |
+| vite | local (dev) | https://github.com/vitejs/vite | Dev server and production build of `web/` |
+| @vitejs/plugin-react | local (dev) | https://github.com/vitejs/vite-plugin-react | JSX and fast refresh in Vite |
+| vitest | local (dev) | https://github.com/vitest-dev/vitest | Web tests |
+| happy-dom | local (dev) | https://github.com/capricorn86/happy-dom | In-memory DOM for component tests; it opens no socket |
+| json-schema-to-typescript | local (dev) | https://github.com/bcherny/json-schema-to-typescript | Generates `web/src/contract.gen.ts` from the contract JSON Schema |
+| ajv | local (dev) | https://github.com/ajv-validator/ajv | Validates web payloads against the contract JSON Schema in tests |
+| @types/react | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React types |
+| @types/react-dom | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React DOM types |
+| @types/node | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | Node types for the generator script and tests |
