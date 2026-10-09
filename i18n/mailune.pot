@@ -1180,3 +1180,27 @@ msgstr ""
 msgctxt "compose.invalid_recipient"
 msgid "Not an email address: {0}"
 msgstr ""
+
+msgctxt "search.ask"
+msgid "Ask"
+msgstr ""
+
+msgctxt "search.ask_prompt"
+msgid "Ask about your mail"
+msgstr ""
+
+msgctxt "search.no_answer"
+msgid "No message answers that."
+msgstr ""
+
+msgctxt "search.source"
+msgid "Source: {0}"
+msgstr ""
+
+msgctxt "search.bad_query"
+msgid "Can’t read “{0}”"
+msgstr ""
+
+msgctxt "search.unsupported"
+msgid "“{0}” can’t be searched here yet"
+msgstr ""

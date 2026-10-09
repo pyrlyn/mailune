@@ -9,6 +9,8 @@ public struct ShellView: View {
     @State private var query = ""
     @State private var composing = false
     @State private var outbox = FakeOutbox()
+    @State private var search = ""
+    @State private var asking = false
 
     public init() {}
 
@@ -24,7 +26,8 @@ public struct ShellView: View {
             }
             .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         } content: {
-            ThreadList(selected: $selected)
+            ThreadList(selected: $selected, query: search)
+                .searchable(text: $search, placement: .toolbar, prompt: Text(Copy.text("search.search_in_mail")))
                 .navigationSplitViewColumnWidth(min: 260, ideal: 320)
         } detail: {
             if let message = openMessage {
@@ -50,12 +53,22 @@ public struct ShellView: View {
                 .keyboardShortcut("n", modifiers: .command)
             }
             ToolbarItem(placement: .primaryAction) {
+                Button(Copy.text("search.ask")) { asking = true }
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
         }
         .sheet(isPresented: $composing) {
             ComposerView(outbox: outbox)
+        }
+        .sheet(isPresented: $asking) {
+            AskView { citation in
+                search = ""
+                selected = [citation.thread]
+                asking = false
+            }
         }
         .sheet(isPresented: $palette) {
             CommandPalette(query: $query) { command in

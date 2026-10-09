@@ -1184,3 +1184,27 @@ msgstr "Retirer {0}"
 msgctxt "compose.invalid_recipient"
 msgid "Not an email address: {0}"
 msgstr "Adresse e-mail non valide : {0}"
+
+msgctxt "search.ask"
+msgid "Ask"
+msgstr "Demander"
+
+msgctxt "search.ask_prompt"
+msgid "Ask about your mail"
+msgstr "Posez une question sur vos e-mails"
+
+msgctxt "search.no_answer"
+msgid "No message answers that."
+msgstr "Aucun message ne répond à cela."
+
+msgctxt "search.source"
+msgid "Source: {0}"
+msgstr "Source : {0}"
+
+msgctxt "search.bad_query"
+msgid "Can’t read “{0}”"
+msgstr "Impossible de lire « {0} »"
+
+msgctxt "search.unsupported"
+msgid "“{0}” can’t be searched here yet"
+msgstr "« {0} » ne peut pas encore être recherché ici"
