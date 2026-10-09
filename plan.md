@@ -15,7 +15,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X3 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
 | X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
@@ -129,10 +129,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X8 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
@@ -222,7 +218,9 @@ Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
 
 Done when: aulo or cox migrated; redaction test moves with it. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `telemetry-setup`. Commit there. Do not push.
+Execution plan: `packages/crates` worktree, crate `telemetry-setup` (T21 there), extracted from `aulo-telemetry` with its redaction and logging tests; the application name, filter variable and extra token patterns become settings. Then aulo moves onto it in its own pull request.
+
+Progress: the crate is in pyrlyn/crates-packages PR #43 with aulo's redaction tests and green checks. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. Gap: aulo cannot migrate until `telemetry-setup` is on crates.io, because a shared crate is consumed as a registry version with a local `paths` override, never a bare path. Publishing it is the creator's call.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
@@ -1129,38 +1127,6 @@ Depends on: I1, R13. Reuse: the R13 App Store Connect workflow, based on the pyr
 Done when: a TestFlight upload can run from that workflow. A real upload waits on R13.
 
 Execution plan: `desktop/macos` on `batch7-imap` only. No real TestFlight upload.
-
-### R11. Windows signing workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
-
-### R12. Flatpak workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
-
-### R13. TestFlight workflow
-
-Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
-
-Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
-
-### R14. Play workflow
-
-Depends on: R10. Reuse: none yet.
-
-Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
 
 ### W13. Windows release
 
