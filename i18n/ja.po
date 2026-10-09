@@ -1114,3 +1114,19 @@ msgstr "{0} 秒"
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
 msgstr "{0} · {1} から"
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr "コマンド"
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr "コマンドを入力"
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr "{0}へ移動"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "カテゴリ"

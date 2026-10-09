@@ -1112,3 +1112,19 @@ msgstr ""
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
 msgstr ""
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr ""
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr ""
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr ""
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr ""

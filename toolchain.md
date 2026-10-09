@@ -7,6 +7,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | git | system | Version control | https://github.com/git/git |
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
+| Xcode | system (App Store) | Swift, SwiftPM and `xcodebuild` for the macOS shell under `desktop/macos` (arm64 only) | https://developer.apple.com/xcode/ |
+| XcodeGen | mise (`mise exec xcodegen@2.46.0` in `desktop/macos/scripts/test.sh`; not in `mise.toml`, which Linux CI installs) | Generates `Mailune.xcodeproj` from `desktop/macos/project.yml` | https://github.com/yonaskolb/XcodeGen |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
 
 | Package | Where | Source | Why here |

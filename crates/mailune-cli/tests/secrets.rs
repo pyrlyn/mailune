@@ -1,7 +1,8 @@
 //! Workspace sources must not call the OS keychain or name a remote image URL.
 //!
 //! Needles are built at runtime so this file does not contain the text it
-//! forbids. The scan covers every Rust file under `crates/`.
+//! forbids. The scan covers every Rust file under `crates/` and the Swift
+//! sources, fixtures and specs of the native shells under `desktop/`.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -26,15 +27,27 @@ fn image_suffixes() -> [&'static str; 6] {
     [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"]
 }
 
-fn rust_sources(dir: &Path, out: &mut Vec<PathBuf>) {
+fn sources(dir: &Path, extensions: &[&str], out: &mut Vec<PathBuf>) {
     let Ok(entries) = fs::read_dir(dir) else {
         return;
     };
     for entry in entries.flatten() {
         let path = entry.path();
+        let name = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+        // Build output and generated projects are not sources.
+        if name.starts_with('.') || name == "DerivedData" || name.ends_with(".xcodeproj") {
+            continue;
+        }
         if path.is_dir() {
-            rust_sources(&path, out);
-        } else if path.extension().and_then(|ext| ext.to_str()) == Some("rs") {
+            sources(&path, extensions, out);
+        } else if path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .is_some_and(|ext| extensions.contains(&ext))
+        {
             out.push(path);
         }
     }
@@ -64,8 +77,19 @@ fn violations(source: &str) -> Vec<String> {
 fn workspace_sources_do_not_call_the_keychain_or_fetch_remote_images() {
     let root = workspace_root();
     let mut files = Vec::new();
-    rust_sources(&root.join("crates"), &mut files);
+    sources(&root.join("crates"), &["rs"], &mut files);
     assert!(!files.is_empty(), "the workspace has Rust sources");
+    sources(
+        &root.join("desktop"),
+        &["swift", "json", "yml", "sh"],
+        &mut files,
+    );
+    assert!(
+        files
+            .iter()
+            .any(|path| path.extension().is_some_and(|ext| ext == "swift")),
+        "the macOS shell has Swift sources"
+    );
     let mut found = Vec::new();
     for path in files {
         let source = fs::read_to_string(&path).unwrap();
@@ -75,7 +99,7 @@ fn workspace_sources_do_not_call_the_keychain_or_fetch_remote_images() {
     }
     assert!(
         found.is_empty(),
-        "a Rust source calls the real keychain or names a remote image:\n{}",
+        "a source calls the real keychain or names a remote image:\n{}",
         found.join("\n")
     );
 }

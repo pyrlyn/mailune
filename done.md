@@ -954,6 +954,66 @@ Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and 
 
 What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.
 
+### M1. Xcode project
+
+Depends on: B3.
+
+Done when: XcodeGen generates MailuneModel, MailuneUI, and MailunePlatform for macOS arm64. No Intel target.
+
+Execution plan: `desktop/macos` only. Port `project.yml` and the three local packages (MailuneModel, MailuneUI, MailunePlatform) from `batch7-imap`. `ARCHS = arm64`, no Intel slice. B3 is not done (it waits on B2 in PR #5), so the project builds without MailuneCore and the model is fixture-backed; B3 adds the package later. `scripts/test.sh` generates the project with XcodeGen and runs `xcodebuild test` on `platform=macOS,arch=arm64`; an arm64 test checks the running slice.
+
+What landed: `desktop/macos/project.yml` generates `Mailune.xcodeproj` (not committed) from the local packages MailuneModel, MailuneUI and MailunePlatform, with `ARCHS = arm64` and no Intel slice. `scripts/test.sh` runs the three package suites, generates the project with XcodeGen 2.46.0, runs `xcodebuild test` on `platform=macOS,arch=arm64`, and fails unless `lipo -archs` on the built app says `arm64` only. `Host.architecture` and its tests fail on any other slice. Depends-on B3 is still open (it waits on B2 in PR #5); the project builds without MailuneCore and the model serves fixture data until B3 adds the package. Xcode and XcodeGen are in `toolchain.md`.
+
+### M2. Swift design tokens
+
+Depends on: M1.
+
+Done when: colors, type, spacing, radii, and motion are Swift constants used by one view.
+
+Execution plan: `desktop/macos` only. Port `Tokens.swift` (colour, type, spacing, radius, motion) and use it in `InboxView`.
+
+What landed: `MailuneUI/Tokens.swift`: colour, type, spacing, radius and motion constants. `InboxView` uses every family; the shell and thread list use colour, type and spacing.
+
+### M3. macOS icons
+
+Depends on: M1.
+
+Done when: one app icon and one toolbar icon are local SVG or asset-catalog entries. No remote image URL.
+
+Execution plan: `desktop/macos` only. Port the local `AppIcon` and `ToolbarCompose` asset-catalog entries; the toolbar uses the local image. No URL.
+
+What landed: `App/Assets.xcassets` holds a local `AppIcon` set and a `ToolbarCompose` image, used by the app's toolbar with a localised accessibility label. The artwork is a placeholder until the brand assets exist. The workspace guard in `mailune-cli/tests/secrets.rs` now also scans Swift, JSON, YAML and shell files under `desktop/`, so a remote image URL or a keychain call there fails the test.
+
+### M4. macOS localisation
+
+Depends on: M1.
+
+Done when: one string is in an English catalog and a second catalog, and a missing key falls back to English.
+
+Execution plan: `desktop/macos/scripts/catalogs.sh` runs `mise run i18n` and copies `target/i18n/apple/*.lproj` into a git-ignored `MailuneUI` resource folder; XcodeGen runs it as `preGenCommand` and `scripts/test.sh` runs it first. No hand-written `Localizable.strings`. `Copy` reads a language's generated table and falls back to English. The key-level fallback is tested on catalogs the test writes at runtime in the generator's format, so no shipped string stays untranslated.
+
+What landed: `Copy.text` and `Copy.format` read the catalogs generated from `i18n/mailune.pot` and `i18n/<lang>.po` (en, de, fr, ja ship). A key missing from a language's table, or a language with no table, falls back to English, which Foundation does not do by itself. Tests cover English and German from the generated catalogs, an unknown language, a `{0}` placeholder, and a key missing from one catalog.
+
+### M7. macOS shell
+
+Depends on: M2, M3.
+
+Done when: a NavigationSplitView shows three panes, a toolbar, one keyboard shortcut, and a command palette. Preview or a unit test builds the view.
+
+Execution plan: `desktop/macos` only. Stay under 500 lines. Port `ShellView` (three-pane `NavigationSplitView`, toolbar, ⌘K) and the command palette; every visible string comes from `Copy`. A unit test filters the palette and one builds the view.
+
+What landed: `ShellView`: a three-pane `NavigationSplitView` (mailboxes, thread list, detail), a Commands toolbar button on ⌘K, and a command palette whose commands are built from the mailbox list (`shell.go_to`). New keys `shell.commands`, `shell.command_placeholder` and `shell.go_to` have de, fr and ja translations. Tests filter the palette in English and German and build the view in an `NSHostingView`.
+
+### M8. macOS thread list
+
+Depends on: M7, B7.
+
+Done when: the list is lazy, has a swipe action, multi-select, one indicator, and category tabs, fed by fixture data.
+
+Execution plan: `desktop/macos` only, plus one test in `mailune-testkit`. Port `ThreadList` (lazy `List`, category tabs, unread mark, swipe to archive, multi-select) fed by a fixture that is a contract `Event::Snapshot` (the B7 JSON shape); the testkit test parses the same file as `Event`.
+
+What landed: `ThreadList`: a `List` (lazy; only on-screen rows are built) with the four contract categories as tabs, an unread dot, a trailing swipe that archives, and multi-select. Rows decode from `MailuneModel/Fixtures/threads.json`, a contract `Event::Snapshot`; `mailune-testkit` parses the same file as `Event`, so the Swift fixture cannot drift from `ThreadRow`. New key `mail_list.category` has de, fr and ja translations.
+
 ### R11. Windows signing workflow
 
 Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
