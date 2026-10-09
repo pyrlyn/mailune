@@ -1130,3 +1130,39 @@ msgstr "{0}へ移動"
 msgctxt "mail_list.category"
 msgid "Category"
 msgstr "カテゴリ"
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr "引用を表示"
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr "引用を隠す"
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr "添付ファイル: {0}"
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr "トラッキングピクセル: {0}"
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr "認証に失敗しました"
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr "暗号化済み"
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr "署名済み"
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr "送信者を確認済み"
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr "送信者は未確認"

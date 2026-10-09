@@ -1132,3 +1132,39 @@ msgstr "Gehe zu {0}"
 msgctxt "mail_list.category"
 msgid "Category"
 msgstr "Kategorie"
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr "Zitierten Text anzeigen"
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr "Zitierten Text ausblenden"
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr "Anhang: {0}"
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr "Tracking-Pixel: {0}"
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr "Authentifizierung fehlgeschlagen"
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr "Verschlüsselt"
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr "Signiert"
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr "Absender bestätigt"
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr "Absender nicht bestätigt"
