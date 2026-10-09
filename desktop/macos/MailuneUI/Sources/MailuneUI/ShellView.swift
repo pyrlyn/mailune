@@ -98,7 +98,7 @@ public struct ShellView: View {
         }
         .task {
             UnreadBadge.update(host.dock, rows: ThreadFixtures.all)
-            host.spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all))
+            host.spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all, messages: MessageFixtures.all))
         }
         .sheet(isPresented: $asking) {
             AskView { citation in

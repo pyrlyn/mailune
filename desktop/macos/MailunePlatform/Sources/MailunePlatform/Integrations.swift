@@ -62,6 +62,7 @@ public struct SpotlightItem: Equatable, Sendable {
     public var id: String
     public var title: String
     public var sender: String
+    public var text: String
 }
 
 @MainActor
@@ -70,10 +71,17 @@ public protocol SpotlightIndex: AnyObject {
 }
 
 public enum SpotlightItems {
-    /// Subject and sender only. Spotlight's store lives outside the app's
-    /// encrypted database, so message text never goes there.
-    public static func items(for rows: [ThreadItem]) -> [SpotlightItem] {
-        rows.map { SpotlightItem(id: $0.id, title: $0.subject, sender: $0.from.display) }
+    /// Spotlight's store lives outside the app's encrypted database, so the
+    /// text of an encrypted message never goes there: decrypting it into the
+    /// index would leave it readable on disk.
+    public static func items(for rows: [ThreadItem], messages: [MailMessage]) -> [SpotlightItem] {
+        rows.map { row in
+            let text = messages
+                .filter { $0.thread == row.id && !$0.security.encrypted }
+                .map(\.body)
+                .joined(separator: "\n\n")
+            return SpotlightItem(id: row.id, title: row.subject, sender: row.from.display, text: text)
+        }
     }
 }
 
@@ -129,6 +137,7 @@ final class AppSpotlight: SpotlightIndex {
             let attributes = CSSearchableItemAttributeSet(contentType: .emailMessage)
             attributes.title = item.title
             attributes.authorNames = [item.sender]
+            attributes.textContent = item.text.isEmpty ? nil : item.text
             return CSSearchableItem(uniqueIdentifier: item.id, domainIdentifier: domain, attributeSet: attributes)
         }
     }

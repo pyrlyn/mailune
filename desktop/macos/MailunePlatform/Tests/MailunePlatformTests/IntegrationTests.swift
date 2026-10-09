@@ -40,14 +40,22 @@ final class IntegrationTests: XCTestCase {
         XCTAssertEqual(sharing.shared, ["Lunch on Thursday\n\nSame place as last time works for me."])
     }
 
-    func testSpotlightGetsSubjectAndSenderButNoText() {
+    func testSpotlightGetsSubjectSenderAndText() throws {
         let spotlight = FakeSpotlight()
-        spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all))
-        XCTAssertEqual(spotlight.items.first, SpotlightItem(id: "t1", title: "Quarterly plan", sender: "Ana Ruiz"))
+        spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all, messages: MessageFixtures.all))
         XCTAssertEqual(spotlight.items.count, ThreadFixtures.all.count)
-        let indexed = spotlight.items.map { "\($0.title) \($0.sender)" }.joined()
-        for row in ThreadFixtures.all {
-            XCTAssertFalse(indexed.contains(row.snippet))
-        }
+        let first = try XCTUnwrap(spotlight.items.first)
+        let body = try XCTUnwrap(MessageFixtures.message(forThread: "t1")).body
+        XCTAssertEqual(first, SpotlightItem(id: "t1", title: "Quarterly plan", sender: "Ana Ruiz", text: body))
+    }
+
+    func testSpotlightNeverGetsEncryptedText() throws {
+        var secret = try XCTUnwrap(MessageFixtures.message(forThread: "t1"))
+        secret.security.encrypted = true
+        let items = SpotlightItems.items(for: ThreadFixtures.all, messages: [secret])
+        let first = try XCTUnwrap(items.first)
+        XCTAssertEqual(first.title, "Quarterly plan")
+        XCTAssertEqual(first.text, "")
+        XCTAssertFalse(items.contains { $0.text.contains(secret.body) })
     }
 }
