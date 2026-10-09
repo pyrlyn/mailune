@@ -7,8 +7,7 @@
 //! evicted once the stored total passes the quota: a body can always be
 //! fetched again from the server.
 
-use aes_gcm::aead::rand_core::RngCore;
-use aes_gcm::aead::{Aead, KeyInit, OsRng, Payload};
+use aes_gcm::aead::{Aead, KeyInit, Payload};
 use aes_gcm::{Aes256Gcm, Nonce};
 use diesel::dsl::max;
 use diesel::prelude::*;
@@ -236,13 +235,11 @@ fn parse_hex(text: &str) -> Option<[u8; 32]> {
 #[cfg(test)]
 mod tests {
     use super::BlobHash;
-    use aes_gcm::aead::rand_core::{OsRng, RngCore};
     use crate::{Error, Store};
 
+    /// A fresh random key per test: no test depends on a particular key.
     fn key() -> [u8; 32] {
-        let mut key = [0u8; 32];
-        OsRng.fill_bytes(&mut key);
-        key
+        rand::random()
     }
     // AES-GCM adds a 16-byte tag to each sealed blob.
     const TAG: u64 = 16;
@@ -272,7 +269,7 @@ mod tests {
     #[test]
     fn stored_bytes_are_not_the_plaintext() {
         let (dir, mut store) = store();
-        let mut blobs = store.blobs(&KEY, 1 << 20).unwrap();
+        let mut blobs = store.blobs(&key(), 1 << 20).unwrap();
         blobs.put(b"a very recognisable secret body").unwrap();
         drop(store);
         let raw = std::fs::read(dir.path().join("mail.db")).unwrap();
@@ -285,13 +282,11 @@ mod tests {
     #[test]
     fn another_key_cannot_read_a_blob() {
         let (_dir, mut store) = store();
-        let hash = store.blobs(&KEY, 1 << 20).unwrap().put(b"body").unwrap();
-        let mut other_key = [0u8; 32];
-        OsRng.fill_bytes(&mut other_key);
-        if other_key == KEY {
-            other_key[0] ^= 1;
-        }
-        let mut other = store.blobs(&other_key, 1 << 20).unwrap();
+        let first = key();
+        let hash = store.blobs(&first, 1 << 20).unwrap().put(b"body").unwrap();
+        let mut second = key();
+        second[0] = first[0] ^ 1;
+        let mut other = store.blobs(&second, 1 << 20).unwrap();
         assert!(matches!(other.get(&hash), Err(Error::BlobKey)));
     }
 
@@ -299,7 +294,7 @@ mod tests {
     fn the_least_recently_used_blob_goes_first() {
         let (_dir, mut store) = store();
         // Room for two 10-byte blobs, not three.
-        let mut blobs = store.blobs(&KEY, 2 * (10 + TAG)).unwrap();
+        let mut blobs = store.blobs(&key(), 2 * (10 + TAG)).unwrap();
         let a = blobs.put(b"aaaaaaaaaa").unwrap();
         let b = blobs.put(b"bbbbbbbbbb").unwrap();
         // Reading `a` makes `b` the oldest.
@@ -314,10 +309,11 @@ mod tests {
     #[test]
     fn a_blob_larger_than_the_quota_is_refused() {
         let (_dir, mut store) = store();
-        let mut blobs = store.blobs(&KEY, 8).unwrap();
+        let key = key();
+        let mut blobs = store.blobs(&key, 8).unwrap();
         assert!(matches!(blobs.put(b"too big"), Err(Error::BlobTooLarge)));
         assert!(matches!(
-            store.blobs(&[0; 3], 8),
+            store.blobs(&key[..3], 8),
             Err(Error::KeyLength { .. })
         ));
     }
@@ -325,7 +321,7 @@ mod tests {
     #[test]
     fn an_unknown_or_malformed_address_reads_nothing() {
         let (_dir, mut store) = store();
-        let mut blobs = store.blobs(&KEY, 1 << 20).unwrap();
+        let mut blobs = store.blobs(&key(), 1 << 20).unwrap();
         assert_eq!(blobs.get(&BlobHash::new("00".repeat(32))).unwrap(), None);
         assert_eq!(blobs.get(&BlobHash::new("zz")).unwrap(), None);
     }

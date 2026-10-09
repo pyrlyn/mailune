@@ -36,6 +36,8 @@ libsqlite3-sys = { workspace = true, features = ["bundled"] }
 # The chunker feeds the embedding test; the store itself never parses mail.
 mailune-mime = { path = "../mailune-mime" }
 tempfile = { workspace = true }
+# Random blob keys, so no test carries a hard-coded key.
+rand = { workspace = true }
 
 [lints]
 workspace = true

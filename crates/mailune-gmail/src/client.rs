@@ -304,7 +304,7 @@ mod tests {
             .json(HISTORY_1)
             .json(HISTORY_2)
             .reply(multipart(BATCH_MESSAGES));
-        let client = GmailClient::new(&http, Secret::new("ya29.tok"));
+        let client = GmailClient::new(&http, Secret::new("test-token"));
         let dir = tempfile::tempdir().unwrap();
         let mut store = Store::open(&dir.path().join("mail.db"), None).unwrap();
         let account = AccountId::new("me@gmail.com");
@@ -385,9 +385,9 @@ mod tests {
         );
         assert_eq!(
             requests[6].header_value("authorization"),
-            Some("Bearer ya29.tok")
+            Some("Bearer test-token")
         );
-        assert!(!format!("{client:?}").contains("ya29"));
+        assert!(!format!("{client:?}").contains("test-token"));
     }
 
     #[test]

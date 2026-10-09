@@ -179,6 +179,7 @@ mod tests {
             screen(Provider::Graph, bearer.to_string().as_bytes()),
             Err(Refusal::Credential)
         );
+        // A fake Google-shaped token: the screen must refuse exactly that shape. nosemgrep
         let access = json!({ "message": { "data": "e30=", "access_token": "ya29.x" } });
         assert!(screen(Provider::Gmail, access.to_string().as_bytes()).is_err());
     }
