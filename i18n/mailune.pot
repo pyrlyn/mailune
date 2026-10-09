@@ -1272,3 +1272,7 @@ msgstr ""
 msgctxt "onboarding.sign_in_failed"
 msgid "Sign-in did not complete. Try again."
 msgstr ""
+
+msgctxt "mail_list.refresh_failed"
+msgid "Couldn’t refresh. Showing the last list."
+msgstr ""

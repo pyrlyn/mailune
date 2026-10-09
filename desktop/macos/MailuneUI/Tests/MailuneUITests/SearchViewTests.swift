@@ -12,7 +12,7 @@ final class SearchViewTests: XCTestCase {
 
     @MainActor
     func testSearchingListAndAskBuild() {
-        XCTAssertGreaterThan(Hosting.render(ThreadList(selected: .constant([]), query: "is:unread")).bounds.width, 0)
+        XCTAssertGreaterThan(Hosting.render(ThreadList(selected: .constant([]), feed: ThreadFeed(), query: "is:unread")).bounds.width, 0)
         XCTAssertGreaterThan(Hosting.render(AskView { _ in }).bounds.width, 0)
     }
 }

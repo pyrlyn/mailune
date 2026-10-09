@@ -36,13 +36,15 @@
 
     struct PhoneStack: View {
         let preferences: any PreferencesStore
+        @State private var feed = ThreadFeed()
 
         var body: some View {
             NavigationStack {
-                List(Mailbox.fixtures) { mailbox in
-                    Text(Copy.text(mailbox.titleKey))
-                }
-                .navigationTitle(Copy.text("app.mail"))
+                PhoneThreadList(feed: feed)
+                    .navigationTitle(Copy.text("app.inbox"))
+                    .navigationDestination(for: String.self) { id in
+                        Text(verbatim: feed.rows.first { $0.id == id }?.subject ?? "")
+                    }
             }
         }
     }

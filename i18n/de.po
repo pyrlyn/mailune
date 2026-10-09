@@ -1276,3 +1276,7 @@ msgstr "Dieser Anbieter bietet nur unverschlüsselte Verbindungen an, die Mailun
 msgctxt "onboarding.sign_in_failed"
 msgid "Sign-in did not complete. Try again."
 msgstr "Die Anmeldung wurde nicht abgeschlossen. Versuche es erneut."
+
+msgctxt "mail_list.refresh_failed"
+msgid "Couldn’t refresh. Showing the last list."
+msgstr "Aktualisieren fehlgeschlagen. Die letzte Liste wird angezeigt."

@@ -1276,3 +1276,7 @@ msgstr "Ce fournisseur ne propose que des connexions non chiffrées, que Mailune
 msgctxt "onboarding.sign_in_failed"
 msgid "Sign-in did not complete. Try again."
 msgstr "La connexion n’a pas abouti. Réessayez."
+
+msgctxt "mail_list.refresh_failed"
+msgid "Couldn’t refresh. Showing the last list."
+msgstr "Actualisation impossible. La dernière liste est affichée."

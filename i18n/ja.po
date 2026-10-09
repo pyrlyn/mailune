@@ -1274,3 +1274,7 @@ msgstr "このプロバイダは暗号化されていない接続のみを提供
 msgctxt "onboarding.sign_in_failed"
 msgid "Sign-in did not complete. Try again."
 msgstr "サインインが完了しませんでした。もう一度お試しください。"
+
+msgctxt "mail_list.refresh_failed"
+msgid "Couldn’t refresh. Showing the last list."
+msgstr "更新できませんでした。前回のリストを表示しています。"
