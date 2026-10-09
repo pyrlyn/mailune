@@ -1166,3 +1166,19 @@ msgstr "送信者を確認済み"
 msgctxt "reader.badge.unverified"
 msgid "Sender not verified"
 msgstr "送信者は未確認"
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr "ファイルを添付"
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr "このメッセージを送信しますか？"
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr "{0}を削除"
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr "メールアドレスではありません: {0}"

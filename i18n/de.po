@@ -1168,3 +1168,19 @@ msgstr "Absender bestätigt"
 msgctxt "reader.badge.unverified"
 msgid "Sender not verified"
 msgstr "Absender nicht bestätigt"
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr "Datei anhängen"
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr "Diese Nachricht senden?"
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr "{0} entfernen"
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr "Keine E-Mail-Adresse: {0}"

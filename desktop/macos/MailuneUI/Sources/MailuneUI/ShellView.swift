@@ -7,6 +7,8 @@ public struct ShellView: View {
     @State private var selected: Set<String> = []
     @State private var palette = false
     @State private var query = ""
+    @State private var composing = false
+    @State private var outbox = FakeOutbox()
 
     public init() {}
 
@@ -38,9 +40,22 @@ public struct ShellView: View {
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
+                Button {
+                    composing = true
+                } label: {
+                    // The app target's asset catalog holds this image.
+                    Image("ToolbarCompose")
+                }
+                .accessibilityLabel(Copy.text("app.compose"))
+                .keyboardShortcut("n", modifiers: .command)
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
+        }
+        .sheet(isPresented: $composing) {
+            ComposerView(outbox: outbox)
         }
         .sheet(isPresented: $palette) {
             CommandPalette(query: $query) { command in
