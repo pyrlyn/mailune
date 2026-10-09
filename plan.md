@@ -39,13 +39,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M1 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| M2 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| M3 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| M4 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M7 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
-| M8 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
 | M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M9 | in progress | P1 | 4 | 0% | Cursor / claude-opus-5.5 |
 | M10 | in progress | P1 | 4 | 0% | Cursor / claude-opus-5.5 |
@@ -410,38 +404,6 @@ Done when: an XCFramework script targets macOS arm64 only, and a SwiftPM package
 
 Execution plan: `desktop/macos` packaging only.
 
-### M1. Xcode project
-
-Depends on: B3.
-
-Done when: XcodeGen generates MailuneModel, MailuneUI, and MailunePlatform for macOS arm64. No Intel target.
-
-Execution plan: `desktop/macos` only. Port `project.yml` and the three local packages (MailuneModel, MailuneUI, MailunePlatform) from `batch7-imap`. `ARCHS = arm64`, no Intel slice. B3 is not done (it waits on B2 in PR #5), so the project builds without MailuneCore and the model is fixture-backed; B3 adds the package later. `scripts/test.sh` generates the project with XcodeGen and runs `xcodebuild test` on `platform=macOS,arch=arm64`; an arm64 test checks the running slice.
-
-### M2. Swift design tokens
-
-Depends on: M1.
-
-Done when: colors, type, spacing, radii, and motion are Swift constants used by one view.
-
-Execution plan: `desktop/macos` only. Port `Tokens.swift` (colour, type, spacing, radius, motion) and use it in `InboxView`.
-
-### M3. macOS icons
-
-Depends on: M1.
-
-Done when: one app icon and one toolbar icon are local SVG or asset-catalog entries. No remote image URL.
-
-Execution plan: `desktop/macos` only. Port the local `AppIcon` and `ToolbarCompose` asset-catalog entries; the toolbar uses the local image. No URL.
-
-### M4. macOS localisation
-
-Depends on: M1.
-
-Done when: one string is in an English catalog and a second catalog, and a missing key falls back to English.
-
-Execution plan: `desktop/macos/scripts/catalogs.sh` runs `mise run i18n` and copies `target/i18n/apple/*.lproj` into a git-ignored `MailuneUI` resource folder; XcodeGen runs it as `preGenCommand`. No hand-written `Localizable.strings`. `Copy` reads a language's generated table and falls back to English. New keys go into `i18n/mailune.pot` and the `.po` files; one key is left untranslated in `de.po` so the fallback test can fail.
-
 ### M5. macOS host integrations
 
 Depends on: M1, B2.
@@ -449,22 +411,6 @@ Depends on: M1, B2.
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
-
-### M7. macOS shell
-
-Depends on: M2, M3.
-
-Done when: a NavigationSplitView shows three panes, a toolbar, one keyboard shortcut, and a command palette. Preview or a unit test builds the view.
-
-Execution plan: `desktop/macos` only. Stay under 500 lines. Port `ShellView` (three-pane `NavigationSplitView`, toolbar, ⌘K) and the command palette; every visible string comes from `Copy`. A unit test filters the palette and one builds the view.
-
-### M8. macOS thread list
-
-Depends on: M7, B7.
-
-Done when: the list is lazy, has a swipe action, multi-select, one indicator, and category tabs, fed by fixture data.
-
-Execution plan: `desktop/macos` only. Port `ThreadList` (lazy `List`, category tabs, unread mark, swipe to archive, multi-select) fed by fixture rows in MailuneModel; categories are keys localised through `Copy`.
 
 ### M12. macOS settings
 
