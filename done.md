@@ -1003,3 +1003,43 @@ Done when: recipient, subject, and body round-trip, and send stays disabled unti
 Execution plan: a composer whose recipient, subject and body round-trip through the generated `save_draft` submission. Send stays disabled until a confirm checkbox is on, and any edit turns the confirmation off again. A happy-dom vitest covers both.
 
 What landed: recipients (`Name <addr>` or plain), subject and body round-trip through the generated `save_draft` submission, and every edit is offered as one. Send stays disabled until the confirm box is on, any edit turns it off again, and Enter cannot submit around it. Both submissions validate against the contract schema in tests.
+
+### R7. Web CI
+
+Depends on: E2.
+
+Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
+
+Execution plan: `.github/workflows/web.yml` only, triggered on changes to `web/`, `i18n/`, `scripts/i18n.py`, `mise.toml` and the two Rust snapshots the web tests read. It installs the pinned mise tools, runs `npm ci`, `npm run typecheck`, `npm test` and `npm run build`; actions pinned by SHA like the existing workflows; actionlint run locally.
+
+What landed: `.github/workflows/web.yml` runs `npm ci`, typecheck, vitest and the Vite build when `web/`, `i18n/`, `scripts/i18n.py`, `mise.toml` or the two Rust snapshots the web tests read change. pyrlyn/ci has no Node workflow, so it installs Node and translate-toolkit from `mise.toml` with the same `jdx/mise-action` pin the shared Rust workflow uses. A separate `web e2e` job installs Chromium and runs Playwright. `ci.yml` and the required checks are unchanged.
+
+### E8. Web AI surfaces
+
+Depends on: E6, E7. Summary, replies, and compose assist already exist in `mailune-ai`.
+
+Done when: the reader shows a summary and reply chips from fixture data, and the composer shows an assist result. No model call.
+
+Execution plan: fixture summary, reply chips and an assist result in `web/`, shaped after `mailune-ai`'s public result types (no JSON Schema exists for them, so a typed fixture mirrors the Rust fields and says where they come from). The reader shows the summary and chips, the composer shows the assist result; nothing calls a model. A happy-dom vitest covers both.
+
+What landed: the reader shows a summary and three reply chips, and a chip starts a reply draft that still needs the confirm box. The composer shows an assist result and applies it only on request, which turns the confirmation off. `mailune-ai`'s result types derive no serde or JSON Schema yet, so `web/src/ai.ts` mirrors `SummaryKind`, `ComposeAction` and the string results by hand. Model text renders as text, never markup. Nothing calls a model.
+
+### E9. Web offline cache
+
+Depends on: E5.
+
+Done when: a service worker caches the latest thread list and serves it when the test marks the network offline. No real push server.
+
+Execution plan: a service worker in `web/src/sw.ts` that answers the thread-list request network-first and falls back to the cached copy when offline; the cache logic is a pure module tested in vitest with an in-memory Cache and a fetch that the test marks offline. No push server.
+
+What landed: `web/src/sw.ts` (built to `/sw.js`, registered in production builds) answers same-origin GETs network-first and replaces the cached copy with every good answer, so the latest thread list and app shell are served when fetch fails. Error and `no-store` answers are not cached, and offline with nothing cached stays an error. A vitest drives the strategy with an in-memory cache and a network the test takes offline; the E11 Playwright run checks the same thing in Chromium. No push server.
+
+### E11. Web end-to-end test
+
+Depends on: E5, B7.
+
+Done when: one Playwright test opens the shell, selects a fixture thread, and sees the subject. If the browser cannot be installed, commit the spec and say why.
+
+Execution plan: `@playwright/test` with one spec under `web/e2e/` that starts the Vite preview, clicks a fixture thread and reads the subject. Browsers are installed with `npx playwright install chromium`; if that fails the spec is committed and the reason recorded. The R7 workflow runs it only if the browser install is clean; vitest stays the required path.
+
+What landed: `web/e2e/shell.spec.ts` opens the production build on a loopback preview, chooses a fixture thread and sees its subject; a second test reloads offline after the service worker took control. Chromium is the revision `@playwright/test` 1.64.0 pins; it was already cached locally and installs cleanly in CI.
