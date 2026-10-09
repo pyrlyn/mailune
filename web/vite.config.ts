@@ -9,6 +9,18 @@ export default defineConfig({
   server: { fs: { allow: [".."] } },
   test: {
     environment: "node",
+    // Component tests run offline: happy-dom must not load a frame, script
+    // or style sheet even if a test hands it a URL.
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          disableIframePageLoading: true,
+          disableJavaScriptFileLoading: true,
+          disableCSSFileLoading: true,
+          disableJavaScriptEvaluation: true,
+        },
+      },
+    },
     include: ["src/**/*.test.{ts,tsx}"],
   },
 });

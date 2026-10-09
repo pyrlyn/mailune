@@ -504,6 +504,10 @@ msgctxt "app.message"
 msgid "Message"
 msgstr "Nachricht"
 
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "Nachrichtentext"
+
 msgctxt "kit.motion"
 msgid "MOTION"
 msgstr "BEWEGUNG"

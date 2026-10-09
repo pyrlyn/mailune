@@ -1,6 +1,6 @@
 import { Shell } from "./Shell";
-import { fixtureThreads } from "./fixture";
+import { fixtureBodies, fixtureThreads } from "./fixture";
 
 export function App() {
-  return <Shell threads={fixtureThreads} />;
+  return <Shell threads={fixtureThreads} bodies={fixtureBodies} />;
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Address, ThreadRow } from "./contract.gen";
+import { Reader } from "./Reader";
 import { InboxIcon } from "./icons";
 import { t } from "./i18n";
+import type { SanitizedHtml } from "./message";
 import "./shell.css";
 
 /** Mailboxes in first-seen order, so the inbox the core lists first stays first. */
@@ -18,12 +20,19 @@ function sender(address: Address): string {
 }
 
 /** Mailboxes, the conversation list, and the open conversation. */
-export function Shell({ threads }: { threads: ThreadRow[] }) {
+export function Shell({
+  threads,
+  bodies = {},
+}: {
+  threads: ThreadRow[];
+  bodies?: Readonly<Record<string, SanitizedHtml>>;
+}) {
   const mailboxes = mailboxesOf(threads);
   const [mailbox, setMailbox] = useState(mailboxes[0] ?? "inbox");
   const [openId, setOpenId] = useState<string | null>(null);
   const listed = threads.filter((thread) => thread.mailbox === mailbox);
   const open = threads.find((thread) => thread.id === openId) ?? null;
+  const body = open ? bodies[open.id] : undefined;
 
   return (
     <div className="shell">
@@ -73,7 +82,7 @@ export function Shell({ threads }: { threads: ThreadRow[] }) {
             <p className="meta">
               {sender(open.from)} · {open.from.email}
             </p>
-            <p>{open.snippet}</p>
+            {body ? <Reader body={body} /> : <p>{open.snippet}</p>}
           </article>
         ) : (
           <div className="empty">

@@ -3,6 +3,7 @@
 // breaks the build here too.
 
 import type { ThreadRow } from "./contract.gen";
+import { fixtureBody, type SanitizedHtml } from "./message";
 
 type RowFields = Pick<ThreadRow, "id" | "from" | "subject" | "snippet" | "stamp" | "mailbox">;
 
@@ -53,3 +54,5 @@ export const fixtureThreads: ThreadRow[] = [
     has_attachment: true,
   }),
 ];
+
+export const fixtureBodies: Readonly<Record<string, SanitizedHtml>> = { build: fixtureBody };

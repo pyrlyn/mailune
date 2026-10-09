@@ -19,7 +19,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; blob-store content addresses |
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
-| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
+| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot; the sanitised-HTML fixture the web reader renders |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
 | serde | local | https://github.com/serde-rs/serde | Contract serialization |
 | serde_json | local | https://github.com/serde-rs/json | Schema snapshot value and scenario replay JSON |

@@ -87,3 +87,12 @@
 .empty {
   color: var(--color-ink-muted);
 }
+
+.message-body {
+  display: block;
+  width: 100%;
+  min-height: 24rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-paper);
+}

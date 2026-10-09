@@ -503,6 +503,10 @@ msgctxt "app.message"
 msgid "Message"
 msgstr "メッセージ"
 
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "メッセージ本文"
+
 msgctxt "kit.motion"
 msgid "MOTION"
 msgstr "モーション"
