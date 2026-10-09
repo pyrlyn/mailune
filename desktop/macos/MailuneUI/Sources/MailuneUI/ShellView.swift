@@ -41,7 +41,7 @@ public struct ShellView: View {
             if let message = openMessage {
                 ReaderView(
                     message: message,
-                    assist: AssistPolicy.visible(AssistFixtures.assist(forThread: message.thread), for: message)
+                    assist: AssistPolicy.fixture(for: message)
                 ) { text in
                     startDraft = .reply(to: message, body: text)
                     composing = true

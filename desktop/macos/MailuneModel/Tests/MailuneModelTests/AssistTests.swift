@@ -20,6 +20,7 @@ final class AssistTests: XCTestCase {
         XCTAssertEqual(AssistPolicy.visible(AssistFixtures.assist(forThread: "t1"), for: plan)?.thread, "t1")
         XCTAssertNil(AssistPolicy.visible(AssistFixtures.assist(forThread: "t2"), for: plan))
         XCTAssertNil(AssistPolicy.visible(nil, for: plan))
+        XCTAssertEqual(AssistPolicy.fixture(for: plan), AssistFixtures.assist(forThread: "t1"))
     }
 
     func testCloudTextAboutEncryptedMailIsHidden() throws {

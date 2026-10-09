@@ -43,7 +43,12 @@
                 PhoneThreadList(feed: feed)
                     .navigationTitle(Copy.text("app.inbox"))
                     .navigationDestination(for: String.self) { id in
-                        Text(verbatim: feed.rows.first { $0.id == id }?.subject ?? "")
+                        if let message = MessageFixtures.message(forThread: id) {
+                            ReaderView(message: message, assist: AssistPolicy.fixture(for: message))
+                                .navigationBarTitleDisplayMode(.inline)
+                        } else {
+                            Text(Copy.text("app.no_conversation_open"))
+                        }
                     }
             }
         }
