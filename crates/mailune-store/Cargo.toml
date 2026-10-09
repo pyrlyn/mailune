@@ -43,5 +43,10 @@ rand = { workspace = true }
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 divan = { workspace = true }
 
+# T6 budgets at 100k messages. `nextest` runs the small-mailbox version in tests/budgets.rs.
+[[bench]]
+name = "budgets"
+harness = false
+
 [lints]
 workspace = true

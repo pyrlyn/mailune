@@ -49,4 +49,4 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
-| divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` benches (S14 vector search) |
+| divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` T6 budget benches at 100k messages |
