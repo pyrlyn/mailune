@@ -1,0 +1,66 @@
+# XcodeGen spec for the macOS app. Mailune.xcodeproj is generated from this
+# file and is not committed. Apple Silicon only: no target builds an Intel slice.
+# MailuneCore (the Rust XCFramework) is not wired yet: it waits on B3, so the
+# model package serves fixture data.
+name: Mailune
+options:
+  bundleIdPrefix: app.mailune
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: YES
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+packages:
+  MailuneModel:
+    path: MailuneModel
+  MailuneUI:
+    path: MailuneUI
+  MailunePlatform:
+    path: MailunePlatform
+targets:
+  Mailune:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+    dependencies:
+      - package: MailuneModel
+      - package: MailuneUI
+      - package: MailunePlatform
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos
+        PRODUCT_NAME: Mailune
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Mailune
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+  MailuneTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: MailuneTests
+    dependencies:
+      - package: MailunePlatform
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Mailune:
+    build:
+      targets:
+        Mailune: all
+        MailuneTests: [test]
+    test:
+      targets:
+        - MailuneTests

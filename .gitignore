@@ -1,2 +1,6 @@
 /target/
 __pycache__/
+/desktop/macos/Mailune.xcodeproj/
+/desktop/macos/DerivedData/
+/desktop/macos/**/.build/
+/desktop/macos/**/.swiftpm/
