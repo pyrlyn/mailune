@@ -105,7 +105,7 @@ pub fn proposal_from_mail(_body: &str) -> Result<ToolProposal, Error> {
     Err(Error::ToolDenied)
 }
 
-fn tool_name(tool: Tool) -> &'static str {
+pub(crate) fn tool_name(tool: Tool) -> &'static str {
     match tool {
         Tool::Summarize => "summarize",
         Tool::Archive => "archive",
