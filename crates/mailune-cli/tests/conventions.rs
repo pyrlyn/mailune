@@ -1,8 +1,9 @@
 //! Convention gates: every Rust file opens with a `//!` header, and an
-//! exported FFI body is one expression.
+//! exported surface body (`#[uniffi::export]`, `#[wasm_bindgen]`) is one
+//! expression.
 //!
-//! The FFI crate does not exist yet. Fixtures prove the gate, and the same
-//! check walks `crates/mailune-ffi/src` once that surface lands. The shape
+//! Fixtures prove the gate, and the same check walks the surface crates
+//! that exist (`mailune-wasm` now, `mailune-ffi` once it lands). The shape
 //! follows cox-ffi's forward-only test: `syn` parses the file, and a body
 //! that is not a single expression statement fails.
 
@@ -38,12 +39,13 @@ fn has_module_header(source: &str) -> bool {
     source.starts_with("//!")
 }
 
-fn is_uniffi_export(attrs: &[Attribute]) -> bool {
+fn is_export(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
-        let mut segments = attr.path().segments.iter();
+        let path = attr.path();
+        let mut segments = path.segments.iter();
         let uniffi = segments.next().is_some_and(|seg| seg.ident == "uniffi");
         let export = segments.next().is_some_and(|seg| seg.ident == "export");
-        uniffi && export && segments.next().is_none()
+        (uniffi && export && segments.next().is_none()) || path.is_ident("wasm_bindgen")
     })
 }
 
@@ -74,12 +76,14 @@ fn export_violations(file: &str, items: &[Item], out: &mut Vec<String>) {
     };
     for item in items {
         match item {
-            Item::Fn(func) if is_uniffi_export(&func.attrs) => {
+            Item::Fn(func) if is_export(&func.attrs) => {
                 note(out, &func.sig.ident.to_string(), &func.block);
             }
             Item::Impl(imp) => {
+                // `#[wasm_bindgen]` on the block exports every method in it.
+                let whole = is_export(&imp.attrs);
                 for method in imp.items.iter().filter_map(|item| match item {
-                    ImplItem::Fn(func) if is_uniffi_export(&func.attrs) => Some(func),
+                    ImplItem::Fn(func) if whole || is_export(&func.attrs) => Some(func),
                     _ => None,
                 }) {
                     note(out, &method.sig.ident.to_string(), &method.block);
@@ -143,22 +147,38 @@ fn a_multi_statement_export_fails() {
 }
 
 #[test]
-fn ffi_sources_stay_forward_only_when_the_crate_exists() {
-    let src = workspace_root().join("crates/mailune-ffi/src");
-    if !src.is_dir() {
-        return;
-    }
-    let mut files = Vec::new();
-    rust_sources(&src, &mut files);
+fn wasm_bindgen_exports_are_checked_too() {
+    let source = "#[wasm_bindgen(js_name = a)]\npub fn a() { let x = 1; x }\n\
+                  #[wasm_bindgen]\nimpl S { pub fn b(&self) { one(); two() } }\n\
+                  #[wasm_bindgen]\npub fn c() { core::c() }\n";
+    assert_eq!(
+        violations_in("lib.rs", source),
+        ["lib.rs: fn a — 2 statements", "lib.rs: fn b — 2 statements"]
+    );
+}
+
+#[test]
+fn surface_sources_stay_forward_only_when_the_crate_exists() {
     let mut found = Vec::new();
-    for path in files {
-        let source = fs::read_to_string(&path).unwrap();
-        let name = path.file_name().unwrap().to_string_lossy();
-        found.extend(violations_in(&name, &source));
+    let mut walked = 0;
+    for krate in ["mailune-ffi", "mailune-wasm"] {
+        let src = workspace_root().join("crates").join(krate).join("src");
+        if !src.is_dir() {
+            continue;
+        }
+        walked += 1;
+        let mut files = Vec::new();
+        rust_sources(&src, &mut files);
+        for path in files {
+            let source = fs::read_to_string(&path).unwrap();
+            let name = format!("{krate}/{}", path.file_name().unwrap().to_string_lossy());
+            found.extend(violations_in(&name, &source));
+        }
     }
+    assert!(walked > 0, "no surface crate found to check");
     assert!(
         found.is_empty(),
-        "mailune-ffi holds a multi-expression export — forward one call:\n{}",
+        "a surface holds a multi-expression export — forward one call:\n{}",
         found.join("\n")
     );
 }
