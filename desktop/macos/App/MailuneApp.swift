@@ -6,6 +6,11 @@ struct MailuneApp: App {
     var body: some Scene {
         WindowGroup {
             InboxView()
+                .toolbar {
+                    ToolbarItem {
+                        Image("ToolbarCompose")
+                    }
+                }
         }
     }
 }
