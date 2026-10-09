@@ -764,6 +764,8 @@ Execution plan: Add mailune-jmap to mailune-wasm; a private replay transport imp
 
 What landed: mailune-wasm depends on mailune-jmap. A private Replay transport implements mailune_protocol::Http from recorded bodies, and a poll-once runner drives the adapter future (it refuses a future that would wait). The export jmapMailboxIds(sessionUrl, replies) loads the JMAP session and returns the mailbox ids as a JSON array; it stays a single forwarding expression. Tests: the export returns the same ids as the native JmapClient over ScriptedHttp on the session.json and sync-initial.json fixtures, and a missing reply is an error. The wasm32 workspace build passes. A fetch-based transport for real browser calls is left for the web client task.
 
+Follow-up: the session-then-mailboxes sequence moved into the adapter as `JmapClient::mailbox_ids`, so the wasm module keeps only the replay transport, the runner and the JSON shape. The syn forward-only gate in `mailune-cli/tests/conventions.rs` now checks `#[wasm_bindgen]` exports in `mailune-wasm`; before, it only checked the not-yet-existing `mailune-ffi`.
+
 ### A28. Agent tools
 
 Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.
