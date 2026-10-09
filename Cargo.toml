@@ -96,6 +96,12 @@ tempfile = "3.27.0"
 rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
+# mailune-config only: layered TOML. 0.10.19 is the version aulo locks. The `test` feature (Jail) is
+# turned on only in mailune-config's dev-dependencies.
+figment = { version = "0.10.19", features = ["toml"] }
+# mailune-config only: parses each layer on its own so an error keeps its byte span, which
+# becomes file:line. 1.1.6 is the version aulo locks.
+toml = "1.1.6"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
