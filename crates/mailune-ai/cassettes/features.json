@@ -1,0 +1,47 @@
+[
+  {
+    "name": "summarize-launch-thread",
+    "call": "summarize_short",
+    "input": "From: Ana\nSubject: Launch\n\nThe launch moves to Friday because the demo build failed QA. Ivan owns the fix.",
+    "prompt_sha256": "443c4dc59e5a572a8fc0adfcdbfe2243373d8d2d7aef8ca76154cccbb9e5de30",
+    "reply": "  Launch moves to Friday after the demo build failed QA; Ivan owns the fix.\n",
+    "expected": "Launch moves to Friday after the demo build failed QA; Ivan owns the fix.",
+    "min_score": 0.9
+  },
+  {
+    "name": "rewrite-status",
+    "call": "rewrite",
+    "input": "so basically the thing is done but not really, need 2 more days",
+    "prompt_sha256": "e1292ba1a3818a99187da25e5a36850688d686124776ebedfe44063e3d4c0b49",
+    "reply": "The work is nearly done. I need two more days to finish it.",
+    "expected": "The work is nearly done. I need two more days to finish it.",
+    "min_score": 0.9
+  },
+  {
+    "name": "shorten-meeting",
+    "call": "shorten",
+    "input": "Hi Ana, I wanted to let you know that I can meet on Friday at 3pm if that still works for you. Best, Ivan",
+    "prompt_sha256": "c4657e45ec169ec6e1aa8213ee0eb4caee74a4bf66bc4a49156949b8a44419b2",
+    "reply": "Hi Ana, Friday at 3pm works for me. Best, Ivan",
+    "expected": "Hi Ana, Friday at 3pm works for me. Best, Ivan",
+    "min_score": 0.9
+  },
+  {
+    "name": "proofread-typos",
+    "call": "proofread",
+    "input": "Thnaks for the update, i will reveiw it tomorow.",
+    "prompt_sha256": "0dfdef420998f76a964ad06cad65e5e2b92b40c68d037053a75028c9d856f248",
+    "reply": "Thanks for the update, I will review it tomorrow.",
+    "expected": "Thanks for the update, I will review it tomorrow.",
+    "min_score": 1.0
+  },
+  {
+    "name": "rule-archive-newsletters",
+    "call": "rule_from_sentence",
+    "input": "Archive newsletters from news.example",
+    "prompt_sha256": "91c4062130c9653e13c7615540be9c88c1239ead5d0f1e81c8d704b73216c795",
+    "reply": "{\"when\":[{\"field\":\"from\",\"value\":\"news.example\"}],\"then\":{\"action\":\"archive\"}}",
+    "expected": "ProposedRule { when: [From(\"news.example\")], then: Archive }",
+    "min_score": 1.0
+  }
+]

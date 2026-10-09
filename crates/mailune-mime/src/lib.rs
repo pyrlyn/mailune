@@ -17,6 +17,7 @@ mod message;
 mod parse;
 mod quirks;
 mod remote;
+mod schedule;
 mod screen;
 mod unsubscribe;
 
@@ -39,6 +40,7 @@ pub use quirks::{
     quirks,
 };
 pub use remote::{RemoteContent, inspect_url};
+pub use schedule::{CivilDate, ScheduleSuggestion, suggest_event};
 pub use screen::{SenderScreen, screen_sender};
 pub use unsubscribe::{Unsubscribe, parse_list_unsubscribe};
 

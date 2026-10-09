@@ -3,22 +3,59 @@
 //! Encrypted mail is local-only even when the account would allow a cloud
 //! model. This crate does not call a network provider.
 
+mod agent;
+mod attachment;
+pub mod catalog;
+mod cloud;
+mod compose;
+mod digest;
+mod engine;
+mod eval;
 mod guard;
 mod ledger;
+mod phishing;
 mod platform;
 mod priority;
 mod prompts;
 mod redact;
 mod router;
+mod rules;
+mod style;
+mod summary;
 mod triage;
 
+#[cfg(test)]
+mod testing;
+
+pub use agent::{
+    Agent, AuditLine, Confirmation, Outcome, Pending, Preview, Requested, Scope, ToolCall,
+    UndoRecord, needs_confirmation, parse_call,
+};
+pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
+pub use cloud::{CloudApi, CloudRequest, KeyHeader, build_request, parse_response};
+pub use compose::{ComposeAction, Tone, assist};
+pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
+pub use engine::{
+    Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
+    generate_json, hash_embedding,
+};
+pub use eval::{Cassette, EvalCall, EvalResult, replay, run_cassettes, token_f1};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
 pub use ledger::{FlowRecord, Ledger, Retention};
+pub use phishing::{
+    Assessment, AuthOutcome, LinkFlags, ModelVerdict, PhishingSignals, Reason, Risk,
+    assess_phishing, combine,
+};
 pub use platform::{PlatformBridge, map_capability};
 pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
+pub use rules::{
+    Condition, EnabledRule, ProposedRule, RuleAction, RuleMessage, RulePreview, rule_from_sentence,
+};
+pub use style::{StyleBook, StyleProfile, guidance};
+pub use summary::{MailText, Privacy, SummaryCache, SummaryKind, cache_key, render_thread};
 pub use triage::{TriageInput, categorize};
 
 use std::fmt;
@@ -31,6 +68,12 @@ pub enum Feature {
     Summarize,
     /// A draft reply.
     DraftReply,
+    /// Draft, rewrite, tone, shorten or proofread in the composer.
+    Compose,
+    /// Turn a sentence into a mail rule.
+    Rules,
+    /// A phishing and scam verdict on one message.
+    Phishing,
 }
 
 /// Where a feature may run.
@@ -140,6 +183,30 @@ pub enum Error {
     /// No published template has that id and version.
     #[error("unknown prompt template")]
     UnknownPrompt,
+    /// A tool call named a conversation outside the granted scope.
+    #[error("tool call is outside the granted scope")]
+    OutOfScope,
+    /// Send and delete wait for the person to confirm in the app.
+    #[error("tool call needs confirmation in the app")]
+    NeedsConfirmation,
+    /// The local runtime failed. The text names the failure, never the prompt.
+    #[error("local engine: {0}")]
+    Engine(String),
+    /// Model output did not have the shape the feature asked for.
+    #[error("model output did not have the expected shape")]
+    BadOutput,
+    /// A model blob had the wrong size or digest. It was deleted.
+    #[error("model blob failed verification")]
+    BadBlob,
+    /// The input is of a kind this feature does not read.
+    #[error("unsupported input for this feature")]
+    Unsupported,
+    /// A cloud provider answered with an error. Only its error type is kept.
+    #[error("cloud provider error: {0}")]
+    Cloud(String),
+    /// Evaluation cassettes no longer match their recording. Names them.
+    #[error("evaluation drifted: {0}")]
+    Drift(String),
 }
 
 /// Class after the encrypted-mail rule. Encrypted mail is always local-only.
@@ -193,14 +260,11 @@ pub fn allow_cloud(prompt: &Prompt) -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use std::future::Future;
-    use std::pin::pin;
-    use std::task::{Context, Poll, Waker};
-
     use super::{
         Completion, Error, Feature, ModelCapability, ModelKind, PrivacyClass, Prompt, Provider,
         allow_cloud, select,
     };
+    use crate::testing::drive;
 
     fn model(id: &str, kind: ModelKind) -> ModelCapability {
         ModelCapability {
@@ -208,15 +272,6 @@ mod tests {
             kind,
             context_tokens: None,
             features: vec![Feature::Summarize],
-        }
-    }
-
-    fn drive<T>(future: impl Future<Output = T>) -> T {
-        let mut future = pin!(future);
-        let mut context = Context::from_waker(Waker::noop());
-        match future.as_mut().poll(&mut context) {
-            Poll::Ready(value) => value,
-            Poll::Pending => panic!("provider waited"),
         }
     }
 

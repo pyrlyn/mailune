@@ -60,6 +60,8 @@ rsa = { version = "0.9.10", features = ["sha2"] }
 rand = "0.8.8"
 # mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
 imap-codec = "1.0.0"
+# mailune-imap: SEARCH SINCE dates. imap-codec already links 0.4.45, the latest on crates.io (checked 2026-10-08).
+chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 # mailune-mime: RFC 5545 parse. 0.17.14 checked on crates.io 2026-10-08.
 icalendar = "0.17.14"
 # mailune-crypto: OpenPGP sign and encrypt. 0.20.0 is the pgp crate already used in this workspace. Default features stay off so bzip2 is not linked.
@@ -80,7 +82,7 @@ aes = "0.8.4"
 cbc = { version = "0.1.2", features = ["alloc"] }
 # mailune-server: HTTP and WebSocket. 0.8.9 checked on crates.io 2026-10-08; only the features the server uses.
 axum = { version = "0.8.9", default-features = false, features = ["http1", "tokio", "ws"] }
-# mailune-server: the runtime axum serves on. 1.53.2 checked on crates.io 2026-10-08.
+# mailune-server and mailune-mcp: the runtime axum and rmcp run on; mcp tests drive the server over an in-memory duplex. 1.53.2 checked on crates.io 2026-10-08.
 tokio = { version = "1.53.2", features = ["macros", "net", "rt-multi-thread"] }
 # mailune-server tests: a real WebSocket client. 0.29.0 is the line axum 0.8.9 already depends on, so no second copy is built.
 tokio-tungstenite = "0.29.0"
@@ -89,6 +91,8 @@ futures-util = { version = "0.3.34", default-features = false, features = ["sink
 # mailune-core tests: property tests of the op queue. 1.11.0 checked on crates.io 2026-10-08.
 # Without default features: no fork or timeout support, which would spawn processes and write temp files.
 proptest = { version = "1.11.0", default-features = false, features = ["std"] }
+# mailune-mcp: MCP server types and stdio JSON-RPC. 3.5.1 checked on crates.io 2026-10-08.
+rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
 
@@ -118,11 +122,9 @@ debug = "line-tables-only"
 debug = false
 opt-level = 1
 
-# The profile that dist builds with. Ordinary `--release` stays fast.
+# The profile that dist builds with: `dev`, so release binaries are dev builds
+# (unoptimized, line tables, no LTO, not stripped).
 # `panic = "abort"` is absent: a panicking extension must become an error
 # the process can skip (fail open), which abort removes.
 [profile.dist]
-inherits = "release"
-lto = "fat"
-codegen-units = 1
-strip = "symbols"
+inherits = "dev"

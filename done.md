@@ -683,3 +683,193 @@ Done when: a design shows shared inboxes and comments on RFC 9670, or records th
 Execution plan: `docs/jmap-sharing.md`, design only. Read RFC 9670, RFC 8621 and `draft-ietf-jmap-mail-sharing-02` (sources with dates), and list the IETF JMAP drafts. Record that shared inboxes work on RFC 8621 shared accounts plus RFC 9670 Principals and ShareNotifications, with sharing management only behind the mail-sharing capability; and that RFC 9670 cannot carry comments, so comments become Emails in a shared mailbox. No Mailune server in the path, no code.
 
 What landed: `docs/jmap-sharing.md`. Shared inboxes: read through RFC 8621 shared accounts, with RFC 9670 Principals for owners and ShareNotifications for notices; the sharing editor appears only when the account has `urn:ietf:params:jmap:mail:share` (draft-ietf-jmap-mail-sharing-02) and `mayShare`; assignment and status as keywords, with keyword sharing between users marked unverified. Comments: recorded that RFC 9670 cannot carry them (no JMAP comment type in any RFC or draft), so they become Emails in a shared `Comments` mailbox threaded by `In-Reply-To`, with the costs listed. Sources cited with URLs, checked 2026-10-08. No Mailune server in the path.
+
+### A28. Agent tools
+
+Depends on: A9, B1. Reuse: cox-permission patterns already reflected in A9. Do not edit the queue.
+
+Done when: a tool call has a scope, a preview, an undo record, and an audit line. The policy still fails closed. No send without the existing confirmation flag.
+
+Execution plan: `mailune-ai` `agent.rs`: a typed `ToolCall` parsed from strict JSON, an `Agent` that checks the A9 policy and a granted `Scope`, builds a `Preview` and an `UndoRecord`, and appends an `AuditLine` for every decision. `commit` returns submissions for the app; the queue is untouched.
+
+What landed: A typed `ToolCall` (summarize, archive, delete, send) is parsed from strict JSON and checked against the A9 policy and a granted scope. Each call gets a preview, an undo record (moves back to the original mailbox) and content-free audit lines. Send and delete are refused at commit until the app passes `Confirmation::Confirmed`; forward has no contract submission and is denied.
+
+### A29. Local MCP server
+
+Depends on: A28. Reuse: `rmcp` from `rust.md`.
+
+Done when: a read-only tool is exposed and a send tool stays behind the in-app approval flag. No network listener in tests.
+
+Execution plan: New crate `mailune-mcp` on rmcp 3.5: a `summarize` tool (read-only hint) and a `send` tool, each forwarding one `Agent::request` call. `mailune-ai` gains `request`, `held` and `approve` so a caller that cannot confirm gets send held for the app. Test drives the server over a tokio duplex.
+
+What landed: New crate `mailune-mcp` (rmcp 3.5.1). `summarize` is read-only and runs through the A28 policy and scope; `send` is held for in-app approval (`Agent::approve` with `Confirmation::Confirmed`), and an MCP client has no argument that confirms. The test drives the server over an in-memory duplex, so no listener opens.
+
+### A3. Local engine adapter
+
+Depends on: A1. Reuse: a scripted engine, not a real model runtime.
+
+Done when: generation, an embedding vector, and JSON-structured output come from a trait the test implements. No process and no download.
+
+Execution plan: `mailune-ai` `engine.rs`: a `LocalEngine` trait (generate, embed, capability), `generate_json` that decodes untrusted JSON output, a `LocalProvider` adapter onto `Provider`, and a `ScriptedEngine` that later features and A30 replay.
+
+What landed: A `LocalEngine` trait gives generation, an embedding vector and JSON-shaped output (`generate_json`, bad output is `Error::BadOutput`). `LocalProvider` puts an engine behind the router as a local model. `ScriptedEngine` replays canned replies and embeds by word hashing; no process, no download.
+
+### A4. Model catalog and verified blobs
+
+Depends on: A3. Reuse: sha2 already in the workspace.
+
+Done when: a catalog entry verifies a blob by SHA-256, records a resume offset, and deletes the blob. The bytes come from a trait. No network.
+
+Execution plan: `mailune-ai` `catalog.rs`: a `CatalogEntry` (capability, source, size, SHA-256), a `BlobSource` trait for the bytes, `download` that writes through the contract `Fs` and reports a `Resume` offset per chunk, `verify` that deletes a mismatched blob, and `delete`. Tests use the testkit `FakeHost` file system.
+
+What landed: A catalog entry verifies a blob by SHA-256 and size (a mismatch deletes it), `download` resumes from a recorded offset after a dropped chunk, and `delete` removes the blob. Bytes come from a `BlobSource` trait and land through the contract `Fs`; no network.
+
+### A11. Thread summary cache
+
+Depends on: A3, A10. Reuse: the prompt registry and the scripted engine.
+
+Done when: short, detailed, and action-item summaries are cached by content hash.
+
+Execution plan: `mailune-ai` `summary.rs`: three versioned templates (`summarize-short`, `summarize-detailed`, `action-items`) in the registry snapshot, and a `SummaryCache` keyed by SHA-256 over template id, version and the rendered thread. Calls go through any `Provider`; tests use the scripted engine.
+
+What landed: Short, detailed and action-item summaries come from three new registry templates and are cached by a SHA-256 content hash that includes the template version. A repeat costs no model call, an edited thread misses, and a failed call caches nothing.
+
+### A12. Daily digest
+
+Depends on: A11. Reuse: the summary cache.
+
+Done when: a digest covers messages since a given instant and skips older ones.
+
+Execution plan: `mailune-ai` `digest.rs`: `daily_digest` filters each thread to messages received at or after `since`, skips threads with none, summarizes the rest through the A11 cache (short kind), cites message ids, and orders entries newest first.
+
+What landed: A daily digest covers only messages received at or after a given instant: older mail and threads with nothing new never reach the model. Each entry is a cached short summary that cites its message ids; entries are newest first.
+
+### A27. Attachment summarisation
+
+Depends on: A11. Reuse: a maintained extractor if one is already in `rust.md`; otherwise plain text only, named in the commit.
+
+Done when: a text attachment becomes a summary through the scripted engine. No network.
+
+Execution plan: `mailune-ai` `attachment.rs`: plain text only, since `rust.md` lists no maintained document extractor. `text/*` (not HTML) is decoded as UTF-8, capped at 16 KiB on a char boundary, and summarized through a new `summarize-attachment` template via `SummaryCache::complete`.
+
+What landed: A text attachment becomes a cached summary through the scripted engine and a new `summarize-attachment` template. Plain text only: `rust.md` has no maintained extractor, so PDF, office formats, raw HTML and non-UTF-8 bodies return `Error::Unsupported`. Text is capped at 16 KiB.
+
+### A6. Cloud BYOK request shapes
+
+Depends on: A1. Reuse: the privacy router. The llm-* crates are not in this repo yet; do not depend on them.
+
+Done when: an OpenAI-compatible request and an Anthropic request are built from a prompt, and a scripted response becomes a typed result. No HTTP.
+
+Execution plan: `mailune-ai` `cloud.rs`, no llm-* dependency (those crates are not published in packages/crates yet). `build_request` runs `allow_cloud` and `redact_for_cloud` first, then shapes an OpenAI-compatible or Anthropic Messages body; the key is never in the shape, only which header carries it. `parse_response` turns scripted bodies into `Completion` or a typed error.
+
+What landed: OpenAI-compatible and Anthropic request shapes are built from a `Prompt` after the privacy check and redaction; encrypted, local-only and local-preferred mail return `CloudForbidden`. The key is not in the shape, only the header that carries it. Scripted responses become `Completion::Text`; an error body keeps only its error type. No HTTP, no llm-* dependency yet.
+
+### A33. Paid hosted AI tier
+
+Depends on: A6, A7. Reuse: the existing privacy router.
+
+Done when: a design names a confidential-compute provider behind that router. Encrypted mail is never sent to a cloud model. The adapter comes after the design.
+
+Execution plan: Design doc `docs/hosted-ai.md` only; the creator deferred the paid tier. Name a confidential-compute provider with a primary source, place it behind the privacy router as a `Hosted` kind that needs `CloudAllowed`, keep encrypted mail local-only, and specify attestation before any request.
+
+What landed: The design in `docs/hosted-ai.md` names Azure confidential GPU VMs (`NCCads_H100_v5`, a TEE that spans CPU and H100 GPU; source checked 2026-10-08) behind the existing router as a `Hosted` kind. The kind needs `CloudAllowed`, encrypted mail is forced local-only, and redaction and the ledger apply. Attestation is checked against pinned values and fails closed. No code; the adapter comes after the design.
+
+### A14. Compose assist
+
+Depends on: A10. Reuse: the prompt registry.
+
+Done when: draft, rewrite, tone, shorten, and proofread each return text from the scripted engine.
+
+Execution plan: `mailune-ai` `compose.rs`: a `Feature::Compose`, five versioned templates in the registry snapshot, and `assist(provider, action, text, privacy)`. The tone is a closed enum, never free text in the prompt.
+
+What landed: Draft, rewrite, tone (formal, friendly, direct), shorten and proofread each run through their own versioned template under the new `Feature::Compose` and return trimmed text from the scripted engine. An empty reply is `BadOutput`. Nothing is sent.
+
+### A15. Style profile from sent mail
+
+Depends on: A1. Reuse: NEW.
+
+Done when: a per-recipient style profile is learned from sent plain text and can be rendered back as guidance. No model call.
+
+Execution plan: `mailune-ai` `style.rs`: a `StyleBook` that tallies greeting, sign-off, sentence and message length and exclamation use per recipient from sent plain text (quotes and signature dropped through `redact_for_cloud`), a `StyleProfile`, and `guidance` that renders it as one line of prompt text. No model call.
+
+What landed: A per-recipient `StyleProfile` (greeting, sign-off, sentence and message length, exclamation share) is learned from sent plain text with quotes and the signature removed. `guidance` renders it back as prompt guidance. Counting only, no model call.
+
+### A19. Natural-language rules
+
+Depends on: A16, A9. Reuse: NEW.
+
+Done when: a sentence becomes a typed rule, and a preview lists the messages that would match before the rule is enabled. No send.
+
+Execution plan: `mailune-ai` `rules.rs`: a `rule-from-sentence` template under `Feature::Rules`, a closed JSON shape (`from`/`subject`/`category` conditions; archive, mark read, star and label actions; no send, forward or delete), validation, `preview` over messages, and `RulePreview::enable` as the only way to turn a rule on. Committed on this PR branch.
+
+What landed: A sentence becomes a typed `ProposedRule` through a scripted model reply that must parse into a closed shape: no send, forward or delete action, at least one condition, no extra fields. `preview` lists the matching message ids, and only `RulePreview::enable` produces an `EnabledRule`, so the person has seen the matches first.
+
+### A22. Scheduling extraction
+
+Depends on: P26. Reuse: `icalendar` already in the workspace. Do not add `jiff` unless a date cannot be expressed with the types already in the tree.
+
+Done when: a fixture sentence with a date and a time becomes an ICS suggestion. No SMTP and no calendar server.
+
+Execution plan: `mailune-mime` `schedule.rs` next to `calendar.rs`: word heuristics for ISO dates, month-day in either order, weekdays, today and tomorrow, and 12- or 24-hour times. Civil-date arithmetic is done in place, so no `jiff` and no direct `chrono`. A one-hour floating-time VEVENT is built with `icalendar`.
+
+What landed: A sentence with a date (ISO, month-day, weekday, today or tomorrow) and a time (3:30pm, 10 am, 14:05, noon) becomes a one-hour `ScheduleSuggestion` with floating local DTSTART and DTEND, and the ICS text is built with `icalendar` and parses back. Without both a date and a time there is no suggestion. No jiff, no SMTP, no calendar server.
+
+### A25. Phishing and scam assessment
+
+Depends on: C8, A2. The rsa-sha256 verifier is already on this branch.
+
+Done when: auth results, link flags, and a scripted model verdict combine into one assessment. No network.
+
+Execution plan: Mirror DKIM/SPF/DMARC outcomes and link flags as plain inputs in mailune-ai (no mime dependency), add a phishing-verdict template under a new Phishing feature, parse a strict JSON verdict, combine into weighted reasons and a risk level. The model may only raise risk.
+
+What landed: `phishing.rs`: `combine` and `assess_phishing` turn auth outcomes, link flags and a scripted `{"verdict":...}` reply into one `Assessment` (risk, score, reasons). A malformed reply is ignored, and a "safe" verdict cannot lower a risk the facts set.
+
+### A30. Evaluation cassettes
+
+Depends on: T5. Reuse: the synthetic mailbox only as fixtures you write yourself. Do not extract `llm-testkit`.
+
+Done when: a cassette replays a feature call and a metric fails the run when the output drifts.
+
+Execution plan: Add eval.rs to mailune-ai: a JSON cassette records the call, input, prompt SHA-256, model reply and expected output; replay runs the real feature through ScriptedEngine; a token-F1 metric and a prompt-digest check fail the run with Error::Drift. Fixtures are hand-written in crates/mailune-ai/cassettes.
+
+What landed: `eval.rs` and `cassettes/features.json`: five cassettes (short summary, rewrite, shorten, proofread, rule from a sentence) replay through the real feature code with `ScriptedEngine`. `run_cassettes` returns `Error::Drift` naming each cassette whose prompt digest changed, whose token-F1 fell below its `min_score`, or whose reply no longer parses. No model, no network.
+
+### P7. IMAP initial sync
+
+Depends on: P6. Reuse: the in-memory IMAP server in `mailune-imap`.
+
+Done when: a sync batch records UIDVALIDITY, fetches envelope, flags, and BODYSTRUCTURE in batches, and applies a day window. No store write and no TCP.
+
+Execution plan: Extend the scripted server with mailboxes (UIDVALIDITY, UIDNEXT, HIGHESTMODSEQ, UID SEARCH SINCE, UID FETCH of UID, FLAGS, ENVELOPE and BODYSTRUCTURE as one-line replies). Add Connection::over, select and initial_sync in a new sync.rs; decode FETCH with imap-codec; window dates via chrono, which imap-codec already links.
+
+What landed: `sync.rs`: `Connection::select` records UIDVALIDITY, UIDNEXT and HIGHESTMODSEQ. `initial_sync` searches `UID SEARCH SINCE` for the day window, then fetches UID, FLAGS, ENVELOPE and BODYSTRUCTURE in batches, decoded by imap-codec, into a `SyncBatch` of `MessageMeta`. No store write, no TCP. The scripted server gained mailboxes and those commands. chrono is the one new direct dependency, already linked through imap-codec.
+
+### P8. IMAP incremental sync
+
+Depends on: P7. Reuse: the same session.
+
+Done when: CONDSTORE CHANGEDSINCE and VANISHED are applied, and a server without QRESYNC falls back to a diff of uid sets.
+
+Execution plan: Scripted server: ENABLE QRESYNC, per-message MODSEQ, expunge tombstones, UID FETCH (CHANGEDSINCE n [VANISHED]). Client incremental.rs: SyncState from a SyncBatch, incremental_sync picking QRESYNC, CONDSTORE plus UID diff, or full flag diff; UIDVALIDITY change resets.
+
+What landed: `incremental.rs`: `incremental_sync` uses `CHANGEDSINCE` with `VANISHED` under QRESYNC, `CHANGEDSINCE` plus a `UID SEARCH` diff under CONDSTORE alone, and a full flag fetch plus UID diff otherwise. New mail above the last known UID is fetched with metadata, and a changed UIDVALIDITY returns a reset. `SyncState::apply` folds a `Delta` in. VANISHED ranges are tested for membership and never expanded.
+
+### P9. IMAP IDLE
+
+Depends on: P7. Reuse: an injected clock. Do not sleep.
+
+Done when: IDLE updates are parsed and a dropped session backs off then reconnects on the scripted server.
+
+Execution plan: Scripted server: IDLE/DONE, pushed EXISTS/EXPUNGE/FETCH while idling, drop and refuse hooks, and a SharedServer so reconnects see the same mailboxes. Client idle.rs: idle, idle_poll, idle_done, parse_idle_line, Backoff, and IdleWatch::step that waits on the injected mailune-protocol Clock (testkit FakeHost in tests).
+
+What landed: `idle.rs`: `Connection::idle`, `idle_poll` and `idle_done` handle IDLE, and `parse_idle_line` reads EXISTS, EXPUNGE, FETCH flags and BYE. `IdleWatch::step` notices a dropped session and waits on the injected `Clock` with exponential `Backoff` (1, 2, then 4 s on the testkit fake clock, never on the thread). It then reconnects, re-selects and re-idles, and returns `Tick::Reconnected` so the caller can run an incremental sync. `SharedServer` lets reconnects reach the same scripted mailboxes.
+
+### P11. IMAP mutations
+
+Depends on: P7. Reuse: the scripted server.
+
+Done when: STORE, MOVE or COPY+EXPUNGE, and APPEND run, and UIDPLUS maps the new uid. No TCP.
+
+Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and APPEND with a synchronizing literal, answering COPYUID and APPENDUID under UIDPLUS. Client mutate.rs: store_flags, copy_messages, move_messages (MOVE, else COPY + Deleted + UID EXPUNGE, refused without UIDPLUS) and append; validate flags and mailbox names; bound COPYUID expansion.
+
+What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.
