@@ -1236,3 +1236,39 @@ msgstr ""
 msgctxt "settings.ai_privacy"
 msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
 msgstr ""
+
+msgctxt "onboarding.address"
+msgid "Email address"
+msgstr ""
+
+msgctxt "onboarding.name"
+msgid "Your name"
+msgstr ""
+
+msgctxt "onboarding.done"
+msgid "Done"
+msgstr ""
+
+msgctxt "onboarding.added"
+msgid "Added {0}"
+msgstr ""
+
+msgctxt "onboarding.not_an_address"
+msgid "That is not an email address."
+msgstr ""
+
+msgctxt "onboarding.already_added"
+msgid "{0} is already added."
+msgstr ""
+
+msgctxt "onboarding.no_configuration"
+msgid "No server settings were found for {0}."
+msgstr ""
+
+msgctxt "onboarding.insecure_only"
+msgid "This provider only offers unencrypted connections, which Mailune does not use."
+msgstr ""
+
+msgctxt "onboarding.sign_in_failed"
+msgid "Sign-in did not complete. Try again."
+msgstr ""

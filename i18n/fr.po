@@ -1240,3 +1240,39 @@ msgstr "Répondre « {0} »"
 msgctxt "settings.ai_privacy"
 msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
 msgstr "L’IA s’exécute sur ce Mac. Les e-mails chiffrés ne sont jamais envoyés à un modèle cloud."
+
+msgctxt "onboarding.address"
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+msgctxt "onboarding.name"
+msgid "Your name"
+msgstr "Votre nom"
+
+msgctxt "onboarding.done"
+msgid "Done"
+msgstr "Terminé"
+
+msgctxt "onboarding.added"
+msgid "Added {0}"
+msgstr "{0} ajouté"
+
+msgctxt "onboarding.not_an_address"
+msgid "That is not an email address."
+msgstr "Ce n’est pas une adresse e-mail."
+
+msgctxt "onboarding.already_added"
+msgid "{0} is already added."
+msgstr "{0} est déjà ajouté."
+
+msgctxt "onboarding.no_configuration"
+msgid "No server settings were found for {0}."
+msgstr "Aucun réglage de serveur trouvé pour {0}."
+
+msgctxt "onboarding.insecure_only"
+msgid "This provider only offers unencrypted connections, which Mailune does not use."
+msgstr "Ce fournisseur ne propose que des connexions non chiffrées, que Mailune n’utilise pas."
+
+msgctxt "onboarding.sign_in_failed"
+msgid "Sign-in did not complete. Try again."
+msgstr "La connexion n’a pas abouti. Réessayez."

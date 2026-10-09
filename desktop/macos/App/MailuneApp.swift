@@ -11,13 +11,16 @@ struct MailuneApp: App {
 
     @State private var preferences: any PreferencesStore =
         underUITest ? FakePreferencesStore() : DefaultsPreferencesStore()
+    /// In memory until the core's keychain store (C1) is reachable over B3;
+    /// the shell itself never writes a token to disk.
+    @State private var vault = MemorySecretVault()
 
     var body: some Scene {
         WindowGroup {
             ShellView(preferences: preferences, host: Self.underUITest ? .fake() : .live())
         }
         Settings {
-            SettingsView(store: preferences)
+            SettingsView(store: preferences, vault: vault)
         }
     }
 }
