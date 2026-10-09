@@ -41,8 +41,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M9 | in progress | P1 | 4 | 0% | Cursor / claude-opus-5.5 |
-| M10 | in progress | P1 | 4 | 0% | Cursor / claude-opus-5.5 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -515,22 +513,6 @@ Depends on: B1. The shared abi-drift crate is not in this repo.
 Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
 
 Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
-
-### M9. macOS reader
-
-Depends on: M8, P3, C6.
-
-Done when: a message renders with quotes collapsed, one attachment, and a security badge. Remote content and JavaScript stay off.
-
-Execution plan: `desktop/macos` only, on a branch stacked on `m1-macos-chain`. No remote image URL. Port the reader from `batch7-imap` and fix it: the badge derives from a typed security state (signature, encryption, DKIM) instead of a literal; the body is plain text with no web view; remote content and JavaScript come from a policy value that a test can flip and see fail. Quotes start collapsed; one attachment row.
-
-### M10. macOS composer
-
-Depends on: M7, P13, S13.
-
-Done when: recipient chips, a body, one attachment, send later, and undo send round-trip through a fake. Send stays off until confirm.
-
-Execution plan: `desktop/macos` only, on the same stacked branch as M9. Port the composer from `batch7-imap`: recipient chips, body, one attachment, send later and undo send through a fake outbox. Send is disabled until a confirm step; a test checks nothing reaches the fake before confirm and that undo inside the window removes it.
 
 ### M6. Apple on-device model
 
