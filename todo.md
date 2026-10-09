@@ -2,7 +2,6 @@
 
 - C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 - C11. Threat model and trust boundaries document (core, AI, MCP)
-- F4. mailune-config: typed TOML, layering, committed JSON Schema
 - F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 - F10. Gettext catalogs for core-originated strings
 - R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml

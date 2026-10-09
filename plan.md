@@ -8,7 +8,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | --- | --- | --- | --- | --- | --- |
 | C1 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| F4 | in progress | P0 | 3 | 10% | Cursor / claude-opus-5.5 |
 | F5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | F10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
@@ -157,14 +156,6 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
-
-### F4. mailune-config: typed TOML, layering, committed JSON Schema
-
-Depends on: F2, X1. Reuse: X1 layered-config (from cox-config/src/load.rs, rtok src/config/validate.rs).
-
-Done when: Unknown keys reported with file:line; schema staleness test; only this module imports figment/toml. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: new crate `mailune-config`. `figment` and `toml` are already in the workspace rust inventory. `X1` is not in this repo. Tests load inside `figment::Jail`. Commit on `batch8-ai`.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
