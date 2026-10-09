@@ -5,7 +5,7 @@ import SwiftUI
 struct MailuneApp: App {
     var body: some Scene {
         WindowGroup {
-            InboxView()
+            ShellView()
                 .toolbar {
                     ToolbarItem {
                         Image("ToolbarCompose")
