@@ -1,0 +1,7 @@
+# Tests compare committed fixtures, snapshots and schemas byte for byte, and
+# Git on the Windows runner would otherwise check them out with CRLF.
+* text=auto eol=lf
+
+# cmd.exe needs CRLF in batch files.
+*.bat text eol=crlf
+*.cmd text eol=crlf
