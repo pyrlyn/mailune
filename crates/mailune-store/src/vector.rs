@@ -228,6 +228,51 @@ mod tests {
         assert!((hits[0].score - 1.0).abs() < 1e-6);
     }
 
+    /// S14 compares the two in `benches/knn.rs`; this pins that they rank by the same metric.
+    #[test]
+    fn nearest_and_a_usearch_cosine_index_agree_on_the_top_hits() {
+        let vectors: [[f32; 3]; 4] = [
+            [1.0, 0.0, 0.0],
+            [0.9, 0.1, 0.0],
+            [0.0, 1.0, 0.0],
+            [-1.0, 0.0, 0.2],
+        ];
+        let query = [1.0, 0.05, 0.0];
+        let (_dir, mut store) = seeded();
+        let index = usearch::Index::new(&usearch::IndexOptions {
+            dimensions: query.len(),
+            metric: usearch::MetricKind::Cos,
+            quantization: usearch::ScalarKind::F32,
+            ..usearch::IndexOptions::default()
+        })
+        .unwrap();
+        index.reserve(vectors.len()).unwrap();
+        for (key, vector) in (0_u64..).zip(&vectors) {
+            let id = format!("m{key}");
+            store.upsert_message(&message(&id, &id, 1, false)).unwrap();
+            store
+                .put_embedding(&account(), &chunk(&id, 0), "a", vector)
+                .unwrap();
+            index.add(key, vector).unwrap();
+        }
+
+        let ours: Vec<String> = store
+            .nearest(&account(), "a", &query, 2)
+            .unwrap()
+            .into_iter()
+            .map(|hit| hit.chunk.message.as_str().to_owned())
+            .collect();
+        let theirs: Vec<String> = index
+            .search(&query, 2)
+            .unwrap()
+            .keys
+            .iter()
+            .map(|key| format!("m{key}"))
+            .collect();
+        assert_eq!(ours, ["m0", "m1"]);
+        assert_eq!(theirs, ours);
+    }
+
     #[test]
     fn a_vector_for_an_unknown_message_is_refused() {
         let (_dir, mut store) = seeded();

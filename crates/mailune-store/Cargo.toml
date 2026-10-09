@@ -39,5 +39,15 @@ tempfile = { workspace = true }
 # Random blob keys, so no test carries a hard-coded key.
 rand = { workspace = true }
 
+# The store is empty on wasm32, and usearch is C++ with no browser build.
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+divan = { workspace = true }
+# S14 comparison only; the store itself keeps the S8 scan.
+usearch = { workspace = true }
+
+[[bench]]
+name = "knn"
+harness = false
+
 [lints]
 workspace = true
