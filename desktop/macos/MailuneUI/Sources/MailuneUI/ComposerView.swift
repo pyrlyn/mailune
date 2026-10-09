@@ -53,7 +53,9 @@ public struct ComposerView: View {
         }
         .font(MailuneType.body)
         .padding(MailuneSpace.m)
-        .frame(minWidth: 480, minHeight: 420)
+        #if os(macOS)
+            .frame(minWidth: 480, minHeight: 420)
+        #endif
         .interactiveDismissDisabled(isHeld)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -76,25 +78,32 @@ public struct ComposerView: View {
         VStack(alignment: .leading, spacing: MailuneSpace.s) {
             HStack(spacing: MailuneSpace.s) {
                 Text(Copy.text("compose.to"))
-                ForEach(composer.draft.to, id: \.self) { address in
-                    HStack(spacing: 4) {
-                        Text(verbatim: address)
-                        Button {
-                            composer.removeRecipient(address)
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(Copy.format("compose.remove", address))
-                    }
-                    .padding(.horizontal, MailuneSpace.s)
-                    .background(MailuneColor.accent.opacity(0.15), in: Capsule())
-                }
                 TextField(Copy.text("compose.recipients"), text: $typed)
                     .onSubmit {
                         rejected = composer.addRecipients(typed)
                         typed = rejected.joined(separator: ", ")
                     }
+            }
+            // Its own scrolling row, so many chips never squeeze the field on a phone.
+            if !composer.draft.to.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: MailuneSpace.s) {
+                        ForEach(composer.draft.to, id: \.self) { address in
+                            HStack(spacing: 4) {
+                                Text(verbatim: address)
+                                Button {
+                                    composer.removeRecipient(address)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(Copy.format("compose.remove", address))
+                            }
+                            .padding(.horizontal, MailuneSpace.s)
+                            .background(MailuneColor.accent.opacity(0.15), in: Capsule())
+                        }
+                    }
+                }
             }
             if !rejected.isEmpty {
                 Text(Copy.format("compose.invalid_recipient", rejected.joined(separator: ", ")))

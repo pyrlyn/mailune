@@ -37,6 +37,9 @@
     struct PhoneStack: View {
         let preferences: any PreferencesStore
         @State private var feed = ThreadFeed()
+        @State private var outbox = FakeOutbox()
+        @State private var composing = false
+        @State private var startDraft = Draft()
 
         var body: some View {
             NavigationStack {
@@ -44,13 +47,40 @@
                     .navigationTitle(Copy.text("app.inbox"))
                     .navigationDestination(for: String.self) { id in
                         if let message = MessageFixtures.message(forThread: id) {
-                            ReaderView(message: message, assist: AssistPolicy.fixture(for: message))
-                                .navigationBarTitleDisplayMode(.inline)
+                            ReaderView(message: message, assist: AssistPolicy.fixture(for: message)) { text in
+                                compose(.reply(to: message, body: text))
+                            }
+                            .navigationBarTitleDisplayMode(.inline)
                         } else {
                             Text(Copy.text("app.no_conversation_open"))
                         }
                     }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                compose(Draft())
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                            }
+                            .accessibilityLabel(Copy.text("app.compose"))
+                        }
+                    }
             }
+            .sheet(isPresented: $composing) {
+                // A sheet on iOS shows toolbar items only inside a navigation container.
+                NavigationStack {
+                    ComposerView(
+                        outbox: outbox,
+                        undoWindow: TimeInterval(preferences.current().undoSendSeconds),
+                        draft: startDraft
+                    )
+                }
+            }
+        }
+
+        private func compose(_ draft: Draft) {
+            startDraft = draft
+            composing = true
         }
     }
 #endif
