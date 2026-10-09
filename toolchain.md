@@ -8,6 +8,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | rust | mise | Compiler, cargo, rustfmt, clippy | https://github.com/rust-lang/rust |
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
+| node | mise | Runs Vite, Vitest and TypeScript for `web/` | https://github.com/nodejs/node |
+| npm | with node | Installs `web/` packages from `web/package-lock.json` | https://github.com/npm/cli |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -49,3 +51,20 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+
+npm (`web/package.json`):
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| react | local | https://github.com/facebook/react | Web client UI |
+| react-dom | local | https://github.com/facebook/react | Renders the web client into the page |
+| typescript | local (dev) | https://github.com/microsoft/TypeScript | Type checks `web/` |
+| vite | local (dev) | https://github.com/vitejs/vite | Dev server and production build of `web/` |
+| @vitejs/plugin-react | local (dev) | https://github.com/vitejs/vite-plugin-react | JSX and fast refresh in Vite |
+| vitest | local (dev) | https://github.com/vitest-dev/vitest | Web tests |
+| happy-dom | local (dev) | https://github.com/capricorn86/happy-dom | In-memory DOM for component tests; it opens no socket |
+| json-schema-to-typescript | local (dev) | https://github.com/bcherny/json-schema-to-typescript | Generates `web/src/contract.gen.ts` from the contract JSON Schema |
+| ajv | local (dev) | https://github.com/ajv-validator/ajv | Validates web payloads against the contract JSON Schema in tests |
+| @types/react | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React types |
+| @types/react-dom | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React DOM types |
+| @types/node | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | Node types for the generator script and tests |
