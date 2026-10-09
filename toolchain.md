@@ -50,4 +50,3 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
 | divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` benches (S14 vector search) |
-| usearch | local (dev) | https://github.com/unum-cloud/USearch | S14: HNSW cosine index benchmarked against the S8 in-SQLite scan (Apache-2.0, C++) |

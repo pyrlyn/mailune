@@ -98,9 +98,6 @@ rmcp = { version = "3.5.1", default-features = false, features = ["server", "mac
 libfuzzer-sys = "0.4.13"
 # mailune-store benches: the harness `rust.md` names. 0.1.21 is the latest, as in rtok and scull.
 divan = "0.1.21"
-# mailune-store benches and one test only (S14): the HNSW index compared with the S8 scan.
-# 2.26.4 checked on crates.io 2026-10-09.
-usearch = "2.26.4"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.
