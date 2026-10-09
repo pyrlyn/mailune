@@ -98,6 +98,6 @@ describe("composer", () => {
     await click([...mailboxes.querySelectorAll("button")].find((b) => b.textContent === t("app.compose")));
     const reading = pane(mounted.container, t("app.message"));
     expect(reading.querySelector("form.composer")).not.toBeNull();
-    expect(reading.textContent).toContain(t("compose.confirm_send"));
+    expect(reading.textContent).toContain(t("compose.confirm_recipients"));
   });
 });

@@ -105,7 +105,7 @@ export function Composer({
           checked={confirmed}
           onChange={(event) => setConfirmed(event.target.checked)}
         />
-        {t("compose.confirm_send")}
+        {t("compose.confirm_recipients")}
       </label>
       <button type="submit" disabled={!canSend}>
         {t("compose.send")}
