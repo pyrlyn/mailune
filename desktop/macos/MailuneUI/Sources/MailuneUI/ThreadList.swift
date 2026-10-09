@@ -91,6 +91,7 @@ struct ThreadRowView: View {
                     Text(item.stamp)
                 }
                 Text(item.subject)
+                    .accessibilityIdentifier("thread-\(item.id)")
                 Text(item.snippet).lineLimit(1).opacity(0.7)
             }
             .font(MailuneType.body)

@@ -67,6 +67,18 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.tests
         GENERATE_INFOPLIST_FILE: YES
+  MailuneUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: MailuneUITests
+    dependencies:
+      - target: Mailune
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Mailune
 schemes:
   Mailune:
     build:
@@ -76,3 +88,13 @@ schemes:
     test:
       targets:
         - MailuneTests
+  # Separate because a UI test needs a logged-in GUI session, which SSH and
+  # headless runs do not have; scripts/uitest.sh runs it.
+  MailuneUITests:
+    build:
+      targets:
+        Mailune: all
+        MailuneUITests: [test]
+    test:
+      targets:
+        - MailuneUITests
