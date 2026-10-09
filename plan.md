@@ -58,7 +58,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| T6 | in progress | P1 | 2 | 10% | Cursor / claude-opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
