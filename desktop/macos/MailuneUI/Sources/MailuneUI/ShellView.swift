@@ -16,10 +16,16 @@ public struct ShellView: View {
     @State private var startDraft = Draft()
     private let preferences: any PreferencesStore
     private let host: HostServices
+    private let requests: ComposeRequests
 
-    public init(preferences: any PreferencesStore = FakePreferencesStore(), host: HostServices = .fake()) {
+    public init(
+        preferences: any PreferencesStore = FakePreferencesStore(),
+        host: HostServices = .fake(),
+        requests: ComposeRequests = ComposeRequests()
+    ) {
         self.preferences = preferences
         self.host = host
+        self.requests = requests
     }
 
     private var openMessage: MailMessage? {
@@ -93,6 +99,12 @@ public struct ShellView: View {
         }
         .onOpenURL { url in
             if let draft = MailtoLink.draft(from: url) {
+                startDraft = draft
+                composing = true
+            }
+        }
+        .onChange(of: requests.pending, initial: true) {
+            if let draft = requests.take() {
                 startDraft = draft
                 composing = true
             }

@@ -1308,3 +1308,19 @@ msgstr ""
 msgctxt "mail_list.refresh_failed"
 msgid "Couldn’t refresh. Showing the last list."
 msgstr ""
+
+msgctxt "intent.summarize"
+msgid "Summarize conversation"
+msgstr ""
+
+msgctxt "intent.conversation"
+msgid "Conversation"
+msgstr ""
+
+msgctxt "intent.query"
+msgid "Search for"
+msgstr ""
+
+msgctxt "intent.no_summary"
+msgid "This conversation has no summary yet."
+msgstr ""
