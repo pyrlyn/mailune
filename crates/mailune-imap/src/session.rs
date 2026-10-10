@@ -218,20 +218,101 @@ impl<S: Read + Write> Connection<S> {
     }
 
     fn read_one_line(&mut self) -> Result<String, Error> {
+        let line = self.read_line_bytes()?;
+        let text = String::from_utf8_lossy(&line[..line.len().saturating_sub(2)]);
+        Ok(text.into_owned())
+    }
+
+    /// Sends `body` under a new tag and returns the untagged responses before the tagged OK,
+    /// with literals read as raw bytes. The line readers above would split a literal at its
+    /// CRLFs and lose bytes that are not UTF-8.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Rejected`] on NO or BAD, [`Error::Response`] for a literal over
+    /// [`MAX_LITERAL`], [`Error::Session`] when the stream stops.
+    pub(crate) fn run_raw(&mut self, body: &str) -> Result<Vec<RawResponse>, Error> {
+        let tag = self.send(body)?;
+        let mut responses = Vec::new();
         loop {
-            if let Some(split) = self.buf.windows(2).position(|window| window == b"\r\n") {
-                let line: Vec<u8> = self.buf.drain(..=split + 1).collect();
-                let text = String::from_utf8_lossy(&line[..line.len().saturating_sub(2)]);
-                return Ok(text.into_owned());
+            let response = self.read_raw_response()?;
+            let rest = response
+                .bytes
+                .strip_prefix(tag.as_bytes())
+                .and_then(|rest| rest.strip_prefix(b" "));
+            match rest {
+                Some(status) if status.starts_with(b"OK") => return Ok(responses),
+                Some(_) => return Err(Error::Rejected),
+                None => responses.push(response),
             }
-            let mut tmp = [0u8; 512];
-            let read = self.io.read(&mut tmp).map_err(|_| Error::Session)?;
-            if read == 0 {
-                return Err(Error::Session);
-            }
-            self.buf.extend_from_slice(&tmp[..read]);
         }
     }
+
+    fn read_raw_response(&mut self) -> Result<RawResponse, Error> {
+        let mut response = RawResponse {
+            bytes: Vec::new(),
+            literals: Vec::new(),
+        };
+        loop {
+            let line = self.read_line_bytes()?;
+            let announced = announced_literal(&line);
+            response.bytes.extend_from_slice(&line);
+            let Some(size) = announced else {
+                return Ok(response);
+            };
+            if size > MAX_LITERAL {
+                return Err(Error::Response);
+            }
+            while self.buf.len() < size {
+                self.fill()?;
+            }
+            let start = response.bytes.len();
+            response.bytes.extend(self.buf.drain(..size));
+            response.literals.push(start..response.bytes.len());
+        }
+    }
+
+    /// One line with its CRLF.
+    fn read_line_bytes(&mut self) -> Result<Vec<u8>, Error> {
+        loop {
+            if let Some(split) = self.buf.windows(2).position(|window| window == b"\r\n") {
+                return Ok(self.buf.drain(..=split + 1).collect());
+            }
+            self.fill()?;
+        }
+    }
+
+    fn fill(&mut self) -> Result<(), Error> {
+        let mut tmp = [0u8; 512];
+        let read = self.io.read(&mut tmp).map_err(|_| Error::Session)?;
+        if read == 0 {
+            return Err(Error::Session);
+        }
+        self.buf.extend_from_slice(&tmp[..read]);
+        Ok(())
+    }
+}
+
+/// Largest literal one reply may carry. The server is untrusted, so a bigger announcement is
+/// refused instead of buffered.
+pub(crate) const MAX_LITERAL: usize = 64 << 20;
+
+/// One server response as it came off the wire, CRLF included, and where its literals sit.
+#[derive(Debug)]
+pub(crate) struct RawResponse {
+    pub(crate) bytes: Vec<u8>,
+    pub(crate) literals: Vec<std::ops::Range<usize>>,
+}
+
+/// The size in a line ending with `{n}` or `~{n}` (a literal8), then CRLF.
+fn announced_literal(line: &[u8]) -> Option<usize> {
+    let inner = line.strip_suffix(b"}\r\n")?;
+    let open = inner.iter().rposition(|&byte| byte == b'{')?;
+    let digits = inner.get(open + 1..)?;
+    if digits.is_empty() || !digits.iter().all(u8::is_ascii_digit) {
+        return None;
+    }
+    std::str::from_utf8(digits).ok()?.parse().ok()
 }
 
 /// A scripted server that successive connections share, so a reconnect

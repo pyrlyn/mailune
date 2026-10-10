@@ -22,12 +22,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
-| P10 | todo | P1 | 2 | 0% | |
-| S5 | todo | P1 | 2 | 0% | |
-| S7 | todo | P1 | 2 | 0% | |
 | T4 | todo | P1 | 3 | 0% | |
 | E1 | todo | P1 | 3 | 0% | |
-| S12 | todo | P1 | 2 | 0% | |
 | B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
@@ -239,30 +235,6 @@ Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
 
-### P10. Lazy body fetch
-
-Depends on: P7. Reuse: imap-codec.
-
-Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
-
-Execution plan: `mailune-imap` only.
-
-### S5. FTS5 index
-
-Depends on: S3. Reuse: FTS5.
-
-Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
-
-Execution plan: `mailune-store` only.
-
-### S7. Change feed
-
-Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
-
-Done when: a second connection in the same process observes a write as a typed invalidation.
-
-Execution plan: `mailune-store` only.
-
 ### T4. Queue property tests
 
 Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
@@ -278,14 +250,6 @@ Depends on: B8. Reuse: `axum` from `rust.md`.
 Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### S12. Storage benchmarks
-
-Depends on: S3. Reuse: `divan` from `rust.md`.
-
-Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
-
-Execution plan: `mailune-store` only. Commit on `batch9-store`.
 
 ### B2. UniFFI records
 

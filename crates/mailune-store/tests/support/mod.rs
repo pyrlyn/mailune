@@ -1,6 +1,6 @@
 //! Mailbox fixture shared by the T6 budget test (`tests/budgets.rs`) and bench
 //! (`benches/budgets.rs`): one account, one inbox, three messages per thread, one embedding per
-//! message.
+//! message. The insert bench and test write the same messages without embeddings.
 //!
 //! Helpers sit outside `#[test]`, so clippy holds them to production rules; a failed seed
 //! should stop the run loudly.
@@ -53,6 +53,30 @@ pub fn query() -> Vec<f32> {
 
 /// Seeds `messages` messages, each with one embedding.
 pub fn seed(store: &mut Store, messages: usize) {
+    seed_account(store);
+    let mut rng = StdRng::seed_from_u64(SEED);
+    for index in 0..messages {
+        let message = message(index);
+        store.upsert_message(&message).unwrap();
+        let chunk = ChunkRef {
+            message: message.envelope.id.clone(),
+            chunk: 0,
+        };
+        store
+            .put_embedding(&account(), &chunk, MODEL, &vector(&mut rng))
+            .unwrap();
+    }
+}
+
+/// Inserts `messages` messages without embeddings, one upsert each, as a first sync writes them.
+pub fn insert_messages(store: &mut Store, messages: usize) {
+    for index in 0..messages {
+        store.upsert_message(&message(index)).unwrap();
+    }
+}
+
+/// The account and inbox every message belongs to.
+pub fn seed_account(store: &mut Store) {
     store
         .upsert_account(&Account {
             id: account(),
@@ -70,18 +94,6 @@ pub fn seed(store: &mut Store, messages: usize) {
             parent: None,
         })
         .unwrap();
-    let mut rng = StdRng::seed_from_u64(SEED);
-    for index in 0..messages {
-        let message = message(index);
-        store.upsert_message(&message).unwrap();
-        let chunk = ChunkRef {
-            message: message.envelope.id.clone(),
-            chunk: 0,
-        };
-        store
-            .put_embedding(&account(), &chunk, MODEL, &vector(&mut rng))
-            .unwrap();
-    }
 }
 
 fn vector(rng: &mut StdRng) -> Vec<f32> {

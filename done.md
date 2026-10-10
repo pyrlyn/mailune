@@ -1387,3 +1387,35 @@ Done when: a scripted recognizer returns text for the composer. Tests do not dow
 Execution plan: `mailune-ai` `dictation.rs`. A `Recognizer` trait over 16 kHz mono PCM the host captured (the core never opens the microphone), a `ScriptedRecognizer` for tests, and `dictate` that turns recognized segments into composer text. Check whether `whisper-rs` can be linked here; `mailune-ai` is the pure domain crate and is checked on wasm32, so if it cannot, keep the trait and say why in the commit.
 
 What landed: `mailune-ai` `dictation.rs`: a `Recognizer` trait over 16 kHz mono samples the host recorded (the core never opens the microphone), a `ScriptedRecognizer`, and `dictate`, which drops whisper's bracketed non-speech segments (`[BLANK_AUDIO]`, `(wind blowing)`), strips control characters, joins words with single spaces, and refuses a clip over 120 seconds or with non-finite samples before the recognizer sees it. The transcript is composer text only. `whisper-rs` is not linked: `whisper-rs-sys` 0.15.0 (behind whisper-rs 0.16) fails to build for `wasm32-unknown-unknown` (`stdio.h` not found while CMake configures whisper.cpp), and `mailune-ai` is the pure domain crate that CI checks for wasm32. Native builds work (cox-voice links it), so the whisper.cpp recognizer belongs in its own adapter crate, as `rust.md` asks for heavy native dependencies. Tests download no model and open no microphone.
+
+### S5. FTS5 index
+
+Depends on: S3. Reuse: FTS5.
+
+Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
+
+Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
+
+### S7. Change feed
+
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+
+Done when: a second connection in the same process observes a write as a typed invalidation.
+
+Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
+
+### S12. Storage benchmarks
+
+Depends on: S3. Reuse: `divan` from `rust.md`.
+
+Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
+
+Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
+
+### P10. Lazy body fetch
+
+Depends on: P7. Reuse: imap-codec.
+
+Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
+
+Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
