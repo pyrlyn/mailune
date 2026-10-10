@@ -83,7 +83,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X7 | todo | P0 | 2 | 0% | |
 | X8 | todo | P0 | 3 | 0% | |
 | D13 | todo | P1 | 3 | 0% | |
-| I8 | todo | P1 | 3 | 60% | |
+| I8 | todo | P1 | 3 | 80% | |
 | W13 | todo | P1 | 3 | 0% | |
 | B10 | todo | P3 | 3 | 0% | |
 | B11 | todo | P3 | 4 | 0% | |
@@ -775,7 +775,9 @@ Execution plan: `desktop/macos` plus one new `.github/workflows/testflight.yml`;
 
 What landed so far: `.github/workflows/testflight.yml` (dispatch only, validated with actionlint 1.7.12) calls the R13 pyrlyn/ci `testflight.yml` pinned at `95d76fd`, with the App Store Connect secrets by name and `desktop/macos/scripts/ipa.sh` as its build command. `ipa.sh` archives MailuneIOS and exports an App Store Connect IPA with Xcode's cloud-managed signing (`desktop/macos/ExportOptions-AppStore.plist`). It stops with a message before calling Apple when the team id or the API key is missing. No upload was run.
 
-Left: the R13 workflow cannot run this build yet. Its Build step runs before any secret is available and without mise, so `ipa.sh` gets neither the App Store Connect key for signing nor XcodeGen and translate-toolkit. R13 needs two things before Build: mise, and the API key written to `~/private_keys` (as its upload step already does) with the key id and issuer in the environment. Its `macos-sign` step also requires a Developer ID certificate, which a TestFlight upload does not use. Outside R13: the iOS app has no app icon yet, which App Store Connect rejects, and the `APPLE_TEAM_ID` variable and the secrets must be set.
+R13 now runs this build: pyrlyn/ci [#62](https://github.com/pyrlyn/ci/pull/62) and [#63](https://github.com/pyrlyn/ci/pull/63) write the API key to `~/private_keys` before Build and pass the key id and issuer to it, install the chosen mise tools (`setup-mise`, `mise-install-args`), and skip the Developer ID check with `developer-id: false`. `testflight.yml` uses all three and no longer passes the certificate secrets.
+
+Left: the iOS app has no app icon yet, which App Store Connect rejects, and the `APPLE_TEAM_ID` variable and the App Store Connect secrets must be set. Then one dispatched run proves the upload.
 
 ### W13. Windows release
 
