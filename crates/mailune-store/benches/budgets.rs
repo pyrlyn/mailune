@@ -1,5 +1,6 @@
 //! T6 budgets at the mailbox size in `docs/architecture.md`: 100k messages, one 384-dimension
-//! embedding each, SQLCipher-keyed on Apple targets.
+//! embedding each, SQLCipher-keyed on Apple targets. S12 adds 100k inserts and a text search,
+//! which have no budget yet.
 //!
 //! The budgets live in `docs/architecture.md`; `tests/budgets.rs` checks a small mailbox against
 //! loose ceilings in every `nextest` run. Run this with
@@ -28,7 +29,9 @@ mod budgets {
 
     use divan::Bencher;
 
-    use super::support::{MODEL, PAGE, TOP_K, account, inbox, open, query, seed};
+    use super::support::{
+        MODEL, PAGE, TOP_K, account, inbox, insert_messages, open, query, seed, seed_account,
+    };
 
     /// Messages in the target mailbox.
     const MESSAGES: usize = 100_000;
@@ -50,8 +53,34 @@ mod budgets {
                 drop(store);
                 std::fs::rename(&partial, &path).unwrap();
             }
+            // A fixture seeded before a schema change migrates here, not inside a timed open.
+            drop(open(&path));
             path
         })
+    }
+
+    /// S12: a first sync of the whole mailbox, one upsert per message, into a fresh file.
+    #[divan::bench(sample_count = 3, sample_size = 1)]
+    fn insert_100k(bencher: Bencher) {
+        bencher
+            .with_inputs(|| {
+                let dir = tempfile::tempdir().unwrap();
+                let mut store = open(&dir.path().join("mail.db"));
+                seed_account(&mut store);
+                (dir, store)
+            })
+            .bench_local_values(|(dir, mut store)| {
+                insert_messages(&mut store, MESSAGES);
+                (dir, store)
+            });
+    }
+
+    /// S12: a full-text search for a word every message holds, so BM25 ranks all of them.
+    #[divan::bench(sample_count = 50)]
+    fn text_search(bencher: Bencher) {
+        let mut store = open(mailbox());
+        bencher
+            .bench_local(|| divan::black_box(store.search_text(&account(), "ada", PAGE).unwrap()));
     }
 
     /// Opening the file and showing the first list page: what launch waits on.

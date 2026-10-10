@@ -6,7 +6,7 @@ use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 
 use crate::Error;
 
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
+pub(crate) const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 /// Brings the file up to the newest schema. Already-applied steps are skipped.
 pub(crate) fn run(conn: &mut SqliteConnection) -> Result<(), Error> {

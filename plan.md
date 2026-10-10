@@ -10,7 +10,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C11 | todo | P0 | 2 | 10% | |
 | F5 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
-| R1 | todo | P0 | 2 | 10% | |
 | R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
 | X2 | todo | P0 | 2 | 0% | |
@@ -22,11 +21,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A13 | todo | P1 | 2 | 0% | |
 | A23 | todo | P1 | 2 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
-| P10 | todo | P1 | 2 | 0% | |
-| S5 | todo | P1 | 2 | 0% | |
-| S7 | todo | P1 | 2 | 0% | |
 | A31 | todo | P1 | 2 | 0% | |
-| S12 | todo | P1 | 2 | 0% | |
 | P18 | todo | P1 | 2 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
@@ -126,14 +121,6 @@ Done when: en + ru + de/fr/ja load; missing key falls back to msgid. Workspace c
 
 Execution plan: catalogs plus a loader in `mailune-app`. Do not edit `mailune-core`. `X4` is not in this repo.
 
-### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
-
-Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
-
-Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
-
 ### R17. Brand entry (pyrlyn/brand brands/mailune) and landing docs/site.md
 
 Depends on: F1. Reuse: apps/brand, apps/landing CONTENT_CONTRACT.md.
@@ -228,30 +215,6 @@ Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
 
-### P10. Lazy body fetch
-
-Depends on: P7. Reuse: imap-codec.
-
-Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
-
-Execution plan: `mailune-imap` only.
-
-### S5. FTS5 index
-
-Depends on: S3. Reuse: FTS5.
-
-Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
-
-Execution plan: `mailune-store` only.
-
-### S7. Change feed
-
-Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
-
-Done when: a second connection in the same process observes a write as a typed invalidation.
-
-Execution plan: `mailune-store` only.
-
 ### A31. Voice dictation
 
 Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
@@ -259,14 +222,6 @@ Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
 Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
 
 Execution plan: `mailune-ai` only.
-
-### S12. Storage benchmarks
-
-Depends on: S3. Reuse: `divan` from `rust.md`.
-
-Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
-
-Execution plan: `mailune-store` only. Commit on `batch9-store`.
 
 ### P18. JMAP push
 

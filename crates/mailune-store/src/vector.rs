@@ -7,7 +7,7 @@
 use diesel::prelude::*;
 use mailune_protocol::{AccountId, MessageId};
 
-use crate::open::{data_version, database_error};
+use crate::open::database_error;
 use crate::schema::embeddings;
 use crate::vector_cache::{SetKey, VectorSet};
 use crate::{Error, Store};
@@ -100,7 +100,7 @@ impl Store {
     /// be compared. Ties keep a stable order by message id and chunk.
     ///
     /// The first query for an account, model and dimension loads its vectors into memory (see
-    /// `vector_cache`); later ones scan memory until another connection writes.
+    /// `vector_cache`); later ones scan memory until another connection changes embeddings.
     ///
     /// # Errors
     ///
@@ -116,7 +116,7 @@ impl Store {
         if query_norm == 0.0 || limit == 0 {
             return Ok(Vec::new());
         }
-        self.vectors.sync(data_version(&mut self.conn)?);
+        self.observe_changes()?;
         let key = SetKey {
             account: account.as_str().to_owned(),
             model: model.to_owned(),
