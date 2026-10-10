@@ -18,7 +18,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | todo | P0 | 2 | 0% | |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | todo | P0 | 2 | 0% | |
-| A13 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | A23 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
@@ -205,14 +204,6 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
-
-### A13. Smart reply suggestions
-
-Depends on: A11. Reuse: the scripted engine.
-
-Done when: a thread yields three reply suggestions.
-
-Execution plan: `mailune-ai` `reply.rs`. A versioned `reply-suggestions` template (DraftReply) asks for JSON with three replies; the thread is rendered with `render_thread` and completed through any `Provider`, so the privacy router and the cloud gate (`allow_cloud`) keep encrypted mail local. A policy outside the model admits exactly three distinct, non-empty, short, single-line suggestions and fails closed with `BadOutput` otherwise. Suggestions are composer text; nothing is sent. Tests use the scripted engine; the prompt registry snapshot gains the template.
 
 ### A23. Language detection
 

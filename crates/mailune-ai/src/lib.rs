@@ -18,6 +18,7 @@ mod platform;
 mod priority;
 mod prompts;
 mod redact;
+mod reply;
 mod router;
 mod rules;
 mod style;
@@ -50,6 +51,7 @@ pub use platform::{PlatformBridge, map_capability};
 pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
+pub use reply::{MAX_REPLY_CHARS, REPLY_COUNT, admit_replies, suggest_replies};
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
 pub use rules::{
     Condition, EnabledRule, ProposedRule, RuleAction, RuleMessage, RulePreview, rule_from_sentence,
