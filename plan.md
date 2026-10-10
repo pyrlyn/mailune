@@ -94,6 +94,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B11 | todo | P3 | 4 | 0% | |
 | P33 | todo | P3 | 4 | 0% | |
 | P34 | todo | P3 | 5 | 0% | |
+| P35 | in progress | P1 | 3 | 10% | Cursor / claude-opus-5.5 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
@@ -832,3 +833,11 @@ From ideas. Shared inboxes and comments, as in Spark and Missive, conflict with 
 Done when: a design shows shared inboxes and comments on RFC 9670, or records that the RFC cannot carry them.
 
 Execution plan: `docs/jmap-sharing.md` on `batch7-imap`. No Mailune server in the path.
+
+### P35. Move mailune-imap to imap-codec 2.0
+
+Approved by the creator on 2026-10-10, including the bump of the pinned `imap-codec = "1.0.0"` to the exact pre-release `=2.0.0-alpha.9` (imap-types 2.0.0-alpha.7 comes with it). imap-codec 1.0.0 has no RFC 3516 BINARY support and refuses literals holding NUL, so P10 parses BINARY replies by hand in `body.rs`. 2.0 has BINARY built in: `MessageDataItemName::Binary`, `MessageDataItem::Binary` with an `NString8` value, and `Literal8` (`~{n}`) that may hold NUL.
+
+Done when: `mailune-imap` builds and its existing tests pass on imap-codec `=2.0.0-alpha.9` with the same behaviour; BINARY FETCH requests are encoded and replies decoded through imap-codec; the hand-written BINARY parsing is deleted; the 64 MiB cap on what is read from the wire stays. The pin comment in `Cargo.toml` and the `toolchain.md` row say why the pin is an exact pre-release.
+
+Execution plan: `Cargo.toml` (pin and comment, same quirk features as 1.0's defaults), `Cargo.lock`, `toolchain.md`, `crates/mailune-imap` only. Fix the 1.0 to 2.0 API breaks in `list.rs`, `sync.rs` and the script tests. In `body.rs`, build both FETCH requests as imap-types `CommandBody::Fetch` and encode them with `CommandCodec`; decode BODY and BINARY replies with `ResponseCodec`; delete `find_outside`, `is_fetch`, `has_uid` and `binary_data`. The session's binary-safe reader stays: it is what frames literals off the wire under the 64 MiB cap. Verify with the existing `body.rs` tests plus the workspace gates (fmt, clippy native and wasm32, nextest). The fuzz workspace does not use imap-codec.
