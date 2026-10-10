@@ -19,7 +19,9 @@ struct AssistCard: View {
                     Label {
                         Text(verbatim: item)
                     } icon: {
+                        // Read aloud as "Selected", which an action item is not.
                         Image(systemName: "checkmark.circle")
+                            .accessibilityHidden(true)
                     }
                 }
             }
