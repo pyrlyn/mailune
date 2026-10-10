@@ -7,7 +7,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
 | C1 | todo | P0 | 2 | 40% | |
-| C11 | todo | P0 | 2 | 10% | |
+| C11 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
 | F5 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
 | R17 | todo | P0 | 2 | 40% | |
@@ -18,8 +18,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | todo | P0 | 2 | 0% | |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | todo | P0 | 2 | 0% | |
-| A13 | todo | P1 | 2 | 0% | |
-| A23 | todo | P1 | 2 | 0% | |
+| A13 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
+| A23 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
@@ -28,17 +28,17 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S5 | todo | P1 | 2 | 0% | |
 | S7 | todo | P1 | 2 | 0% | |
 | T4 | todo | P1 | 3 | 0% | |
-| A31 | todo | P1 | 2 | 0% | |
+| A31 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | E1 | todo | P1 | 3 | 0% | |
 | S12 | todo | P1 | 2 | 0% | |
-| P18 | todo | P1 | 2 | 0% | |
+| P18 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
 | M6 | todo | P1 | 3 | 0% | |
 | M15 | todo | P1 | 2 | 0% | |
 | M16 | todo | P1 | 2 | 0% | |
-| P32 | todo | P1 | 2 | 0% | |
+| P32 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | todo | P1 | 3 | 0% | |
 | E12 | todo | P1 | 2 | 0% | |
@@ -120,7 +120,7 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
+Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, MCP, and the push relay. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's `SECURITY.md` guard list: one table of assets, one of boundaries, and the guard that holds each one, naming the code that implements it. Link to the security sections of `docs/architecture.md` instead of restating them. Do not edit other tasks' files. Verify: every guard named in the document exists in the tree.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
@@ -214,7 +214,7 @@ Depends on: A11. Reuse: the scripted engine.
 
 Done when: a thread yields three reply suggestions.
 
-Execution plan: `mailune-ai` only.
+Execution plan: `mailune-ai` `reply.rs`. A versioned `reply-suggestions` template (DraftReply) asks for JSON with three replies; the thread is rendered with `render_thread` and completed through any `Provider`, so the privacy router and the cloud gate (`allow_cloud`) keep encrypted mail local. A policy outside the model admits exactly three distinct, non-empty, short, single-line suggestions and fails closed with `BadOutput` otherwise. Suggestions are composer text; nothing is sent. Tests use the scripted engine; the prompt registry snapshot gains the template.
 
 ### A23. Language detection
 
@@ -222,7 +222,7 @@ Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
 
 Done when: a message is labelled with a language. No translation call.
 
-Execution plan: `mailune-ai` only.
+Execution plan: `mailune-ai` `language.rs` on a maintained detector: survey whatlang, lingua, and whichlang on crates.io. Detect on the subject and body with quoted lines and the signature stripped (`redact_for_cloud`); return an ISO 639-3 code with confidence, and no label when the detector is not reliable. No translation call. Row in `toolchain.md`.
 
 ### C3. Autocrypt headers
 
@@ -294,7 +294,7 @@ Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
 
 Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
 
-Execution plan: `mailune-ai` only.
+Execution plan: `mailune-ai` `dictation.rs`. A `Recognizer` trait over 16 kHz mono PCM the host captured (the core never opens the microphone), a `ScriptedRecognizer` for tests, and `dictate` that turns recognized segments into composer text. Check whether `whisper-rs` can be linked here; `mailune-ai` is the pure domain crate and is checked on wasm32, so if it cannot, keep the trait and say why in the commit.
 
 ### E1. mailune-server
 
@@ -318,7 +318,7 @@ Depends on: P17.
 
 Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
 
-Execution plan: `mailune-jmap` only.
+Execution plan: `mailune-jmap` `push.rs`. The session keeps `eventSourceUrl` and the RFC 8887 WebSocket capability. A typed `StateChange` (account, type, state, pushState); EventSource `state` and `ping` events parsed with a maintained SSE parser if one fits; RFC 8887 frames (`StateChange`, `Response`, `RequestError`) decoded and `WebSocketPushEnable`/`Disable` encoded; the `{types}`, `{closeafter}`, `{ping}` URL template expanded. Tests feed fixture frames; no TCP.
 
 ### B2. UniFFI records
 
@@ -350,7 +350,7 @@ Depends on: P31, P16.
 
 Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
 
-Execution plan: `mailune-push` only.
+Execution plan: `mailune-push` `client.rs`. A `RelayClient` turns caller-supplied random bytes into an unguessable channel, builds the webhook URL for the provider and a `POST /register` request (provider, channel, device handle; no token, no mail) for the injected `Http`, and keeps channel-to-account routes on the device. The relay gains `POST /register` (screened, an existing channel is not overwritten). An empty wake marks the device's relay-backed accounts due; `take_due` hands them to the P16 scheduler. Test: the client registers through an `Http` that drives the router in process, a Graph webhook wakes the device, and that account is due. No socket, no APNs or FCM.
 
 ### T6. Performance budgets
 
