@@ -4,6 +4,13 @@ Mailune will speak IMAP with **`imap-codec` 1.0.0** (the stable line). The clien
 
 Checked 2026-10-08.
 
+**Update (P35, checked 2026-10-10):** `mailune-imap` now pins the exact pre-release `imap-codec = "=2.0.0-alpha.9"` (with `imap-types` 2.0.0-alpha.7), because 1.0.0 has no RFC 3516 BINARY. Sources:
+
+- <https://crates.io/api/v1/crates/imap-codec>: 2.0.0-alpha.9 is the newest publish (2026-07-19); 1.0.0 is still the only stable release.
+- imap-types 2.0.0-alpha.7 `src/fetch.rs` and `src/extensions/binary.rs` (crates.io package): `MessageDataItemName::Binary`, `MessageDataItem::Binary` with an `NString8` value, and `Literal8`, which may hold NUL.
+- imap-codec 2.0.0-alpha.9 `Cargo.toml`: the default feature `quirk` turns on every quirk, so the workspace sets `default-features = false` and keeps 1.0's defaults, `quirk_missing_text` and `quirk_rectify_numbers`.
+- imap-codec 2.0.0-alpha.9 `src/fetch.rs` (`msg_att_static`) decodes `"BINARY" section-binary SP (nstring / literal8)` with no origin octet, as the ABNF in <https://www.rfc-editor.org/rfc/rfc3516.txt> section 7 and <https://www.rfc-editor.org/rfc/rfc9051.txt> section 9 has it. The prose of both (RFC 3516 section 4.3, RFC 9051 section 7.5.2) says a partial reply is `BINARY[section]<<number>>`. `main` on <https://github.com/duesee/imap-codec> was the same on 2026-10-10. `body.rs` drops that origin before decoding.
+
 ## What was opened
 
 | Source | What it is |

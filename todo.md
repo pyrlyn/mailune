@@ -88,4 +88,3 @@
 - B11. Shared view-model core
 - P33. Calendar view
 - P34. Shared inboxes
-- P35. Move mailune-imap to imap-codec 2.0
