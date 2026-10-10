@@ -1526,6 +1526,8 @@ Done when: subject, addresses, and body text are searchable. FTS5 virtual tables
 
 Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
 
+What landed: migration `000004_fts` (FTS5 table over subject, addresses and body keyed by a `search_docs` rowid map, a view that flattens the recipient JSON, triggers for insert, indexed-column update and delete, and a backfill) and `search.rs` with `Store::index_body` and `Store::search_text` (BM25, subject > addresses > body, one account, every word a quoted phrase). Measured on the 100k bench fixture (Apple, SQLCipher, release): a word every message holds ranks in 59 ms median. A plain JOIN let SQLite run the MATCH once per `search_docs` row (2.4 minutes), so the query pins the index as the outer loop with CROSS JOIN.
+
 ### S7. Change feed
 
 Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
@@ -1533,6 +1535,8 @@ Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_versio
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
 Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
+
+What landed: migration `000005_change_feed` (`change_counters` bumped by triggers per topic; blobs have no topic because reads bump `used`) and `feed.rs` (`Topic`, `Invalidation`, `Store::poll_changes`). The feed reads the counters only when `open::data_version` moves. The vector cache now drops only on an `Embeddings` invalidation, and an internal check keeps the invalidation for the caller. This connection's own writes surface with the next foreign commit.
 
 ### S12. Storage benchmarks
 
@@ -1542,6 +1546,8 @@ Done when: benches measure 100k inserts, a list page, and a search. A small test
 
 Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
 
+What landed: `seed_account` and `insert_messages` in `tests/support`, `insert_100k` and `text_search` in `benches/budgets.rs`, and a small insert and text search test in `tests/budgets.rs`. Measured (Apple, SQLCipher, release): 100k single-message upserts take 51 s median, about 0.5 ms each. There is no insert or text search budget yet.
+
 ### P10. Lazy body fetch
 
 Depends on: P7. Reuse: imap-codec.
@@ -1549,3 +1555,5 @@ Depends on: P7. Reuse: imap-codec.
 Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
 
 Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
+
+What landed: `body.rs` with `Section`, `Partial`, `Connection::fetch_body` (`BODY.PEEK`, decoded with imap-codec) and `Connection::fetch_binary` (`BINARY.PEEK`, needs the `BINARY` capability). imap-codec 1.0.0 has no RFC 3516 support and refuses literals holding NUL, so BINARY replies are parsed from the raw bytes a new binary-safe session reader keeps (literals capped at 64 MiB). The scripted server answers both forms from message metadata; its attachment carries a NUL byte.
