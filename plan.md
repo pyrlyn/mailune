@@ -12,12 +12,12 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | F10 | todo | P0 | 2 | 0% | |
 | R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
-| X2 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
-| X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
-| X4 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
-| X9 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
+| X2 | in progress | P0 | 2 | 60% | Cursor / claude-opus-5.5 |
+| X3 | in progress | P0 | 3 | 70% | Cursor / claude-opus-5.5 |
+| X4 | in progress | P0 | 2 | 60% | Cursor / claude-opus-5.5 |
+| X9 | in progress | P0 | 2 | 60% | Cursor / claude-opus-5.5 |
 | X10 | todo | P0 | 2 | 0% | |
-| X11 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
+| X11 | in progress | P0 | 2 | 80% | Cursor / claude-opus-5.5 |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
@@ -159,6 +159,10 @@ Done when: One implementation; one consumer migrated; no-real-keychain test help
 
 Execution plan: a new crate in pyrlyn/crates-packages, one pull request. The crates.io name `secret-store` belongs to another owner, so the crate is `keychain-secret` (404 on crates.io, 2026-10-10). One implementation from runa `secrets.rs`, cox `resolve_key_with`, and aulo's token store: a redacted `Secret`, a store trait with keychain, memory and no-op stores, env-then-store resolution, the keychain switch, the inline-secret check, and cox's no-real-keychain guard as a reusable scanner. Gates and `cargo publish --dry-run` run locally. The consumer migration waits for the crates.io release through `bump.yml`.
 
+Progress: `keychain-secret` is in pyrlyn/crates-packages#47 with tests that never touch the keychain. Local gates and `cargo publish --dry-run` pass.
+
+Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `keychain-secret` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=keychain-secret`. Then one consumer (runa `secrets.rs`, or this repo's C1) moves onto the registry version with a local `paths` override.
+
 ### X3. Extract telemetry setup with redaction — telemetry-setup
 
 Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
@@ -167,7 +171,9 @@ Done when: aulo or cox migrated; redaction test moves with it. Workspace checks 
 
 Execution plan: `packages/crates` worktree, crate `telemetry-setup` (T21 there), extracted from `aulo-telemetry` with its redaction and logging tests; the application name, filter variable and extra token patterns become settings. Then aulo moves onto it in its own pull request.
 
-Progress: the crate is in pyrlyn/crates-packages PR #43 with aulo's redaction tests and green checks. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. Gap: aulo cannot migrate until `telemetry-setup` is on crates.io, because a shared crate is consumed as a registry version with a local `paths` override, never a bare path. Publishing it is the creator's call.
+Progress: the crate is in pyrlyn/crates-packages#43 with aulo's redaction tests. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. On 2026-10-10 the package was trimmed to `src`, `tests` and `README.md`; local gates, the `otlp` tests, Rust 1.98 and `cargo publish --dry-run` pass.
+
+Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `telemetry-setup` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=telemetry-setup`. Then aulo migrates: a shared crate is consumed as a registry version with a local `paths` override, never a bare path.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
@@ -177,6 +183,10 @@ Done when: cox migrated; .po fixtures + plural test. Workspace checks (nextest, 
 
 Execution plan: a new crate `gettext-catalog` in pyrlyn/crates-packages, one pull request, split there into two tasks under the line cap: catalog, plural rules and placeholders; then the localizer. Locales, the default locale and constants such as `{brand}` are parameters. `.po` fixtures for en, ru and uk with plural tests. Gates and `cargo publish --dry-run` run locally. The cox migration waits for the crates.io release through `bump.yml`.
 
+Progress: `gettext-catalog` is in pyrlyn/crates-packages#44 (tasks T22.1 and T22.2 there) with en, ru and uk `.po` fixtures and plural tests. Local gates and `cargo publish --dry-run` pass.
+
+Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `gettext-catalog` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=gettext-catalog`. Then cox moves `cox-i18n` onto the registry version.
+
 ### X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 
 Depends on: nothing. Reuse: scull crates/scull-ffi/tests/bindings.rs; ketch-capi drift test.
@@ -184,6 +194,10 @@ Depends on: nothing. Reuse: scull crates/scull-ffi/tests/bindings.rs; ketch-capi
 Done when: scull uses it; diff shown on drift. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: a new crate `abi-drift` in pyrlyn/crates-packages, one pull request: a drift checker (unified diff on drift, bless from an environment variable) plus cbindgen and csbindgen render helpers. A fixture FFI crate carries a committed header and C# file. Gates and `cargo publish --dry-run` run locally. The scull migration waits for the crates.io release through `bump.yml`.
+
+Progress: `abi-drift` is in pyrlyn/crates-packages#46; a stale fixture header fails with a unified diff. Local gates, `cargo publish --dry-run` and Rust 1.86 pass.
+
+Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `abi-drift` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=abi-drift`. Then scull's `crates/scull-ffi/tests/bindings.rs` moves onto the registry version.
 
 ### X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 
@@ -202,6 +216,10 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: a new crate `sqlite-change-feed` in pyrlyn/crates-packages, one pull request: `ChangeToken` over a Diesel `SqliteConnection` polling `PRAGMA data_version`. The cross-process test re-executes the test binary as a writer. Gates and `cargo publish --dry-run` run locally.
+
+Progress: `sqlite-change-feed` is in pyrlyn/crates-packages#45. Its test spawns a writer process and sees the commit exactly once, and a second connection in the same process is covered too. Local gates, nextest and `cargo publish --dry-run` pass.
+
+Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `sqlite-change-feed` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=sqlite-change-feed`.
 
 ### C3. Autocrypt headers
 
