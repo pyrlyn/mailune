@@ -37,8 +37,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
 | M6 | todo | P1 | 3 | 0% | |
-| M15 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| M16 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | P32 | todo | P1 | 2 | 0% | |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | todo | P1 | 3 | 0% | |
@@ -58,11 +56,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | todo | P1 | 2 | 0% | |
 | L12 | todo | P1 | 2 | 0% | |
 | L13 | todo | P1 | 2 | 0% | |
-| M18 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | I2 | todo | P1 | 3 | 0% | |
 | I6 | todo | P1 | 2 | 0% | |
-| I9 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| I10 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | I7 | todo | P1 | 3 | 0% | |
 | B5 | todo | P1 | 2 | 0% | |
 | W1 | todo | P1 | 2 | 0% | |
@@ -98,7 +93,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X7 | todo | P0 | 2 | 0% | |
 | X8 | todo | P0 | 3 | 0% | |
 | D13 | todo | P1 | 3 | 0% | |
-| I8 | in progress | P1 | 3 | 0% | Cursor / claude-opus-5.5 |
+| I8 | todo | P1 | 3 | 60% | |
 | W13 | todo | P1 | 3 | 0% | |
 | B10 | todo | P3 | 3 | 0% | |
 | B11 | todo | P3 | 4 | 0% | |
@@ -423,22 +418,6 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M15. App Intents
-
-Depends on: M11.
-
-Done when: summarise, search, and compose are intent types a unit test can invoke with fixture data.
-
-Execution plan: `desktop/macos` only. `MailuneUI/Intents.swift`: a thread `AppEntity` with a string query over the fixture rows, and three App Intents. Summarise returns the thread's summary through `AssistPolicy`, so cloud text about encrypted mail stays hidden. Search runs the M11 `SearchQuery` over the same rows the thread list shows. Compose builds a `mailto:` link that the app's existing `MailtoLink` handler opens in the composer, so the intent can never send and confirm-before-send still applies. The app target lists the package's intents. Titles come from `i18n/` keys. Tests call each intent's logic and `perform()` with fixtures.
-
-### M16. macOS accessibility
-
-Depends on: M9, M10.
-
-Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
-
-Execution plan: `desktop/macos` only. The reader marks the subject as a heading and labels the sender, the badge and the assist card; the composer labels the body editor and the recipient chips. Keyboard path: select a thread, ⌘R replies, ⌘↩ asks to send, and Return confirms. The shortcuts live in one table, and a test checks they do not collide. The palette keeps its colour components so a test can compute the WCAG contrast of ink on canvas and fail below 4.5:1.
-
 ### L1. C library build
 
 Depends on: B6. GTK 4 and `valac` are not installed on this machine.
@@ -503,14 +482,6 @@ Done when: a list description has one fixture row with a subject, and a test rea
 
 Execution plan: `desktop/linux` only.
 
-### M18. macOS release script
-
-Depends on: M13, R10.
-
-Done when: a script builds a DMG layout and an appcast fixture. If the signing identity is missing, the script says so and does not call Apple. Do not notarize for real.
-
-Execution plan: `desktop/macos` only. `scripts/release.sh` builds the Release app, or takes `--app`, and lays out a DMG folder (the app plus an `Applications` link). It makes the DMG with `hdiutil` and writes a Sparkle-style `appcast.xml` fixture with the version, the length and a placeholder signature. It signs only when `MAILUNE_SIGN_IDENTITY` is set; otherwise it says so and calls nothing at Apple. It never notarizes. `scripts/test.sh` runs it on the Debug app in a temporary folder and checks the layout and the appcast.
-
 ### I2. iOS host
 
 Depends on: I1, M5.
@@ -526,22 +497,6 @@ Depends on: M6. The model catalog is on another branch.
 Done when: embeddings are the default on-device job, and a larger job stays off unless a flag is set. The scripted model covers the test.
 
 Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
-
-### I9. iOS UI test
-
-Depends on: I3, B7.
-
-Done when: one XCUITest selects a fixture thread on the phone layout. If the runner cannot launch, commit the test and say why.
-
-Execution plan: `desktop/macos` only. A `MailuneIOSUITests` target and scheme. The iOS app honours `-mailune-ui-test` (fake preferences). One XCUITest launches on an iPhone simulator, taps the `thread-t1` fixture row, and sees the reader. `scripts/test.sh` compiles it; `scripts/uitest.sh` also runs it on the newest iPhone simulator. If the runner cannot launch, the test stays committed and the card says why.
-
-### I10. iOS AI surfaces
-
-Depends on: I4, I5, M19.
-
-Done when: the phone reader shows a fixture summary and reply chips.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. The phone stack already pushes the M19 `ReaderView` with its `AssistCard`, so nothing is duplicated. At phone width the reply chips stack when a row does not fit. A test hosts the reader at 390 pt and checks it fits. The I9 XCUITest checks the summary and the reply chips on the phone.
 
 ### I7. iOS extensions
 
@@ -878,6 +833,10 @@ Depends on: I1, R13. Reuse: the R13 App Store Connect workflow, based on the pyr
 Done when: a TestFlight upload can run from that workflow. A real upload waits on R13.
 
 Execution plan: `desktop/macos` plus one new `.github/workflows/testflight.yml`; the required checks are unchanged. `desktop/macos/scripts/ipa.sh` archives `MailuneIOS` for devices and exports an App Store Connect IPA. Without a team id and signing identity it says so and stops before calling Apple. The workflow is `workflow_dispatch` only and calls the R13 pyrlyn/ci `testflight.yml` reusable workflow, pinned by SHA, with `ipa.sh` as the build command. It is validated with actionlint. No real upload.
+
+What landed so far: `.github/workflows/testflight.yml` (dispatch only, validated with actionlint 1.7.12) calls the R13 pyrlyn/ci `testflight.yml` pinned at `95d76fd`, with the App Store Connect secrets by name and `desktop/macos/scripts/ipa.sh` as its build command. `ipa.sh` archives MailuneIOS and exports an App Store Connect IPA with Xcode's cloud-managed signing (`desktop/macos/ExportOptions-AppStore.plist`). It stops with a message before calling Apple when the team id or the API key is missing. No upload was run.
+
+Left: the R13 workflow cannot run this build yet. Its Build step runs before any secret is available and without mise, so `ipa.sh` gets neither the App Store Connect key for signing nor XcodeGen and translate-toolkit. R13 needs two things before Build: mise, and the API key written to `~/private_keys` (as its upload step already does) with the key id and issuer in the environment. Its `macos-sign` step also requires a Developer ID certificate, which a TestFlight upload does not use. Outside R13: the iOS app has no app icon yet, which App Store Connect rejects, and the `APPLE_TEAM_ID` variable and the secrets must be set.
 
 ### W13. Windows release
 
