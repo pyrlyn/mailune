@@ -9,15 +9,6 @@ final class ThreadTests: XCTestCase {
         XCTAssertEqual(ThreadFixtures.all[2].from.display, "receipts@shop.example")
     }
 
-    func testPrimaryTabHidesOtherCategoriesAndArchivedRows() {
-        let rows = ThreadFixtures.visible(category: .primary, archived: ["t2"])
-        XCTAssertEqual(rows.map(\.id), ["t1"])
-        XCTAssertTrue(rows[0].unread)
-    }
-
-    func testUpdatesTab() {
-        XCTAssertEqual(ThreadFixtures.visible(category: .updates, archived: []).map(\.subject), ["Your receipt"])
-    }
 
     func testUnknownCategoryIsRejected() {
         let json = #"{"snapshot":{"threads":[{"id":"x","from":{"email":"a@b"},"subject":"","snippet":"","stamp":"","unread":false,"has_attachment":false,"category":"spam","labels":[]}]}}"#

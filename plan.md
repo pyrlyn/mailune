@@ -31,10 +31,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -53,11 +51,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I3 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I9 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -352,14 +346,6 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M13. macOS onboarding
-
-Depends on: M12, P14, P15.
-
-Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
-
-Execution plan: `desktop/macos` only.
-
 ### M15. App Intents
 
 Depends on: M11.
@@ -375,14 +361,6 @@ Depends on: M9, M10.
 Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
 
 Execution plan: `desktop/macos` only.
-
-### R3. Swift CI
-
-Depends on: M1. Required Rust checks already exist.
-
-Done when: a new workflow runs `xcodebuild test` for macOS arm64. Do not add an Intel slice. Do not edit `.github/workflows/ci.yml`.
-
-Execution plan: `.github/workflows/swift.yml` only.
 
 ### L1. C library build
 
@@ -456,43 +434,11 @@ Done when: a script builds a DMG layout and an appcast fixture. If the signing i
 
 Execution plan: `desktop/macos` only.
 
-### I1. iOS target
-
-Depends on: M7.
-
-Done when: the shared model and UI build for the iOS simulator on arm64. A compact stack and an iPad split are both present. No Intel slice.
-
-Execution plan: `desktop/macos` project only. Do not edit `desktop/linux`.
-
 ### I2. iOS host
 
 Depends on: I1, M5.
 
 Done when: keychain, background refresh, and notifications sit behind fakes. No source line contains `keyring::` or `Security.framework`.
-
-Execution plan: `desktop/macos` only.
-
-### I3. iOS thread list
-
-Depends on: I1, M8.
-
-Done when: the phone list has a swipe action, pull to refresh, and selection, fed by fixtures.
-
-Execution plan: `desktop/macos` only.
-
-### I4. iOS reader
-
-Depends on: I3, M9.
-
-Done when: the phone reader shows a fixture message with remote content off.
-
-Execution plan: `desktop/macos` only. No remote image URL.
-
-### I5. iOS composer
-
-Depends on: I1, M10.
-
-Done when: the phone composer round-trips recipient, subject, and body, and send stays off until confirm.
 
 Execution plan: `desktop/macos` only.
 

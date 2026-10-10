@@ -5,10 +5,13 @@ import SwiftUI
 /// change is written through the store at once, as macOS settings windows do.
 public struct SettingsView: View {
     private let store: any PreferencesStore
+    private let vault: any SecretVault
     @State private var settings: Preferences
+    @State private var onboarding = false
 
-    public init(store: any PreferencesStore) {
+    public init(store: any PreferencesStore, vault: any SecretVault = MemorySecretVault()) {
         self.store = store
+        self.vault = vault
         _settings = State(initialValue: store.current())
     }
 
@@ -22,6 +25,7 @@ public struct SettingsView: View {
                         Text(verbatim: account.address)
                     }
                 }
+                Button(Copy.text("settings.add_account")) { onboarding = true }
             }
             Section(Copy.text("settings.appearance")) {
                 Picker(Copy.text("settings.theme"), selection: $settings.theme) {
@@ -62,6 +66,9 @@ public struct SettingsView: View {
         .formStyle(.grouped)
         .font(MailuneType.body)
         .frame(minWidth: 460, minHeight: 520)
+        .sheet(isPresented: $onboarding, onDismiss: { settings = store.current() }) {
+            OnboardingView(store: store, vault: vault)
+        }
         .onChange(of: settings) { _, updated in
             // Plain strings, numbers and enums always encode; a failure here
             // would be the store's medium, which has nowhere better to report.

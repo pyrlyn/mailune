@@ -108,6 +108,18 @@ impl<'h, H: Http> JmapClient<'h, H> {
         Ok((got.list.into_iter().map(Into::into).collect(), got.state))
     }
 
+    /// Loads the session from `url` and lists every mailbox id: the first
+    /// thing a client asks of a new account.
+    ///
+    /// # Errors
+    ///
+    /// The errors of [`Self::load_session`] and [`Self::mailboxes`].
+    pub async fn mailbox_ids(&mut self, url: &str) -> Result<Vec<MailboxId>, Error> {
+        self.load_session(url).await?;
+        let (mailboxes, _state) = self.mailboxes().await?;
+        Ok(mailboxes.into_iter().map(|mailbox| mailbox.id).collect())
+    }
+
     /// Emails by id and the `Email` state.
     ///
     /// # Errors
@@ -342,6 +354,29 @@ mod tests {
         store
             .set_sync_state(account, "jmap:Email", &batch.state)
             .unwrap();
+    }
+
+    #[test]
+    fn mailbox_ids_loads_the_session_then_lists_every_mailbox() {
+        let url = "https://jmap.example.com/.well-known/jmap";
+        let http = ScriptedHttp::new().json(SESSION).json(INITIAL);
+        let mut client = JmapClient::new(&http, Secret::new("t"));
+        poll_now(client.load_session(url)).unwrap().unwrap();
+        let (listed, _) = poll_now(client.mailboxes()).unwrap().unwrap();
+        let listed: Vec<MailboxId> = listed.into_iter().map(|mailbox| mailbox.id).collect();
+        assert!(!listed.is_empty());
+
+        let http = ScriptedHttp::new().json(SESSION).json(INITIAL);
+        let mut client = JmapClient::new(&http, Secret::new("t"));
+        assert_eq!(poll_now(client.mailbox_ids(url)).unwrap().unwrap(), listed);
+        assert_eq!(client.account().unwrap(), "acc-1");
+
+        let http = ScriptedHttp::new().json(r#"{"apiUrl":"x","state":"s","primaryAccounts":{}}"#);
+        let mut client = JmapClient::new(&http, Secret::new("t"));
+        assert!(matches!(
+            poll_now(client.mailbox_ids(url)).unwrap(),
+            Err(Error::NoMailAccount)
+        ));
     }
 
     #[test]

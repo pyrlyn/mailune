@@ -7,9 +7,7 @@ final class ComposerViewTests: XCTestCase {
     @MainActor
     func testComposerBuildsWithoutSendingAnything() {
         let outbox = FakeOutbox()
-        let host = NSHostingView(rootView: ComposerView(outbox: outbox))
-        host.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(host.fittingSize.height, 0)
+        XCTAssertGreaterThan(Hosting.render(ComposerView(outbox: outbox)).bounds.height, 0)
         XCTAssertTrue(outbox.held.isEmpty)
         XCTAssertTrue(outbox.sent.isEmpty)
     }

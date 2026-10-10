@@ -1,4 +1,3 @@
-import AppKit
 import MailuneModel
 import SwiftUI
 import XCTest
@@ -8,12 +7,7 @@ final class ReaderViewTests: XCTestCase {
     @MainActor
     func testReaderBuildsNoWebView() throws {
         let message = try XCTUnwrap(MessageFixtures.message(forThread: "t1"))
-        let host = NSHostingView(rootView: ReaderView(message: message).frame(width: 600, height: 500))
-        let window = NSWindow(contentRect: host.frame, styleMask: [.titled], backing: .buffered, defer: false)
-        window.contentView = host
-        host.layoutSubtreeIfNeeded()
-
-        let classes = Self.classNames(in: host)
+        let classes = Hosting.classNames(in: Hosting.render(ReaderView(message: message), width: 600, height: 500))
         XCTAssertFalse(classes.isEmpty)
         XCTAssertFalse(classes.contains { $0.contains("WebView") }, "a web view can run scripts and load remote content")
     }
@@ -23,11 +17,5 @@ final class ReaderViewTests: XCTestCase {
             XCTAssertNotEqual(Copy.text(badge.titleKey, language: "en"), badge.titleKey)
             XCTAssertNotEqual(Copy.text(badge.titleKey, language: "de"), Copy.text(badge.titleKey, language: "en"))
         }
-    }
-
-    /// Every view class in the tree; other suites check for web views with it.
-    @MainActor
-    static func classNames(in view: NSView) -> [String] {
-        [String(describing: type(of: view))] + view.subviews.flatMap { classNames(in: $0) }
     }
 }

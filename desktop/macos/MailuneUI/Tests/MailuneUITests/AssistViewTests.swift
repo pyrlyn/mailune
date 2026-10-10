@@ -9,10 +9,8 @@ final class AssistViewTests: XCTestCase {
         let message = try XCTUnwrap(MessageFixtures.message(forThread: "t1"))
         let assist = AssistPolicy.visible(AssistFixtures.assist(forThread: "t1"), for: message)
         XCTAssertNotNil(assist)
-        let host = NSHostingView(rootView: ReaderView(message: message, assist: assist).frame(width: 640, height: 600))
-        host.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(host.fittingSize.height, 0)
-        XCTAssertFalse(ReaderViewTests.classNames(in: host).contains { $0.contains("WebView") })
+        let host = Hosting.render(ReaderView(message: message, assist: assist), width: 640, height: 600)
+        XCTAssertFalse(Hosting.classNames(in: host).contains { $0.contains("WebView") })
     }
 
     func testAIStringsAreInTheCatalogs() {

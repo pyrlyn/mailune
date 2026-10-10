@@ -1,10 +1,12 @@
 //! Convention gates: every Rust file opens with a `//!` header, and an
-//! exported FFI body is one expression.
+//! exported surface body (`#[uniffi::export]`, `#[unsafe(no_mangle)]`,
+//! `#[wasm_bindgen]`) is one expression.
 //!
-//! Fixtures prove the gate, and the same check walks `crates/mailune-ffi/src`
-//! (`#[uniffi::export]`) and `crates/mailune-capi/src` (`#[unsafe(no_mangle)]`).
-//! The shape follows cox-ffi's forward-only test: `syn` parses the file, and
-//! a body that is not a single expression statement fails.
+//! Fixtures prove the gate, and the same check walks every surface crate:
+//! `mailune-ffi` (`#[uniffi::export]`), `mailune-capi` (`#[unsafe(no_mangle)]`)
+//! and `mailune-wasm` (`#[wasm_bindgen]`). The shape follows cox-ffi's
+//! forward-only test: `syn` parses the file, and a body that is not a single
+//! expression statement fails.
 
 #![allow(clippy::unwrap_used, clippy::panic)]
 
@@ -38,12 +40,14 @@ fn has_module_header(source: &str) -> bool {
     source.starts_with("//!")
 }
 
-fn is_uniffi_export(attrs: &[Attribute]) -> bool {
+/// `#[uniffi::export]` or `#[wasm_bindgen]`: a binding generator's export.
+fn is_binding_export(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
-        let mut segments = attr.path().segments.iter();
+        let path = attr.path();
+        let mut segments = path.segments.iter();
         let uniffi = segments.next().is_some_and(|seg| seg.ident == "uniffi");
         let export = segments.next().is_some_and(|seg| seg.ident == "export");
-        uniffi && export && segments.next().is_none()
+        (uniffi && export && segments.next().is_none()) || path.is_ident("wasm_bindgen")
     })
 }
 
@@ -57,7 +61,7 @@ fn is_c_export(attrs: &[Attribute]) -> bool {
 }
 
 fn is_export(attrs: &[Attribute]) -> bool {
-    is_uniffi_export(attrs) || is_c_export(attrs)
+    is_binding_export(attrs) || is_c_export(attrs)
 }
 
 fn is_cfg_test(attrs: &[Attribute]) -> bool {
@@ -91,8 +95,10 @@ fn export_violations(file: &str, items: &[Item], out: &mut Vec<String>) {
                 note(out, &func.sig.ident.to_string(), &func.block);
             }
             Item::Impl(imp) => {
+                // `#[wasm_bindgen]` on the block exports every method in it.
+                let whole = is_export(&imp.attrs);
                 for method in imp.items.iter().filter_map(|item| match item {
-                    ImplItem::Fn(func) if is_export(&func.attrs) => Some(func),
+                    ImplItem::Fn(func) if whole || is_export(&func.attrs) => Some(func),
                     _ => None,
                 }) {
                     note(out, &method.sig.ident.to_string(), &method.block);
@@ -156,6 +162,17 @@ fn a_multi_statement_export_fails() {
 }
 
 #[test]
+fn wasm_bindgen_exports_are_checked_too() {
+    let source = "#[wasm_bindgen(js_name = a)]\npub fn a() { let x = 1; x }\n\
+                  #[wasm_bindgen]\nimpl S { pub fn b(&self) { one(); two() } }\n\
+                  #[wasm_bindgen]\npub fn c() { core::c() }\n";
+    assert_eq!(
+        violations_in("lib.rs", source),
+        ["lib.rs: fn a — 2 statements", "lib.rs: fn b — 2 statements"]
+    );
+}
+
+#[test]
 fn a_multi_statement_c_export_fails() {
     let source = "#[unsafe(no_mangle)]\npub extern \"C\" fn send() { let a = 1; go(a) }\n";
     assert_eq!(
@@ -172,7 +189,7 @@ fn assert_forward_only(krate: &str) {
     let mut found = Vec::new();
     for path in files {
         let source = fs::read_to_string(&path).unwrap();
-        let name = path.file_name().unwrap().to_string_lossy();
+        let name = format!("{krate}/{}", path.file_name().unwrap().to_string_lossy());
         found.extend(violations_in(&name, &source));
     }
     assert!(
@@ -190,4 +207,9 @@ fn ffi_sources_stay_forward_only() {
 #[test]
 fn capi_sources_stay_forward_only() {
     assert_forward_only("mailune-capi");
+}
+
+#[test]
+fn wasm_sources_stay_forward_only() {
+    assert_forward_only("mailune-wasm");
 }

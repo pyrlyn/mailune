@@ -10,6 +10,7 @@ public struct ShellView: View {
     @State private var query = ""
     @State private var composing = false
     @State private var outbox = FakeOutbox()
+    @State private var feed = ThreadFeed()
     @State private var search = ""
     @State private var asking = false
     @State private var startDraft = Draft()
@@ -33,14 +34,14 @@ public struct ShellView: View {
             }
             .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         } content: {
-            ThreadList(selected: $selected, query: search)
+            ThreadList(selected: $selected, feed: feed, query: search)
                 .searchable(text: $search, placement: .toolbar, prompt: Text(Copy.text("search.search_in_mail")))
                 .navigationSplitViewColumnWidth(min: 260, ideal: 320)
         } detail: {
             if let message = openMessage {
                 ReaderView(
                     message: message,
-                    assist: AssistPolicy.visible(AssistFixtures.assist(forThread: message.thread), for: message)
+                    assist: AssistPolicy.fixture(for: message)
                 ) { text in
                     startDraft = .reply(to: message, body: text)
                     composing = true
@@ -96,9 +97,10 @@ public struct ShellView: View {
                 composing = true
             }
         }
-        .task {
-            UnreadBadge.update(host.dock, rows: ThreadFixtures.all)
-            host.spotlight.replace(with: SpotlightItems.items(for: ThreadFixtures.all, messages: MessageFixtures.all))
+        .task(id: feed.archived) {
+            let rows = feed.visible(category: nil)
+            UnreadBadge.update(host.dock, rows: rows)
+            host.spotlight.replace(with: SpotlightItems.items(for: rows, messages: MessageFixtures.all))
         }
         .sheet(isPresented: $asking) {
             AskView { citation in
