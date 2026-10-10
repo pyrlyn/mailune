@@ -1212,3 +1212,59 @@ msgstr ""
 msgctxt "compose.invalid_recipient"
 msgid "Not an email address: {0}"
 msgstr ""
+
+msgctxt "search.ask"
+msgid "Ask"
+msgstr ""
+
+msgctxt "search.ask_prompt"
+msgid "Ask about your mail"
+msgstr ""
+
+msgctxt "search.no_answer"
+msgid "No message answers that."
+msgstr ""
+
+msgctxt "search.source"
+msgid "Source: {0}"
+msgstr ""
+
+msgctxt "search.bad_query"
+msgid "Can’t read “{0}”"
+msgstr ""
+
+msgctxt "search.unsupported"
+msgid "“{0}” can’t be searched here yet"
+msgstr ""
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr ""
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr ""
+
+msgctxt "ai.summary"
+msgid "Summary"
+msgstr ""
+
+msgctxt "ai.action_items"
+msgid "To do"
+msgstr ""
+
+msgctxt "ai.made_on_device"
+msgid "Made on this Mac"
+msgstr ""
+
+msgctxt "ai.made_in_cloud"
+msgid "Made by your cloud model"
+msgstr ""
+
+msgctxt "ai.reply_with"
+msgid "Reply with “{0}”"
+msgstr ""
+
+msgctxt "settings.ai_privacy"
+msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
+msgstr ""

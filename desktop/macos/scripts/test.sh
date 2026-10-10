@@ -18,6 +18,14 @@ xcodebuild test \
     -derivedDataPath DerivedData \
     -quiet
 
+# The UI test only runs in scripts/uitest.sh, but it must still compile here.
+xcodebuild build-for-testing \
+    -project Mailune.xcodeproj \
+    -scheme MailuneUITests \
+    -destination 'platform=macOS,arch=arm64' \
+    -derivedDataPath DerivedData \
+    -quiet
+
 slices=$(lipo -archs DerivedData/Build/Products/Debug/Mailune.app/Contents/MacOS/Mailune)
 if [ "$slices" != "arm64" ]; then
     echo "error: Mailune.app has slices '$slices'; only arm64 is supported" >&2

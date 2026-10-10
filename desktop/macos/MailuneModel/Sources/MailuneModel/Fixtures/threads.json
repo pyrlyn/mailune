@@ -18,7 +18,7 @@
         "has_attachment": true,
         "category": "primary",
         "mailbox": "inbox",
-        "labels": []
+        "labels": ["work"]
       },
       {
         "id": "t2",

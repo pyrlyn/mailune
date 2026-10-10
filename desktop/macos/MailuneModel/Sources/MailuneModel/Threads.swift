@@ -25,6 +25,7 @@ public struct ThreadItem: Identifiable, Equatable, Sendable, Decodable {
     public var unread: Bool
     public var hasAttachment: Bool
     public var category: ThreadCategory
+    public var labels: [String]
 }
 
 /// Rows until the core is wired. `threads.json` is a contract `Event::Snapshot`;

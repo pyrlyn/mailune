@@ -36,14 +36,10 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -64,7 +60,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M17 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -365,14 +360,6 @@ Done when: Keychain, notifications, network path, web auth, and open-URL sit beh
 
 Execution plan: `desktop/macos` only.
 
-### M12. macOS settings
-
-Depends on: M7.
-
-Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
-
-Execution plan: `desktop/macos` only.
-
 ### P32. Relay client
 
 Depends on: P31, P16.
@@ -421,27 +408,11 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M11. macOS search
-
-Depends on: M8. Citation ranking is on another branch.
-
-Done when: filter tokens narrow a fixture list, and Ask shows a citation that points at a fixture id.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-core`.
-
 ### M13. macOS onboarding
 
 Depends on: M12, P14, P15.
 
 Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
-
-Execution plan: `desktop/macos` only.
-
-### M14. macOS integration
-
-Depends on: M8.
-
-Done when: mailto, a dock badge, share, and Spotlight sit behind fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
 
@@ -460,14 +431,6 @@ Depends on: M9, M10.
 Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
 
 Execution plan: `desktop/macos` only.
-
-### M19. macOS AI surfaces
-
-Depends on: M9, M10. The summary and reply engines are on another branch.
-
-Done when: the reader shows a summary and reply chips from fixtures, and settings shows a privacy line. No model call.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
 
 ### R3. Swift CI
 
@@ -540,14 +503,6 @@ Depends on: L6, L2.
 Done when: a list description has one fixture row with a subject, and a test reads that subject.
 
 Execution plan: `desktop/linux` only.
-
-### M17. macOS UI test
-
-Depends on: M8, B7.
-
-Done when: one XCUITest opens the thread list from fixture data and sees a subject. If the test runner cannot launch the app, commit the test and say why.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`.
 
 ### M18. macOS release script
 
