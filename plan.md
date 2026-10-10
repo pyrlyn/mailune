@@ -40,7 +40,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -101,7 +101,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P33 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P34 | in progress | P3 | 5 | 0% | Cursor / grok 4.7 |
@@ -284,7 +283,7 @@ Execution plan: `mailune-store` only.
 
 ### S7. Change feed
 
-Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
 
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
@@ -368,7 +367,29 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
-Execution plan: `mailune-store` benches and one test.
+Execution plan: `mailune-store` benches and one test, on the S14 branch because the search being budgeted is the cached vector scan.
+
+- Dependencies: B1 is done. S12 (storage benches) is not on `main`, so this task brings the 100k list-page and search benches itself; S12's insert bench is still open. S5 (FTS) is not on `main` either, so "a search" is `Store::nearest` until it lands.
+- Budgets go in `docs/architecture.md`. Only the 50 ms list page at 100k is stated there; cold open and search get proposed numbers, flagged for the creator.
+- `benches/budgets.rs` (divan) times them on a 100k fixture, seeded once into Cargo's target temp directory and reused. `tests/budgets.rs` runs a 300-message mailbox against ten times each budget, which holds even in a debug build. Both share `tests/support`.
+
+Proposed budgets and why. The thresholds are from Nielsen Norman Group, "Response Times: The 3 Important Limits" (https://www.nngroup.com/articles/response-times-3-important-limits/): about 0.1 s feels instant, and about 1 s keeps the user's flow.
+
+- **Search: 100 ms.** A typed query answered within the "instant" limit. It is looser than a list page, which has to keep up with scrolling, page after page.
+- **Cold open (open the store and show the first page): 300 ms.** The store's share of a launch that should feel under a second; the rest is the native shell's.
+
+Measured (Apple M3 Max, release, SQLCipher, 100k messages with 384 dimensions, medians):
+
+| Measurement | Median | Budget |
+| --- | --- | --- |
+| Cold open to first page | 258 ms | 300 ms, met |
+| List page | 220 ms | 50 ms, **missed**; the time is in `thread_page`'s query, not the vectors |
+| Search, cached | 71 ms | 100 ms, met |
+| First search after open, which fills the cache | 1.31 s | not budgeted |
+
+Fixes for the list page and the first search are proposed in `ideas.md`.
+
+Left: creator confirmation of the two proposed budgets.
 
 ### R8. Integration compose file
 
@@ -873,14 +894,6 @@ From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one
 Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
 
 Execution plan: `docs/boltffi.md` on `batch7-imap`. Do not replace UniFFI.
-
-### S14. usearch for vectors
-
-From ideas. The in-SQLite KNN is S8.
-
-Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
-
-Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
 
 ### B11. Shared view-model core
 

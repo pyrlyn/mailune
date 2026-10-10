@@ -20,6 +20,7 @@ pub const KEY_LEN: usize = 32;
 /// An open database. One connection; callers that need a reader open a second.
 pub struct Store {
     pub(crate) conn: SqliteConnection,
+    pub(crate) vectors: crate::vector_cache::VectorCache,
 }
 
 impl std::fmt::Debug for Store {
@@ -59,7 +60,10 @@ impl Store {
         }
         configure(&mut conn)?;
         crate::migrate::run(&mut conn)?;
-        Ok(Self { conn })
+        Ok(Self {
+            conn,
+            vectors: crate::vector_cache::VectorCache::default(),
+        })
     }
 
     /// SQLCipher's version string, or `None` on a plain SQLite build.
@@ -98,6 +102,25 @@ fn apply_key(conn: &mut SqliteConnection, key: &[u8]) -> Result<(), Error> {
 struct CipherVersion {
     #[diesel(sql_type = Text)]
     cipher_version: String,
+}
+
+#[derive(QueryableByName)]
+struct DataVersion {
+    #[diesel(sql_type = diesel::sql_types::BigInt)]
+    data_version: i64,
+}
+
+/// SQLite's counter that moves when another connection commits to the file; this connection's
+/// own writes leave it unchanged. The vector cache uses it now; the S7 change feed is meant to
+/// build on the same reader.
+pub(crate) fn data_version(conn: &mut SqliteConnection) -> Result<i64, Error> {
+    let rows: Vec<DataVersion> = diesel::sql_query("PRAGMA data_version")
+        .load(conn)
+        .map_err(database_error)?;
+    rows.into_iter()
+        .next()
+        .map(|row| row.data_version)
+        .ok_or_else(|| Error::Database("PRAGMA data_version returned no row".to_owned()))
 }
 
 #[derive(QueryableByName)]

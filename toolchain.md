@@ -53,6 +53,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` T6 budget benches at 100k messages |
 | figment | local | https://github.com/SergioBenitez/Figment | `mailune-config` layer merge; `Jail` in its tests |
 | toml | local | https://github.com/toml-rs/toml | `mailune-config` parses each layer alone so errors keep file:line |
 
