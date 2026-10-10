@@ -1,0 +1,32 @@
+{
+  "name": "mailune-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "i18n": "cd .. && mise run i18n",
+    "contract": "node scripts/contract.ts",
+    "dev": "npm run i18n && vite",
+    "build": "npm run i18n && tsc --noEmit && vite build",
+    "typecheck": "npm run i18n && tsc --noEmit",
+    "test": "npm run i18n && vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "ajv": "8.20.0",
+    "happy-dom": "20.14.6",
+    "json-schema-to-typescript": "16.0.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}

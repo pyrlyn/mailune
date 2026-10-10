@@ -1,0 +1,23 @@
+[
+  {
+    "thread": "t1",
+    "summary": "Ana shared the quarterly plan draft and wants comments by Friday.",
+    "action_items": ["Read the attached plan", "Send comments by Friday"],
+    "replies": ["I'll send comments by Friday.", "Thanks, reading it now.", "Can we talk it through on Thursday?"],
+    "source": "device"
+  },
+  {
+    "thread": "t2",
+    "summary": "Ben is fine with the usual place for Thursday's lunch.",
+    "action_items": [],
+    "replies": ["See you there.", "Can we make it 1 pm?", "I have to skip this week."],
+    "source": "device"
+  },
+  {
+    "thread": "t3",
+    "summary": "Order 4471 has shipped.",
+    "action_items": [],
+    "replies": ["Thanks.", "When will it arrive?", "Please cancel the order."],
+    "source": "cloud"
+  }
+]

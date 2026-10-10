@@ -8,14 +8,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | --- | --- | --- | --- | --- | --- |
 | C1 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| F4 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | F5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | F10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
 | R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
 | X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X3 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
+| X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
 | X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
 | X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
@@ -32,42 +31,20 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M9 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
-| M10 | in progress | P1 | 4 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -83,7 +60,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M17 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -129,13 +105,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X8 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
 | D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | B10 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
-| S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 | B11 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P33 | in progress | P3 | 4 | 0% | Cursor / grok 4.7 |
 | P34 | in progress | P3 | 5 | 0% | Cursor / grok 4.7 |
@@ -157,14 +128,6 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
-
-### F4. mailune-config: typed TOML, layering, committed JSON Schema
-
-Depends on: F2, X1. Reuse: X1 layered-config (from cox-config/src/load.rs, rtok src/config/validate.rs).
-
-Done when: Unknown keys reported with file:line; schema staleness test; only this module imports figment/toml. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: new crate `mailune-config`. `figment` and `toml` are already in the workspace rust inventory. `X1` is not in this repo. Tests load inside `figment::Jail`. Commit on `batch8-ai`.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
@@ -222,7 +185,9 @@ Depends on: nothing. Reuse: aulo-telemetry, cox-telemetry, rtok src/otel.
 
 Done when: aulo or cox migrated; redaction test moves with it. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `telemetry-setup`. Commit there. Do not push.
+Execution plan: `packages/crates` worktree, crate `telemetry-setup` (T21 there), extracted from `aulo-telemetry` with its redaction and logging tests; the application name, filter variable and extra token patterns become settings. Then aulo moves onto it in its own pull request.
+
+Progress: the crate is in pyrlyn/crates-packages PR #43 with aulo's redaction tests and green checks. `cox-telemetry` does no redaction, and rtok `src/otel` has nothing to share. Gap: aulo cannot migrate until `telemetry-setup` is on crates.io, because a shared crate is consumed as a registry version with a local `paths` override, never a bare path. Publishing it is the creator's call.
 
 ### X4. Extract gettext catalog loader — gettext-catalog
 
@@ -324,7 +289,7 @@ Execution plan: `mailune-store` only.
 
 ### S7. Change feed
 
-Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
 
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
@@ -353,30 +318,6 @@ Depends on: B8. Reuse: `axum` from `rust.md`.
 Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### E2. Web frontend scaffold
-
-Depends on: B8. Reuse: Vite, React, TypeScript.
-
-Done when: `web/` builds and a vitest checks that a generated payload type round-trips. No live server required for the test.
-
-Execution plan: `web/` only, plus the workspace files a package manager needs.
-
-### E3. Web tokens and icons
-
-Depends on: E2.
-
-Done when: colors, type, and spacing are CSS variables, and one icon is an inline SVG. No remote image URL on one source line.
-
-Execution plan: `web/` only.
-
-### E4. Web localisation catalogs
-
-Depends on: E2.
-
-Done when: one English catalog and one other catalog load by language code, and a missing key falls back to English.
-
-Execution plan: `web/` only. Do not add a translation toolchain.
 
 ### S12. Storage benchmarks
 
@@ -410,67 +351,11 @@ Done when: an XCFramework script targets macOS arm64 only, and a SwiftPM package
 
 Execution plan: `desktop/macos` packaging only.
 
-### M1. Xcode project
-
-Depends on: B3.
-
-Done when: XcodeGen generates MailuneModel, MailuneUI, and MailunePlatform for macOS arm64. No Intel target.
-
-Execution plan: `desktop/macos` only.
-
-### M2. Swift design tokens
-
-Depends on: M1.
-
-Done when: colors, type, spacing, radii, and motion are Swift constants used by one view.
-
-Execution plan: `desktop/macos` only.
-
-### M3. macOS icons
-
-Depends on: M1.
-
-Done when: one app icon and one toolbar icon are local SVG or asset-catalog entries. No remote image URL.
-
-Execution plan: `desktop/macos` only.
-
-### M4. macOS localisation
-
-Depends on: M1.
-
-Done when: one string is in an English catalog and a second catalog, and a missing key falls back to English.
-
-Execution plan: `desktop/macos` only.
-
 ### M5. macOS host integrations
 
 Depends on: M1, B2.
 
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
-
-Execution plan: `desktop/macos` only.
-
-### M7. macOS shell
-
-Depends on: M2, M3.
-
-Done when: a NavigationSplitView shows three panes, a toolbar, one keyboard shortcut, and a command palette. Preview or a unit test builds the view.
-
-Execution plan: `desktop/macos` only. Stay under 500 lines.
-
-### M8. macOS thread list
-
-Depends on: M7, B7.
-
-Done when: the list is lazy, has a swipe action, multi-select, one indicator, and category tabs, fed by fixture data.
-
-Execution plan: `desktop/macos` only.
-
-### M12. macOS settings
-
-Depends on: M7.
-
-Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
 
 Execution plan: `desktop/macos` only.
 
@@ -488,7 +373,29 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
-Execution plan: `mailune-store` benches and one test.
+Execution plan: `mailune-store` benches and one test, on the S14 branch because the search being budgeted is the cached vector scan.
+
+- Dependencies: B1 is done. S12 (storage benches) is not on `main`, so this task brings the 100k list-page and search benches itself; S12's insert bench is still open. S5 (FTS) is not on `main` either, so "a search" is `Store::nearest` until it lands.
+- Budgets go in `docs/architecture.md`. Only the 50 ms list page at 100k is stated there; cold open and search get proposed numbers, flagged for the creator.
+- `benches/budgets.rs` (divan) times them on a 100k fixture, seeded once into Cargo's target temp directory and reused. `tests/budgets.rs` runs a 300-message mailbox against ten times each budget, which holds even in a debug build. Both share `tests/support`.
+
+Proposed budgets and why. The thresholds are from Nielsen Norman Group, "Response Times: The 3 Important Limits" (https://www.nngroup.com/articles/response-times-3-important-limits/): about 0.1 s feels instant, and about 1 s keeps the user's flow.
+
+- **Search: 100 ms.** A typed query answered within the "instant" limit. It is looser than a list page, which has to keep up with scrolling, page after page.
+- **Cold open (open the store and show the first page): 300 ms.** The store's share of a launch that should feel under a second; the rest is the native shell's.
+
+Measured (Apple M3 Max, release, SQLCipher, 100k messages with 384 dimensions, medians):
+
+| Measurement | Median | Budget |
+| --- | --- | --- |
+| Cold open to first page | 258 ms | 300 ms, met |
+| List page | 220 ms | 50 ms, **missed**; the time is in `thread_page`'s query, not the vectors |
+| Search, cached | 71 ms | 100 ms, met |
+| First search after open, which fills the cache | 1.31 s | not budgeted |
+
+Fixes for the list page and the first search are proposed in `ideas.md`.
+
+Left: creator confirmation of the two proposed budgets.
 
 ### R8. Integration compose file
 
@@ -498,54 +405,6 @@ Done when: a compose file names Stalwart and Dovecot, and a test reads that file
 
 Execution plan: `docker-compose.yml` plus one test in `mailune-cli`.
 
-### E5. Web shell and thread list
-
-Depends on: E3, E1.
-
-Done when: three panes render a fixture thread list, and choosing a row shows that thread. A vitest covers the selection.
-
-Execution plan: `web/` only. Commit on `batch8-ai`.
-
-### E6. Web reader
-
-Depends on: E5, P3.
-
-Done when: a message body renders in a sandboxed iframe from srcdoc with a strict CSP. No remote image URL on one source line.
-
-Execution plan: `web/` only.
-
-### E7. Web composer
-
-Depends on: E5.
-
-Done when: recipient, subject, and body round-trip, and send stays disabled until a confirm control is on.
-
-Execution plan: `web/` only.
-
-### E8. Web AI surfaces
-
-Depends on: E6, E7. Summary, replies, and compose assist already exist in `mailune-ai`.
-
-Done when: the reader shows a summary and reply chips from fixture data, and the composer shows an assist result. No model call.
-
-Execution plan: `web/` only. Do not edit `mailune-ai`.
-
-### E9. Web offline cache
-
-Depends on: E5.
-
-Done when: a service worker caches the latest thread list and serves it when the test marks the network offline. No real push server.
-
-Execution plan: `web/` only.
-
-### E11. Web end-to-end test
-
-Depends on: E5, B7.
-
-Done when: one Playwright test opens the shell, selects a fixture thread, and sees the subject. If the browser cannot be installed, commit the spec and say why.
-
-Execution plan: `web/` only.
-
 ### E12. Server container
 
 Depends on: E1. Another agent owns `docker-compose.yml`.
@@ -553,14 +412,6 @@ Depends on: E1. Another agent owns `docker-compose.yml`.
 Done when: a Dockerfile builds the server binary on paper (the file exists and names the binary) and `docs/self-host.md` says how to run it. Do not start Docker in tests. Do not edit `docker-compose.yml`.
 
 Execution plan: `Dockerfile` and `docs/self-host.md` only.
-
-### R7. Web CI
-
-Depends on: E2.
-
-Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
-
-Execution plan: `.github/workflows/web.yml` only.
 
 ### B6. C ABI
 
@@ -570,22 +421,6 @@ Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails i
 
 Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
 
-### M9. macOS reader
-
-Depends on: M8, P3, C6.
-
-Done when: a message renders with quotes collapsed, one attachment, and a security badge. Remote content and JavaScript stay off.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`. No remote image URL.
-
-### M10. macOS composer
-
-Depends on: M7, P13, S13.
-
-Done when: recipient chips, a body, one attachment, send later, and undo send round-trip through a fake. Send stays off until confirm.
-
-Execution plan: `desktop/macos` only.
-
 ### M6. Apple on-device model
 
 Depends on: M5, A5.
@@ -594,27 +429,11 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M11. macOS search
-
-Depends on: M8. Citation ranking is on another branch.
-
-Done when: filter tokens narrow a fixture list, and Ask shows a citation that points at a fixture id.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-core`.
-
 ### M13. macOS onboarding
 
 Depends on: M12, P14, P15.
 
 Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
-
-Execution plan: `desktop/macos` only.
-
-### M14. macOS integration
-
-Depends on: M8.
-
-Done when: mailto, a dock badge, share, and Spotlight sit behind fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
 
@@ -633,14 +452,6 @@ Depends on: M9, M10.
 Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
 
 Execution plan: `desktop/macos` only.
-
-### M19. macOS AI surfaces
-
-Depends on: M9, M10. The summary and reply engines are on another branch.
-
-Done when: the reader shows a summary and reply chips from fixtures, and settings shows a privacy line. No model call.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
 
 ### R3. Swift CI
 
@@ -713,14 +524,6 @@ Depends on: L6, L2.
 Done when: a list description has one fixture row with a subject, and a test reads that subject.
 
 Execution plan: `desktop/linux` only.
-
-### M17. macOS UI test
-
-Depends on: M8, B7.
-
-Done when: one XCUITest opens the thread list from fixture data and sees a subject. If the test runner cannot launch the app, commit the test and say why.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`.
 
 ### M18. macOS release script
 
@@ -1130,38 +933,6 @@ Done when: a TestFlight upload can run from that workflow. A real upload waits o
 
 Execution plan: `desktop/macos` on `batch7-imap` only. No real TestFlight upload.
 
-### R11. Windows signing workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that signs a Windows build and packs an MSIX. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree (remote pyrlyn/ci). New reusable workflow only. Do not push.
-
-### R12. Flatpak workflow
-
-Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.
-
-Done when: pyrlyn/ci has a reusable workflow that builds the Flatpak. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Flatpak workflow only. Do not push.
-
-### R13. TestFlight workflow
-
-Depends on: R10. Reuse: pyrlyn/ci macos-sign action as a base.
-
-Done when: pyrlyn/ci has a reusable iOS TestFlight workflow that talks to the App Store Connect API. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable TestFlight workflow only. Do not push.
-
-### R14. Play workflow
-
-Depends on: R10. Reuse: none yet.
-
-Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App Bundle. This repository's required checks stay unchanged.
-
-Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
-
 ### W13. Windows release
 
 Depends on: W1, R11. Reuse: the R11 signing workflow.
@@ -1177,14 +948,6 @@ From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one
 Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
 
 Execution plan: `docs/boltffi.md` on `batch7-imap`. Do not replace UniFFI.
-
-### S14. usearch for vectors
-
-From ideas. The in-SQLite KNN is S8.
-
-Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
-
-Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.
 
 ### B11. Shared view-model core
 

@@ -252,6 +252,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "Unterhaltungsansicht"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "Unterhaltungen"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "Normal"
@@ -428,6 +432,10 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr "Ich stimme den Nutzungsbedingungen und der Datenschutzerklärung zu."
 
+msgctxt "compose.confirm_recipients"
+msgid "I have checked the recipients and want to send this"
+msgstr "Ich habe die Empfänger geprüft und möchte das senden"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "SYMBOLE"
@@ -491,6 +499,18 @@ msgstr "Layout"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "Hell"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "Postfächer"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "Nachricht"
+
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "Nachrichtentext"
 
 msgctxt "kit.motion"
 msgid "MOTION"
@@ -768,6 +788,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr "VORSCHLÄGE"
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr "Antwortvorschläge"
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr "Zusammenfassung"
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr "FLÄCHEN"
@@ -1041,6 +1069,10 @@ msgctxt "data.updates"
 msgid "Updates"
 msgstr "Updates"
 
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
+msgstr "Vorschlag übernehmen"
+
 msgctxt "settings.vacation_responder"
 msgid "Vacation responder"
 msgstr "Abwesenheitsnotiz"
@@ -1116,3 +1148,127 @@ msgstr "{0} s"
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
 msgstr "{0} · von {1}"
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr "Befehle"
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr "Befehl eingeben"
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr "Gehe zu {0}"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "Kategorie"
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr "Zitierten Text anzeigen"
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr "Zitierten Text ausblenden"
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr "Anhang: {0}"
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr "Tracking-Pixel: {0}"
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr "Authentifizierung fehlgeschlagen"
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr "Verschlüsselt"
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr "Signiert"
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr "Absender bestätigt"
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr "Absender nicht bestätigt"
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr "Datei anhängen"
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr "Diese Nachricht senden?"
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr "{0} entfernen"
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr "Keine E-Mail-Adresse: {0}"
+
+msgctxt "search.ask"
+msgid "Ask"
+msgstr "Fragen"
+
+msgctxt "search.ask_prompt"
+msgid "Ask about your mail"
+msgstr "Frage zu deinen E-Mails"
+
+msgctxt "search.no_answer"
+msgid "No message answers that."
+msgstr "Keine Nachricht beantwortet das."
+
+msgctxt "search.source"
+msgid "Source: {0}"
+msgstr "Quelle: {0}"
+
+msgctxt "search.bad_query"
+msgid "Can’t read “{0}”"
+msgstr "„{0}“ ist nicht lesbar"
+
+msgctxt "search.unsupported"
+msgid "“{0}” can’t be searched here yet"
+msgstr "Nach „{0}“ kann hier noch nicht gesucht werden"
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr "Anzeigename"
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr "{0} Sekunden"
+
+msgctxt "ai.summary"
+msgid "Summary"
+msgstr "Zusammenfassung"
+
+msgctxt "ai.action_items"
+msgid "To do"
+msgstr "Zu erledigen"
+
+msgctxt "ai.made_on_device"
+msgid "Made on this Mac"
+msgstr "Auf diesem Mac erstellt"
+
+msgctxt "ai.made_in_cloud"
+msgid "Made by your cloud model"
+msgstr "Von deinem Cloud-Modell erstellt"
+
+msgctxt "ai.reply_with"
+msgid "Reply with “{0}”"
+msgstr "Mit „{0}“ antworten"
+
+msgctxt "settings.ai_privacy"
+msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
+msgstr "KI läuft auf diesem Mac. Verschlüsselte E-Mails werden nie an ein Cloud-Modell gesendet."

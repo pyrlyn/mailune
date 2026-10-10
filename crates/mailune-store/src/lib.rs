@@ -23,6 +23,8 @@ mod schema;
 mod testutil;
 #[cfg(not(target_arch = "wasm32"))]
 mod vector;
+#[cfg(not(target_arch = "wasm32"))]
+mod vector_cache;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
