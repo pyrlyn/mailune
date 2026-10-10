@@ -20,8 +20,6 @@ final class CommandTests: XCTestCase {
 
     @MainActor
     func testShellBuilds() {
-        let view = NSHostingView(rootView: ShellView().frame(width: 900, height: 600))
-        view.layout()
-        XCTAssertGreaterThan(view.fittingSize.width, 0)
+        XCTAssertGreaterThan(Hosting.render(ShellView(), width: 900, height: 600).bounds.width, 0)
     }
 }

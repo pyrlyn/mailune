@@ -38,7 +38,8 @@ fn sources(dir: &Path, extensions: &[&str], out: &mut Vec<PathBuf>) {
             .and_then(|name| name.to_str())
             .unwrap_or("");
         // Build output and generated projects are not sources.
-        if name.starts_with('.') || name == "DerivedData" || name.ends_with(".xcodeproj") {
+        if name.starts_with('.') || name.starts_with("DerivedData") || name.ends_with(".xcodeproj")
+        {
             continue;
         }
         if path.is_dir() {

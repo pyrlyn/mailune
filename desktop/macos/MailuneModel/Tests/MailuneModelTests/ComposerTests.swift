@@ -73,6 +73,7 @@ final class ComposerTests: XCTestCase {
 
         XCTAssertEqual(outbox.sent.count, 1)
         XCTAssertEqual(outbox.sent.first?.to, ["ana@acme.example"])
+        XCTAssertEqual(outbox.sent.first?.subject, "Agenda")
         XCTAssertEqual(outbox.sent.first?.body, "See the attached agenda.")
         XCTAssertEqual(outbox.sent.first?.attachment, attachment)
 

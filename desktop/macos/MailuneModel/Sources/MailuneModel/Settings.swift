@@ -12,10 +12,13 @@ public enum Density: String, Codable, CaseIterable, Sendable {
     public var titleKey: String { "settings.\(rawValue)" }
 }
 
+/// An account's public settings. Its token lives in a `SecretVault`, never here.
 public struct AccountSetting: Codable, Equatable, Identifiable, Sendable {
     public var id: String
     public var address: String
     public var displayName: String
+    public var incoming: ServerEndpoint? = nil
+    public var outgoing: ServerEndpoint? = nil
 }
 
 /// Everything the settings screen edits, one group per section. No secret

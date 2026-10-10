@@ -50,6 +50,11 @@ public enum AssistPolicy {
         }
         return assist
     }
+
+    /// The fixture assist for `message`, already through the rule above.
+    public static func fixture(for message: MailMessage) -> ThreadAssist? {
+        visible(AssistFixtures.assist(forThread: message.thread), for: message)
+    }
 }
 
 extension Draft {

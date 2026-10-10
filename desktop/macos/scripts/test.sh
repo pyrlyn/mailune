@@ -1,9 +1,18 @@
 #!/bin/sh
-# Every macOS test: the three local packages, then the generated Xcode project
-# on the arm64 slice. XcodeGen is pinned here rather than in mise.toml because
-# it has no Linux build and mise.toml is installed on Linux CI too.
+# Every Apple-shell test: the three local packages on macOS, the generated Xcode
+# project on the arm64 slice, then the iOS app for the simulator and the shared
+# packages' tests on an iPhone simulator. XcodeGen is pinned here rather than in
+# mise.toml because it has no Linux build and mise.toml is installed on Linux CI.
 set -eu
 cd "$(dirname "$0")/.."
+
+only_arm64() {
+    slices=$(lipo -archs "$1")
+    if [ "$slices" != "arm64" ]; then
+        echo "error: $1 has slices '$slices'; only arm64 is supported" >&2
+        exit 1
+    fi
+}
 
 scripts/catalogs.sh
 for package in MailuneModel MailuneUI MailunePlatform; do
@@ -25,9 +34,36 @@ xcodebuild build-for-testing \
     -destination 'platform=macOS,arch=arm64' \
     -derivedDataPath DerivedData \
     -quiet
+only_arm64 DerivedData/Build/Products/Debug/Mailune.app/Contents/MacOS/Mailune
 
-slices=$(lipo -archs DerivedData/Build/Products/Debug/Mailune.app/Contents/MacOS/Mailune)
-if [ "$slices" != "arm64" ]; then
-    echo "error: Mailune.app has slices '$slices'; only arm64 is supported" >&2
-    exit 1
-fi
+xcodebuild build \
+    -project Mailune.xcodeproj \
+    -scheme MailuneIOS \
+    -destination 'generic/platform=iOS Simulator' \
+    -derivedDataPath DerivedData \
+    -quiet
+only_arm64 DerivedData/Build/Products/Debug-iphonesimulator/MailuneIOS.app/MailuneIOS
+
+# The first iPhone on the newest installed iOS runtime, so the script works on
+# whichever simulators a machine or runner image ships.
+simulator=$(xcrun simctl list devices available --json | python3 -c '
+import json, sys
+devices = json.load(sys.stdin)["devices"]
+runtimes = sorted(
+    (key for key in devices if ".SimRuntime.iOS-" in key),
+    key=lambda key: [int(part) for part in key.rsplit("iOS-", 1)[1].split("-")],
+)
+for runtime in reversed(runtimes):
+    for device in devices[runtime]:
+        if device["name"].startswith("iPhone"):
+            print(device["udid"])
+            sys.exit(0)
+sys.exit("no iPhone simulator is installed")
+')
+for package in MailuneModel MailuneUI; do
+    (cd "$package" && xcodebuild test \
+        -scheme "$package" \
+        -destination "id=$simulator" \
+        -derivedDataPath ../DerivedData-ios \
+        -quiet)
+done

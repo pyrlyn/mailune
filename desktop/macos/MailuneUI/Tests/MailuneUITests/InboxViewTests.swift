@@ -5,6 +5,6 @@ import XCTest
 final class InboxViewTests: XCTestCase {
     @MainActor
     func testViewBuilds() {
-        XCTAssertNotNil(NSHostingView(rootView: InboxView()).fittingSize)
+        XCTAssertGreaterThan(Hosting.render(InboxView()).bounds.width, 0)
     }
 }
