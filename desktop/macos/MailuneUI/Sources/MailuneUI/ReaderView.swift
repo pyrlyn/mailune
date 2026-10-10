@@ -23,10 +23,14 @@ public struct ReaderView: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text(message.subject)
                         .font(MailuneType.title)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
                     SecurityBadgeView(badge: presentation.badge)
+                    Button(Copy.text("thread.reply")) { reply("") }
+                        .keyboardShortcut(MailuneShortcut.reply)
                 }
                 Text(message.from.display)
+                    .accessibilityLabel(Copy.format("compose.from", message.from.display))
                 if let assist {
                     AssistCard(assist: assist, reply: reply)
                 }
@@ -39,7 +43,7 @@ public struct ReaderView: View {
                     Button(Copy.text(quotesCollapsed ? "reader.show_quote" : "reader.hide_quote")) {
                         quotesCollapsed.toggle()
                     }
-                    .keyboardShortcut("q", modifiers: [.command, .shift])
+                    .keyboardShortcut(MailuneShortcut.toggleQuote)
                 }
                 ForEach(presentation.attachments, id: \.name) { attachment in
                     Label {
@@ -99,5 +103,6 @@ struct RemoteBanner: View {
         .padding(MailuneSpace.s)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(MailuneColor.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: MailuneRadius.card))
+        .accessibilityElement(children: .combine)
     }
 }

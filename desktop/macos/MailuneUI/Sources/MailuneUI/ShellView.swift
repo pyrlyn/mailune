@@ -69,7 +69,7 @@ public struct ShellView: View {
                     Image("ToolbarCompose")
                 }
                 .accessibilityLabel(Copy.text("app.compose"))
-                .keyboardShortcut("n", modifiers: .command)
+                .keyboardShortcut(MailuneShortcut.compose)
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("search.ask")) { asking = true }
@@ -84,7 +84,7 @@ public struct ShellView: View {
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
-                    .keyboardShortcut("k", modifiers: .command)
+                    .keyboardShortcut(MailuneShortcut.commands)
             }
         }
         .sheet(item: $composing) { sheet in

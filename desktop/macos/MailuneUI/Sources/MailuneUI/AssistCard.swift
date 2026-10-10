@@ -40,5 +40,8 @@ struct AssistCard: View {
         .padding(MailuneSpace.s)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(MailuneColor.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: MailuneRadius.card))
+        // One named group, so VoiceOver can skip past the AI text in one move.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Copy.text("ai.summary"))
     }
 }

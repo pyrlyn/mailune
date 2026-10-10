@@ -33,11 +33,13 @@ public struct ComposerView: View {
                 TextField(Copy.text("compose.subject"), text: $composer.draft.subject)
                 TextEditor(text: $composer.draft.body)
                     .frame(minHeight: 160)
+                    .accessibilityLabel(Copy.text("thread.message_body"))
                     .overlay(alignment: .topLeading) {
                         if composer.draft.body.isEmpty {
                             Text(Copy.text("compose.write_your_message"))
                                 .opacity(0.5)
                                 .allowsHitTesting(false)
+                                .accessibilityHidden(true)
                         }
                     }
                 attachment
@@ -77,6 +79,7 @@ public struct ComposerView: View {
         }
         .confirmationDialog(Copy.text("compose.confirm_send"), isPresented: confirming) {
             Button(Copy.text("compose.send")) { composer.confirmSend(now: Date()) }
+                .keyboardShortcut(.defaultAction)
             Button(Copy.text("sheets.cancel"), role: .cancel) { composer.cancelSend() }
         }
     }
@@ -85,7 +88,9 @@ public struct ComposerView: View {
         VStack(alignment: .leading, spacing: MailuneSpace.s) {
             HStack(spacing: MailuneSpace.s) {
                 Text(Copy.text("compose.to"))
+                    .accessibilityHidden(true)
                 TextField(Copy.text("compose.recipients"), text: $typed)
+                    .accessibilityLabel(Copy.text("compose.to"))
                     .onSubmit {
                         rejected = composer.addRecipients(typed)
                         typed = rejected.joined(separator: ", ")
@@ -108,6 +113,8 @@ public struct ComposerView: View {
                             }
                             .padding(.horizontal, MailuneSpace.s)
                             .background(MailuneColor.accent.opacity(0.15), in: Capsule())
+                            .accessibilityElement(children: .contain)
+                            .accessibilityLabel(address)
                         }
                     }
                 }
@@ -156,7 +163,7 @@ public struct ComposerView: View {
                 Spacer()
                 Button(Copy.text("compose.send")) { composer.requestSend() }
                     .disabled(!composer.canSend)
-                    .keyboardShortcut(.return, modifiers: .command)
+                    .keyboardShortcut(MailuneShortcut.send)
             }
         }
     }
