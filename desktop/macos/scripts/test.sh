@@ -44,22 +44,15 @@ xcodebuild build \
     -quiet
 only_arm64 DerivedData/Build/Products/Debug-iphonesimulator/MailuneIOS.app/MailuneIOS
 
-# The first iPhone on the newest installed iOS runtime, so the script works on
-# whichever simulators a machine or runner image ships.
-simulator=$(xcrun simctl list devices available --json | python3 -c '
-import json, sys
-devices = json.load(sys.stdin)["devices"]
-runtimes = sorted(
-    (key for key in devices if ".SimRuntime.iOS-" in key),
-    key=lambda key: [int(part) for part in key.rsplit("iOS-", 1)[1].split("-")],
-)
-for runtime in reversed(runtimes):
-    for device in devices[runtime]:
-        if device["name"].startswith("iPhone"):
-            print(device["udid"])
-            sys.exit(0)
-sys.exit("no iPhone simulator is installed")
-')
+# The phone UI test only runs in scripts/uitest.sh, but it must still compile here.
+xcodebuild build-for-testing \
+    -project Mailune.xcodeproj \
+    -scheme MailuneIOSUITests \
+    -destination 'generic/platform=iOS Simulator' \
+    -derivedDataPath DerivedData \
+    -quiet
+
+simulator=$(scripts/simulator.sh)
 for package in MailuneModel MailuneUI; do
     (cd "$package" && xcodebuild test \
         -scheme "$package" \

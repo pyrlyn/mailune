@@ -6,7 +6,11 @@ import SwiftUI
 
 @main
 struct MailuneIOSApp: App {
-    @State private var preferences = DefaultsPreferencesStore()
+    /// Set by the UI tests so a run never writes the user's saved settings.
+    private static let underUITest = CommandLine.arguments.contains("-mailune-ui-test")
+
+    @State private var preferences: any PreferencesStore =
+        underUITest ? FakePreferencesStore() : DefaultsPreferencesStore()
     @State private var requests: ComposeRequests
 
     init() {

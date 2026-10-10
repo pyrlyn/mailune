@@ -82,6 +82,19 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.mailune.macos.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Mailune
+  MailuneIOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: MailuneIOSUITests
+    dependencies:
+      - target: MailuneIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mailune.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: MailuneIOS
+        TARGETED_DEVICE_FAMILY: "1,2"
   MailuneIOS:
     type: application
     platform: iOS
@@ -128,3 +141,11 @@ schemes:
     build:
       targets:
         MailuneIOS: all
+  MailuneIOSUITests:
+    build:
+      targets:
+        MailuneIOS: all
+        MailuneIOSUITests: [test]
+    test:
+      targets:
+        - MailuneIOSUITests
