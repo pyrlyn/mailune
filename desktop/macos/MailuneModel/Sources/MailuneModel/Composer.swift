@@ -64,9 +64,10 @@ public final class Composer {
     public let undoWindow: TimeInterval
     private let outbox: Outbox
 
-    public init(outbox: Outbox, undoWindow: TimeInterval = 10) {
+    public init(outbox: Outbox, undoWindow: TimeInterval = 10, draft: Draft = Draft()) {
         self.outbox = outbox
         self.undoWindow = undoWindow
+        self.draft = draft
     }
 
     /// Splits typed text into chips and returns the parts that are not addresses.
@@ -138,7 +139,7 @@ public final class Composer {
         return true
     }
 
-    static func looksLikeAddress(_ text: String) -> Bool {
+    public nonisolated static func looksLikeAddress(_ text: String) -> Bool {
         let parts = text.split(separator: "@", omittingEmptySubsequences: false)
         return parts.count == 2 && !parts[0].isEmpty && parts[1].contains(".")
             && !parts[1].hasPrefix(".") && !parts[1].hasSuffix(".")

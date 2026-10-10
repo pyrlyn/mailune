@@ -5,10 +5,15 @@ import SwiftUI
 /// the core's sanitized text, so no script runs and nothing remote loads.
 public struct ReaderView: View {
     private let message: MailMessage
+    private let assist: ThreadAssist?
+    private let reply: (String) -> Void
     @State private var quotesCollapsed = true
 
-    public init(message: MailMessage) {
+    /// `assist` has already passed `AssistPolicy`; `reply` gets a chip's text.
+    public init(message: MailMessage, assist: ThreadAssist? = nil, reply: @escaping (String) -> Void = { _ in }) {
         self.message = message
+        self.assist = assist
+        self.reply = reply
     }
 
     public var body: some View {
@@ -22,6 +27,9 @@ public struct ReaderView: View {
                     SecurityBadgeView(badge: presentation.badge)
                 }
                 Text(message.from.display)
+                if let assist {
+                    AssistCard(assist: assist, reply: reply)
+                }
                 if let blocked = presentation.blockedRemote {
                     RemoteBanner(summary: blocked)
                 }
