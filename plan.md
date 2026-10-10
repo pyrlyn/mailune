@@ -12,12 +12,12 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | F10 | todo | P0 | 2 | 0% | |
 | R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
-| X2 | todo | P0 | 2 | 0% | |
+| X2 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
 | X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
-| X4 | todo | P0 | 2 | 0% | |
-| X9 | todo | P0 | 2 | 0% | |
+| X4 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
+| X9 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
 | X10 | todo | P0 | 2 | 0% | |
-| X11 | todo | P0 | 2 | 0% | |
+| X11 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
@@ -157,7 +157,7 @@ Depends on: nothing. Reuse: cox-provider-http, runa-cloud src/secrets.rs, aulo-s
 
 Done when: One implementation; one consumer migrated; no-real-keychain test helper included. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `secret-store`. Commit there. Do not push.
+Execution plan: a new crate in pyrlyn/crates-packages, one pull request. The crates.io name `secret-store` belongs to another owner, so the crate is `keychain-secret` (404 on crates.io, 2026-10-10). One implementation from runa `secrets.rs`, cox `resolve_key_with`, and aulo's token store: a redacted `Secret`, a store trait with keychain, memory and no-op stores, env-then-store resolution, the keychain switch, the inline-secret check, and cox's no-real-keychain guard as a reusable scanner. Gates and `cargo publish --dry-run` run locally. The consumer migration waits for the crates.io release through `bump.yml`.
 
 ### X3. Extract telemetry setup with redaction — telemetry-setup
 
@@ -175,7 +175,7 @@ Depends on: nothing. Reuse: cox-i18n.
 
 Done when: cox migrated; .po fixtures + plural test. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `gettext-catalog`. Commit there. Do not push.
+Execution plan: a new crate `gettext-catalog` in pyrlyn/crates-packages, one pull request, split there into two tasks under the line cap: catalog, plural rules and placeholders; then the localizer. Locales, the default locale and constants such as `{brand}` are parameters. `.po` fixtures for en, ru and uk with plural tests. Gates and `cargo publish --dry-run` run locally. The cox migration waits for the crates.io release through `bump.yml`.
 
 ### X9. Extract ABI drift test helper (cbindgen + csbindgen regenerate & diff, BLESS env) — abi-drift
 
@@ -183,7 +183,7 @@ Depends on: nothing. Reuse: scull crates/scull-ffi/tests/bindings.rs; ketch-capi
 
 Done when: scull uses it; diff shown on drift. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `abi-drift`. Commit there. Do not push.
+Execution plan: a new crate `abi-drift` in pyrlyn/crates-packages, one pull request: a drift checker (unified diff on drift, bless from an environment variable) plus cbindgen and csbindgen render helpers. A fixture FFI crate carries a committed header and C# file. Gates and `cargo publish --dry-run` run locally. The scull migration waits for the crates.io release through `bump.yml`.
 
 ### X10. Consume text-sanitize from packages/crates (aulo S1 T1.11, in flight)
 
@@ -201,7 +201,7 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
+Execution plan: a new crate `sqlite-change-feed` in pyrlyn/crates-packages, one pull request: `ChangeToken` over a Diesel `SqliteConnection` polling `PRAGMA data_version`. The cross-process test re-executes the test binary as a writer. Gates and `cargo publish --dry-run` run locally.
 
 ### C3. Autocrypt headers
 
