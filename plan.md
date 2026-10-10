@@ -6,91 +6,91 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
-| C1 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
-| C11 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| F5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| F10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| R1 | in progress | P0 | 2 | 10% | Cursor / grok 4.7 |
-| R17 | in progress | P0 | 2 | 40% | Cursor / grok 4.7 |
-| X1 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
-| X2 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
+| C1 | todo | P0 | 2 | 40% | |
+| C11 | todo | P0 | 2 | 10% | |
+| F5 | todo | P0 | 2 | 0% | |
+| F10 | todo | P0 | 2 | 0% | |
+| R1 | todo | P0 | 2 | 10% | |
+| R17 | todo | P0 | 2 | 40% | |
+| X1 | todo | P0 | 3 | 0% | |
+| X2 | todo | P0 | 2 | 0% | |
 | X3 | in progress | P0 | 3 | 60% | Cursor / claude-opus-5.5 |
-| X4 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X9 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X10 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X11 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| A13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A23 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| C7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| X4 | todo | P0 | 2 | 0% | |
+| X9 | todo | P0 | 2 | 0% | |
+| X10 | todo | P0 | 2 | 0% | |
+| X11 | todo | P0 | 2 | 0% | |
+| A13 | todo | P1 | 2 | 0% | |
+| A23 | todo | P1 | 2 | 0% | |
+| C7 | todo | P1 | 2 | 0% | |
+| P10 | todo | P1 | 2 | 0% | |
+| S5 | todo | P1 | 2 | 0% | |
+| S7 | todo | P1 | 2 | 0% | |
+| A31 | todo | P1 | 2 | 0% | |
+| S12 | todo | P1 | 2 | 0% | |
+| P18 | todo | P1 | 2 | 0% | |
+| B3 | todo | P1 | 2 | 0% | |
+| M5 | todo | P1 | 3 | 0% | |
+| M6 | todo | P1 | 3 | 0% | |
+| M15 | todo | P1 | 2 | 0% | |
+| M16 | todo | P1 | 2 | 0% | |
+| P32 | todo | P1 | 2 | 0% | |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
-| E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| L11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I9 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I10 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| I7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| B5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| W1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| W2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| W3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| W4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| W12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| D1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| D2 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| D3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| D4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D7 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D10 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| D11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| D12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| R5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| X5 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X6 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X7 | in progress | P0 | 2 | 0% | Cursor / grok 4.7 |
-| X8 | in progress | P0 | 3 | 0% | Cursor / grok 4.7 |
-| D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
+| E12 | todo | P1 | 2 | 0% | |
+| L1 | todo | P1 | 2 | 0% | |
+| L2 | todo | P1 | 3 | 0% | |
+| L3 | todo | P1 | 2 | 0% | |
+| L4 | todo | P1 | 2 | 0% | |
+| R6 | todo | P1 | 2 | 0% | |
+| L5 | todo | P1 | 3 | 0% | |
+| L6 | todo | P1 | 3 | 0% | |
+| L7 | todo | P1 | 3 | 0% | |
+| L8 | todo | P1 | 3 | 0% | |
+| L9 | todo | P1 | 3 | 0% | |
+| L10 | todo | P1 | 3 | 0% | |
+| L11 | todo | P1 | 2 | 0% | |
+| L12 | todo | P1 | 2 | 0% | |
+| L13 | todo | P1 | 2 | 0% | |
+| M18 | todo | P1 | 2 | 0% | |
+| I2 | todo | P1 | 3 | 0% | |
+| I6 | todo | P1 | 2 | 0% | |
+| I9 | todo | P1 | 2 | 0% | |
+| I10 | todo | P1 | 2 | 0% | |
+| I7 | todo | P1 | 3 | 0% | |
+| B5 | todo | P1 | 2 | 0% | |
+| W1 | todo | P1 | 2 | 0% | |
+| W2 | todo | P1 | 2 | 0% | |
+| W3 | todo | P1 | 2 | 0% | |
+| W4 | todo | P1 | 3 | 0% | |
+| W5 | todo | P1 | 3 | 0% | |
+| W6 | todo | P1 | 3 | 0% | |
+| W7 | todo | P1 | 3 | 0% | |
+| W8 | todo | P1 | 3 | 0% | |
+| W9 | todo | P1 | 3 | 0% | |
+| W10 | todo | P1 | 3 | 0% | |
+| W11 | todo | P1 | 2 | 0% | |
+| W12 | todo | P1 | 2 | 0% | |
+| R4 | todo | P1 | 2 | 0% | |
+| D1 | todo | P1 | 2 | 0% | |
+| D2 | todo | P1 | 2 | 0% | |
+| D3 | todo | P1 | 2 | 0% | |
+| D4 | todo | P1 | 3 | 0% | |
+| D6 | todo | P1 | 3 | 0% | |
+| D7 | todo | P1 | 3 | 0% | |
+| D8 | todo | P1 | 3 | 0% | |
+| D9 | todo | P1 | 3 | 0% | |
+| D10 | todo | P1 | 3 | 0% | |
+| D5 | todo | P1 | 3 | 0% | |
+| D11 | todo | P1 | 2 | 0% | |
+| D12 | todo | P1 | 3 | 0% | |
+| R5 | todo | P1 | 2 | 0% | |
+| R18 | todo | P1 | 2 | 0% | |
+| X5 | todo | P0 | 2 | 0% | |
+| X6 | todo | P0 | 2 | 0% | |
+| X7 | todo | P0 | 2 | 0% | |
+| X8 | todo | P0 | 3 | 0% | |
+| D13 | todo | P1 | 3 | 0% | |
+| I8 | todo | P1 | 3 | 0% | |
+| W13 | todo | P1 | 3 | 0% | |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
