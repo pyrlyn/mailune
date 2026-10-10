@@ -139,6 +139,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    change_counters (topic) {
+        topic -> Text,
+        version -> BigInt,
+    }
+}
+
+diesel::table! {
     embeddings (account_id, message_id, chunk, model) {
         account_id -> Text,
         message_id -> Text,

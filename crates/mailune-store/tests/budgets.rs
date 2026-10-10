@@ -10,7 +10,9 @@ mod support;
 
 use std::time::{Duration, Instant};
 
-use support::{MODEL, PAGE, TOP_K, account, inbox, open, query, seed};
+use support::{
+    MODEL, PAGE, TOP_K, account, inbox, insert_messages, open, query, seed, seed_account,
+};
 
 const MESSAGES: usize = 300;
 /// Budgets 300 ms, 50 ms and 100 ms, times ten.
@@ -54,4 +56,25 @@ fn a_small_mailbox_opens_lists_and_searches_under_loose_ceilings() {
     let (hits, search_time) = timed(|| store.nearest(&account(), MODEL, &query, TOP_K).unwrap());
     assert_eq!(hits.len(), TOP_K);
     assert!(search_time < SEARCH_CEILING, "search took {search_time:?}");
+}
+
+/// S12: the insert and text search paths the 100k bench measures, at a size `nextest` runs in
+/// well under a second. Neither has a budget yet, so this checks the result, not the time.
+#[test]
+fn a_small_mailbox_inserts_and_is_found_by_text() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut store = open(&dir.path().join("mail.db"));
+    seed_account(&mut store);
+    insert_messages(&mut store, MESSAGES);
+
+    let counts = store.mailbox_counts(&account(), &inbox()).unwrap();
+    assert_eq!(counts.total, u64::try_from(MESSAGES).unwrap());
+    assert_eq!(
+        store.search_text(&account(), "ada", PAGE).unwrap().len(),
+        PAGE
+    );
+    let hits = store.search_text(&account(), "subject 42", PAGE).unwrap();
+    let mut ids: Vec<&str> = hits.iter().map(|id| id.as_str()).collect();
+    ids.sort_unstable();
+    assert_eq!(ids, ["m126", "m127", "m128"]);
 }

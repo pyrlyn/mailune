@@ -7,10 +7,9 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
 | C1 | todo | P0 | 2 | 40% | |
-| C11 | todo | P0 | 2 | 10% | |
+| C11 | in progress | P0 | 2 | 90% | Cursor / claude-opus-5.5 |
 | F5 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
-| R1 | todo | P0 | 2 | 10% | |
 | R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
 | X2 | todo | P0 | 2 | 0% | |
@@ -19,25 +18,16 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | todo | P0 | 2 | 0% | |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | todo | P0 | 2 | 0% | |
-| A13 | todo | P1 | 2 | 0% | |
-| A23 | todo | P1 | 2 | 0% | |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
-| P10 | todo | P1 | 2 | 0% | |
-| S5 | todo | P1 | 2 | 0% | |
-| S7 | todo | P1 | 2 | 0% | |
 | T4 | todo | P1 | 3 | 0% | |
-| A31 | todo | P1 | 2 | 0% | |
 | E1 | todo | P1 | 3 | 0% | |
-| S12 | todo | P1 | 2 | 0% | |
-| P18 | todo | P1 | 2 | 0% | |
 | B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
 | M6 | todo | P1 | 3 | 0% | |
-| P32 | todo | P1 | 2 | 0% | |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | todo | P1 | 3 | 0% | |
 | E12 | todo | P1 | 2 | 0% | |
@@ -116,7 +106,11 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
-Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, and MCP. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's permission design. Do not edit other tasks' files.
+Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, MCP, and the push relay. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's `SECURITY.md` guard list: one table of assets, one of boundaries, and the guard that holds each one, naming the code that implements it. Link to the security sections of `docs/architecture.md` instead of restating them. Do not edit other tasks' files. Verify: every guard named in the document exists in the tree.
+
+Progress: `docs/threat-model.md` now covers the push relay and speech as well, links to the Security section of `docs/architecture.md` instead of restating it, and has a guard table naming the function or test that holds each rule (every name checked against the tree). A known-gaps section lists what the tree does not hold yet: SQLCipher only on Apple targets, no header escape/bidi cleaning until X10, fuzz targets for three parsers only, relay channel ids that can trigger wakes, and empty wakes that sync every relay account on a device (a creator decision).
+
+Left: creator review.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
@@ -133,14 +127,6 @@ Depends on: F2, X4. Reuse: X4 gettext-catalog (from cox-i18n); research/mail-app
 Done when: en + ru + de/fr/ja load; missing key falls back to msgid. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: catalogs plus a loader in `mailune-app`. Do not edit `mailune-core`. `X4` is not in this repo.
-
-### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
-
-Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
-
-Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 ### R17. Brand entry (pyrlyn/brand brands/mailune) and landing docs/site.md
 
@@ -212,22 +198,6 @@ Done when: Two-connection test sees writes from another process. Workspace check
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
 
-### A13. Smart reply suggestions
-
-Depends on: A11. Reuse: the scripted engine.
-
-Done when: a thread yields three reply suggestions.
-
-Execution plan: `mailune-ai` only.
-
-### A23. Language detection
-
-Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
-
-Done when: a message is labelled with a language. No translation call.
-
-Execution plan: `mailune-ai` only.
-
 ### C3. Autocrypt headers
 
 Depends on: C2. Reuse: the OpenPGP key type only if `mailune-crypto` can be called without editing it. Prefer a header codec in `mailune-mime`.
@@ -260,30 +230,6 @@ Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
 
-### P10. Lazy body fetch
-
-Depends on: P7. Reuse: imap-codec.
-
-Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
-
-Execution plan: `mailune-imap` only.
-
-### S5. FTS5 index
-
-Depends on: S3. Reuse: FTS5.
-
-Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
-
-Execution plan: `mailune-store` only.
-
-### S7. Change feed
-
-Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
-
-Done when: a second connection in the same process observes a write as a typed invalidation.
-
-Execution plan: `mailune-store` only.
-
 ### T4. Queue property tests
 
 Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
@@ -292,14 +238,6 @@ Done when: random ops against a model mailbox keep idempotency and undo invarian
 
 Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
 
-### A31. Voice dictation
-
-Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
-
-Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
-
-Execution plan: `mailune-ai` only.
-
 ### E1. mailune-server
 
 Depends on: B8. Reuse: `axum` from `rust.md`.
@@ -307,22 +245,6 @@ Depends on: B8. Reuse: `axum` from `rust.md`.
 Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### S12. Storage benchmarks
-
-Depends on: S3. Reuse: `divan` from `rust.md`.
-
-Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
-
-Execution plan: `mailune-store` only. Commit on `batch9-store`.
-
-### P18. JMAP push
-
-Depends on: P17.
-
-Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
-
-Execution plan: `mailune-jmap` only.
 
 ### B2. UniFFI records
 
@@ -347,14 +269,6 @@ Depends on: M1, B2.
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
-
-### P32. Relay client
-
-Depends on: P31, P16.
-
-Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
-
-Execution plan: `mailune-push` only.
 
 ### T6. Performance budgets
 

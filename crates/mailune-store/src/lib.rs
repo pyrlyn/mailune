@@ -10,6 +10,8 @@ mod blob;
 #[cfg(not(target_arch = "wasm32"))]
 mod embed;
 #[cfg(not(target_arch = "wasm32"))]
+mod feed;
+#[cfg(not(target_arch = "wasm32"))]
 mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
@@ -19,6 +21,8 @@ mod ops;
 mod repo;
 #[cfg(not(target_arch = "wasm32"))]
 mod schema;
+#[cfg(not(target_arch = "wasm32"))]
+mod search;
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod testutil;
 #[cfg(not(target_arch = "wasm32"))]
@@ -30,6 +34,8 @@ mod vector_cache;
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
 #[cfg(not(target_arch = "wasm32"))]
 pub use embed::{Choice, Embedder, Probe};
+#[cfg(not(target_arch = "wasm32"))]
+pub use feed::{Invalidation, Topic};
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
 #[cfg(not(target_arch = "wasm32"))]
@@ -90,4 +96,7 @@ pub enum Error {
     /// No candidate embedder produced usable vectors.
     #[error("no embedder produced usable vectors")]
     NoEmbedder,
+    /// The message is not stored, so there is nothing to attach the data to.
+    #[error("message is not stored")]
+    UnknownMessage,
 }

@@ -1377,3 +1377,103 @@ Done when: the phone reader shows a fixture summary and reply chips.
 Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. The phone stack already pushes the M19 `ReaderView` with its `AssistCard`, so nothing is duplicated. At phone width the reply chips stack when a row does not fit. A test hosts the reader at 390 pt and checks it fits. The I9 XCUITest checks the summary and the reply chips on the phone.
 
 What landed: The phone reader is the M19 `ReaderView` and `AssistCard`, so nothing is duplicated. At phone width the three reply chips now stack (`ViewThatFits`) instead of wrapping to a few words a line. Off the Mac, the provenance line says "Made on this device" (new `ai.made_on_this_device` key with de, fr and ja). `PhoneThreadUITests.testPhoneReaderShowsTheSummaryAndReplyChips` passed on the simulator. It checks the fixture summary, three stacked chips inside the screen, and a chip opening the composer with the reply filled in. `mailune-ai` is not edited.
+
+### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
+
+Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
+
+Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
+
+What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
+
+### P18. JMAP push
+
+Depends on: P17.
+
+Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
+
+Execution plan: `mailune-jmap` `push.rs`. The session keeps `eventSourceUrl` and the RFC 8887 WebSocket capability. A typed `StateChange` (account, type, state, pushState); EventSource `state` and `ping` events parsed with a maintained SSE parser if one fits; RFC 8887 frames (`StateChange`, `Response`, `RequestError`) decoded and `WebSocketPushEnable`/`Disable` encoded; the `{types}`, `{closeafter}`, `{ping}` URL template expanded. Tests feed fixture frames; no TCP.
+
+What landed: New module `push.rs` in `mailune-jmap`. The session now keeps `eventSourceUrl` and the RFC 8887 WebSocket capability (`url`, `supportsPush`). `event_source_request` expands the RFC 6570 template (`types`, `closeafter`, `ping`) into an authorized `GET` with `Accept: text/event-stream` for the host's streaming transport; `event_source` turns body chunks (split anywhere) into typed `PushEvent::State(StateChange)` and `Ping` through sse-stream 0.3.0, skipping unknown event types. `ws_message` decodes RFC 8887 `StateChange` (with `pushState`), `Response` and `RequestError` frames, and `push_enable`/`push_disable` encode the client messages. `StateChange::is_newer` tells the caller which saved state is behind. No TCP: tests feed fixture frames. New deps: sse-stream 0.3.0 (eventsource-stream 0.2.3, used by cox, has had no release since 2022-02) and futures-util 0.3.34, already in the tree.
+
+### P32. Relay client
+
+Depends on: P31, P16.
+
+Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
+
+Execution plan: `mailune-push` `client.rs`. A `RelayClient` turns caller-supplied random bytes into an unguessable channel, builds the webhook URL for the provider and a `POST /register` request (provider, channel, device handle; no token, no mail) for the injected `Http`, and keeps channel-to-account routes on the device. The relay gains `POST /register` (screened, an existing channel is not overwritten). An empty wake marks the device's relay-backed accounts due; `take_due` hands them to the P16 scheduler. Test: the client registers through an `Http` that drives the router in process, a Graph webhook wakes the device, and that account is due. No socket, no APNs or FCM.
+
+What landed: `RelayClient` in `mailune-push` (`client.rs`). It turns 16 bytes of host randomness into a base64url channel, registers `{provider, channel, device}` with the relay over the injected `Http`, and returns the webhook URL for the provider subscription; the channel-to-account map stays on the device. The relay gains `POST /register`: unknown keys, a short or non-base64url channel, and a device handle that is empty, has spaces, or looks like a bearer token are refused (422), and a taken channel is not overwritten (409), so knowing a channel cannot re-point it. `Registry` now has `register`. An empty wake marks every account registered on the device due, and `take_due` hands them to the P16 scheduler once. The test registers through an `Http` that drives the router in process, posts a Graph webhook to the returned URL, and sees that account due. No socket, no APNs or FCM. The wake stays empty, so with several relay accounts on one device all of them sync: naming the account would need data in the push that Apple or Google would see (a creator decision, recorded in the PR).
+
+### A13. Smart reply suggestions
+
+Depends on: A11. Reuse: the scripted engine.
+
+Done when: a thread yields three reply suggestions.
+
+Execution plan: `mailune-ai` `reply.rs`. A versioned `reply-suggestions` template (DraftReply) asks for JSON with three replies; the thread is rendered with `render_thread` and completed through any `Provider`, so the privacy router and the cloud gate (`allow_cloud`) keep encrypted mail local. A policy outside the model admits exactly three distinct, non-empty, short, single-line suggestions and fails closed with `BadOutput` otherwise. Suggestions are composer text; nothing is sent. Tests use the scripted engine; the prompt registry snapshot gains the template.
+
+What landed: `mailune-ai` `reply.rs`. A new `reply-suggestions` v1 template (DraftReply, in the registry snapshot) asks for JSON with three replies. `suggest_replies` renders the thread with `render_thread` and completes it through any `Provider`, carrying the thread's privacy, so a cloud provider's `build_request` refuses encrypted mail (tested). `admit_replies` is the policy outside the model: exactly three distinct (case-insensitive), non-empty, single-line suggestions of at most 160 characters with no control character and no link, and no extra JSON keys; anything else is `BadOutput`, nothing is trimmed into shape. Suggestions are composer text; nothing is sent. Tests use the scripted engine.
+
+### A23. Language detection
+
+Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
+
+Done when: a message is labelled with a language. No translation call.
+
+Execution plan: `mailune-ai` `language.rs` on a maintained detector: survey whatlang, lingua, and whichlang on crates.io. Detect on the subject and body with quoted lines and the signature stripped (`redact_for_cloud`); return an ISO 639-3 code with confidence, and no label when the detector is not reliable. No translation call. Row in `toolchain.md`.
+
+What landed: `mailune-ai` `language.rs` on whatlang 0.18.0. `label_language` detects on the subject and the body with quoted lines and the signature stripped (`redact_for_cloud`), so a reply is not labelled with the language it quotes; `detect_language` takes plain text. A label is an ISO 639-3 code, the English name, and the confidence; when whatlang says the result is not reliable (a short "ok", or Cyrillic it cannot tell from Bulgarian) there is no label rather than a guess. No translation call and no model call, so it runs for encrypted mail too. Survey (crates.io, 2026-10-10): whatlang 0.18.0 (2025-10-16, MIT, pure Rust, 69 languages, 83 KB crate, one dependency); lingua 1.8.0 (2026-03-09, Apache-2.0, more accurate but a 3.3 MB crate plus an optional model crate per language, 104 declared dependencies); whichlang 0.1.1 (2025-01-21, MIT, 16 languages).
+
+### A31. Voice dictation
+
+Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
+
+Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
+
+Execution plan: `mailune-ai` `dictation.rs`. A `Recognizer` trait over 16 kHz mono PCM the host captured (the core never opens the microphone), a `ScriptedRecognizer` for tests, and `dictate` that turns recognized segments into composer text. Check whether `whisper-rs` can be linked here; `mailune-ai` is the pure domain crate and is checked on wasm32, so if it cannot, keep the trait and say why in the commit.
+
+What landed: `mailune-ai` `dictation.rs`: a `Recognizer` trait over 16 kHz mono samples the host recorded (the core never opens the microphone), a `ScriptedRecognizer`, and `dictate`, which drops whisper's bracketed non-speech segments (`[BLANK_AUDIO]`, `(wind blowing)`), strips control characters, joins words with single spaces, and refuses a clip over 120 seconds or with non-finite samples before the recognizer sees it. The transcript is composer text only. `whisper-rs` is not linked: `whisper-rs-sys` 0.15.0 (behind whisper-rs 0.16) fails to build for `wasm32-unknown-unknown` (`stdio.h` not found while CMake configures whisper.cpp), and `mailune-ai` is the pure domain crate that CI checks for wasm32. Native builds work (cox-voice links it), so the whisper.cpp recognizer belongs in its own adapter crate, as `rust.md` asks for heavy native dependencies. Tests download no model and open no microphone.
+
+### S5. FTS5 index
+
+Depends on: S3. Reuse: FTS5.
+
+Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
+
+Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
+
+What landed: migration `000004_fts` (FTS5 table over subject, addresses and body keyed by a `search_docs` rowid map, a view that flattens the recipient JSON, triggers for insert, indexed-column update and delete, and a backfill) and `search.rs` with `Store::index_body` and `Store::search_text` (BM25, subject > addresses > body, one account, every word a quoted phrase). Measured on the 100k bench fixture (Apple, SQLCipher, release): a word every message holds ranks in 59 ms median. A plain JOIN let SQLite run the MATCH once per `search_docs` row (2.4 minutes), so the query pins the index as the outer loop with CROSS JOIN.
+
+### S7. Change feed
+
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+
+Done when: a second connection in the same process observes a write as a typed invalidation.
+
+Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
+
+What landed: migration `000005_change_feed` (`change_counters` bumped by triggers per topic; blobs have no topic because reads bump `used`) and `feed.rs` (`Topic`, `Invalidation`, `Store::poll_changes`). The feed reads the counters only when `open::data_version` moves. The vector cache now drops only on an `Embeddings` invalidation, and an internal check keeps the invalidation for the caller. This connection's own writes surface with the next foreign commit.
+
+### S12. Storage benchmarks
+
+Depends on: S3. Reuse: `divan` from `rust.md`.
+
+Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
+
+Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
+
+What landed: `seed_account` and `insert_messages` in `tests/support`, `insert_100k` and `text_search` in `benches/budgets.rs`, and a small insert and text search test in `tests/budgets.rs`. Measured (Apple, SQLCipher, release): 100k single-message upserts take 51 s median, about 0.5 ms each. There is no insert or text search budget yet.
+
+### P10. Lazy body fetch
+
+Depends on: P7. Reuse: imap-codec.
+
+Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
+
+Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
+
+What landed: `body.rs` with `Section`, `Partial`, `Connection::fetch_body` (`BODY.PEEK`, decoded with imap-codec) and `Connection::fetch_binary` (`BINARY.PEEK`, needs the `BINARY` capability). imap-codec 1.0.0 has no RFC 3516 support and refuses literals holding NUL, so BINARY replies are parsed from the raw bytes a new binary-safe session reader keeps (literals capped at 64 MiB). The scripted server answers both forms from message metadata; its attachment carries a NUL byte.
