@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import type { AssistResult } from "./ai";
 import type { Address, Submission } from "./contract.gen";
 import { t } from "./i18n";
 
@@ -56,10 +57,12 @@ function sendSubmission(draft: Draft): Submission {
  */
 export function Composer({
   initial = emptyDraft,
+  assist,
   onDraft,
   onSend,
 }: {
   initial?: Draft;
+  assist?: AssistResult;
   onDraft?: (submission: Submission) => void;
   onSend: (submission: Submission) => void;
 }) {
@@ -67,13 +70,15 @@ export function Composer({
   const [confirmed, setConfirmed] = useState(false);
   const canSend = confirmed && parseRecipients(draft.to).length > 0;
 
+  const change = (next: Draft) => {
+    setDraft(next);
+    setConfirmed(false);
+    onDraft?.(draftSubmission(next));
+  };
+
   const edit =
-    (field: keyof Draft) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const next = { ...draft, [field]: event.target.value };
-      setDraft(next);
-      setConfirmed(false);
-      onDraft?.(draftSubmission(next));
-    };
+    (field: keyof Draft) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      change({ ...draft, [field]: event.target.value });
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -98,6 +103,15 @@ export function Composer({
         {t("compose.write_your_message")}
         <textarea name="body" rows={10} value={draft.body} onChange={edit("body")} />
       </label>
+      {assist ? (
+        <section className="assist" aria-label={t("compose.suggested")}>
+          <h3>{t("compose.suggested")}</h3>
+          <p>{assist.text}</p>
+          <button type="button" onClick={() => change({ ...draft, body: assist.text })}>
+            {t("compose.use_suggestion")}
+          </button>
+        </section>
+      ) : null}
       <label className="confirm">
         <input
           name="confirm"
@@ -105,7 +119,7 @@ export function Composer({
           checked={confirmed}
           onChange={(event) => setConfirmed(event.target.checked)}
         />
-        {t("compose.confirm_send")}
+        {t("compose.confirm_recipients")}
       </label>
       <button type="submit" disabled={!canSend}>
         {t("compose.send")}

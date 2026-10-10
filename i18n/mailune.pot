@@ -429,7 +429,7 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 
-msgctxt "compose.confirm_send"
+msgctxt "compose.confirm_recipients"
 msgid "I have checked the recipients and want to send this"
 msgstr ""
 
@@ -785,6 +785,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr ""
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr ""
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr ""
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr ""
@@ -1055,6 +1063,10 @@ msgstr ""
 
 msgctxt "data.updates"
 msgid "Updates"
+msgstr ""
+
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
 msgstr ""
 
 msgctxt "settings.vacation_responder"
