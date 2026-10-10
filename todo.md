@@ -20,7 +20,6 @@
 - S5. FTS5 index
 - S7. Change feed
 - T4. Queue property tests
-- A31. Voice dictation
 - E1. mailune-server
 - S12. Storage benchmarks
 - B2. UniFFI records

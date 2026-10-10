@@ -26,7 +26,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S5 | todo | P1 | 2 | 0% | |
 | S7 | todo | P1 | 2 | 0% | |
 | T4 | todo | P1 | 3 | 0% | |
-| A31 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | E1 | todo | P1 | 3 | 0% | |
 | S12 | todo | P1 | 2 | 0% | |
 | B2 | todo | P1 | 3 | 0% | |
@@ -267,14 +266,6 @@ Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
 Done when: random ops against a model mailbox keep idempotency and undo invariants.
 
 Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
-
-### A31. Voice dictation
-
-Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
-
-Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
-
-Execution plan: `mailune-ai` `dictation.rs`. A `Recognizer` trait over 16 kHz mono PCM the host captured (the core never opens the microphone), a `ScriptedRecognizer` for tests, and `dictate` that turns recognized segments into composer text. Check whether `whisper-rs` can be linked here; `mailune-ai` is the pure domain crate and is checked on wasm32, so if it cannot, keep the trait and say why in the commit.
 
 ### E1. mailune-server
 

@@ -8,6 +8,7 @@ mod attachment;
 pub mod catalog;
 mod cloud;
 mod compose;
+mod dictation;
 mod digest;
 mod engine;
 mod eval;
@@ -36,6 +37,7 @@ pub use agent::{
 pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
 pub use cloud::{CloudApi, CloudRequest, KeyHeader, build_request, parse_response};
 pub use compose::{ComposeAction, Tone, assist};
+pub use dictation::{MAX_SECONDS, Recognizer, SAMPLE_RATE, ScriptedRecognizer, dictate};
 pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
