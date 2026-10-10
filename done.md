@@ -1328,6 +1328,56 @@ Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do n
 
 What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
 
+### M15. App Intents
+
+Depends on: M11.
+
+Done when: summarise, search, and compose are intent types a unit test can invoke with fixture data.
+
+Execution plan: `desktop/macos` only. `MailuneUI/Intents.swift`: a thread `AppEntity` with a string query over the fixture rows, and three App Intents. Summarise returns the thread's summary through `AssistPolicy`, so cloud text about encrypted mail stays hidden. Search runs the M11 `SearchQuery` over the same rows the thread list shows. Compose builds a `mailto:` link that the app's existing `MailtoLink` handler opens in the composer, so the intent can never send and confirm-before-send still applies. The app target lists the package's intents. Titles come from `i18n/` keys. Tests call each intent's logic and `perform()` with fixtures.
+
+What landed: `MailuneUI/Intents.swift` defines three App Intents. A thread `AppEntity` with a string query over the fixture rows carries the subject and sender only, never message text. Summarize returns the thread's summary through `AssistPolicy`, so cloud text about encrypted mail stays hidden. Search runs the M11 `SearchQuery` over the thread rows and reports a bad or unsupported query. Compose has no outbox: it hands a draft to `ComposeRequests`, which the Mac shell, the iPad split and the phone stack open in the composer, so a send still needs the confirm step. `Composer.addresses(in:)` is now the one recipient splitter for the composer and the intent. Both apps list the package through `AppIntentsPackage`, and the build exports `Metadata.appintents` with the three intents. Titles are i18n keys read from the MailuneUI bundle; the new `intent.*` keys have de, fr and ja translations. `IntentTests` runs each intent's `perform()` on fixtures. The Shortcuts app itself was not checked by hand.
+
+### M16. macOS accessibility
+
+Depends on: M9, M10.
+
+Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
+
+Execution plan: `desktop/macos` only. The reader marks the subject as a heading and labels the sender, the badge and the assist card; the composer labels the body editor and the recipient chips. Keyboard path: select a thread, ⌘R replies, ⌘↩ asks to send, and Return confirms. The shortcuts live in one table, and a test checks they do not collide. The palette keeps its colour components so a test can compute the WCAG contrast of ink on canvas and fail below 4.5:1.
+
+What landed: The reader marks the subject as a heading, labels the sender ("From Ana Ruiz"), groups the assist card under "Summary" and the blocked-content banner into one element, and hides the action-item tick that VoiceOver read as "Selected". The composer labels the body editor ("Message body"), the To field and each recipient chip. Keyboard path: arrow keys pick a thread, ⌘R replies (a new Reply button), ⌘↩ asks to send, and Return confirms. Every shortcut lives in one `MailuneShortcut` table; a test checks they are distinct and leave the macOS ones alone. The palette keeps its sRGB numbers (`MailunePalette`), and a test computes the WCAG 2.2 ratio of ink on canvas (14.9:1) and fails below 7:1; the formula is checked against 21:1 and #777777 on white. `AccessibilityUITests.testReaderAndComposerAreLabelled` reads the tree VoiceOver reads and passed locally and in CI. `testReplyAndSendFromTheKeyboard` drives that path with keys; it passed in the swift workflow's `ui` job, but not on the agent's Mac, where XCUITest could not deliver key events from that session. Found and fixed on the way: a composer sheet shown by a Bool could open with the previous draft, so Reply and the M19 reply chips opened an empty composer; both shells now use `sheet(item:)`.
+
+### M18. macOS release script
+
+Depends on: M13, R10.
+
+Done when: a script builds a DMG layout and an appcast fixture. If the signing identity is missing, the script says so and does not call Apple. Do not notarize for real.
+
+Execution plan: `desktop/macos` only. `scripts/release.sh` builds the Release app, or takes `--app`, and lays out a DMG folder (the app plus an `Applications` link). It makes the DMG with `hdiutil` and writes a Sparkle-style `appcast.xml` fixture with the version, the length and a placeholder signature. It signs only when `MAILUNE_SIGN_IDENTITY` is set; otherwise it says so and calls nothing at Apple. It never notarizes. `scripts/test.sh` runs it on the Debug app in a temporary folder and checks the layout and the appcast.
+
+What landed: `scripts/release.sh` builds the Release app or takes `--app`, lays out `Mailune-X.Y.Z.dmg` with `hdiutil` (the app plus an `Applications` link, the layout pyrlyn/ci `release-apple-desktop.yml` makes), verifies it, and writes a Sparkle `appcast.xml` fixture with the version, build, minimum macOS, DMG length and a placeholder EdDSA signature. It signs only with `MAILUNE_SIGN_IDENTITY`; without it, it says so and calls nothing at Apple. It never notarizes. `scripts/release_test.sh` runs it on the Debug app with codesign, xcrun, notarytool, altool and curl replaced by recording stubs, then mounts the DMG and checks its contents and the appcast; removing the Applications link made it fail. `scripts/test.sh` runs it. The feed URL uses a `desktop-v` tag as ketch does; the macOS release tag prefix is not decided yet.
+
+### I9. iOS UI test
+
+Depends on: I3, B7.
+
+Done when: one XCUITest selects a fixture thread on the phone layout. If the runner cannot launch, commit the test and say why.
+
+Execution plan: `desktop/macos` only. A `MailuneIOSUITests` target and scheme. The iOS app honours `-mailune-ui-test` (fake preferences). One XCUITest launches on an iPhone simulator, taps the `thread-t1` fixture row, and sees the reader. `scripts/test.sh` compiles it; `scripts/uitest.sh` also runs it on the newest iPhone simulator. If the runner cannot launch, the test stays committed and the card says why.
+
+What landed: `MailuneIOSUITests/PhoneThreadUITests.swift`, in a new `MailuneIOSUITests` target and scheme, launches the iPhone layout with `-mailune-ui-test` (fake saved settings), taps the `thread-t1` fixture row and sees the pushed reader. It passed on an iPhone simulator through `xcodebuild test`. It caught a bug: the phone list always had a selection binding, so a tap selected the row and never pushed the reader; the binding is now passed only in Edit mode. `scripts/test.sh` compiles the test, `scripts/uitest.sh` runs it on the newest iPhone simulator, and the simulator lookup moved to `scripts/simulator.sh`.
+
+### I10. iOS AI surfaces
+
+Depends on: I4, I5, M19.
+
+Done when: the phone reader shows a fixture summary and reply chips.
+
+Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. The phone stack already pushes the M19 `ReaderView` with its `AssistCard`, so nothing is duplicated. At phone width the reply chips stack when a row does not fit. A test hosts the reader at 390 pt and checks it fits. The I9 XCUITest checks the summary and the reply chips on the phone.
+
+What landed: The phone reader is the M19 `ReaderView` and `AssistCard`, so nothing is duplicated. At phone width the three reply chips now stack (`ViewThatFits`) instead of wrapping to a few words a line. Off the Mac, the provenance line says "Made on this device" (new `ai.made_on_this_device` key with de, fr and ja). `PhoneThreadUITests.testPhoneReaderShowsTheSummaryAndReplyChips` passed on the simulator. It checks the fixture summary, three stacked chips inside the screen, and a chip opening the composer with the reply filled in. `mailune-ai` is not edited.
+
 ### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
 
 Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.

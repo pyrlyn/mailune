@@ -1312,3 +1312,23 @@ msgstr "La connexion n’a pas abouti. Réessayez."
 msgctxt "mail_list.refresh_failed"
 msgid "Couldn’t refresh. Showing the last list."
 msgstr "Actualisation impossible. La dernière liste est affichée."
+
+msgctxt "intent.summarize"
+msgid "Summarize conversation"
+msgstr "Résumer la conversation"
+
+msgctxt "intent.conversation"
+msgid "Conversation"
+msgstr "Conversation"
+
+msgctxt "intent.query"
+msgid "Search for"
+msgstr "Rechercher"
+
+msgctxt "intent.no_summary"
+msgid "This conversation has no summary yet."
+msgstr "Cette conversation n’a pas encore de résumé."
+
+msgctxt "ai.made_on_this_device"
+msgid "Made on this device"
+msgstr "Créé sur cet appareil"

@@ -11,7 +11,9 @@
         @Environment(\.editMode) private var editMode
 
         var body: some View {
-            List(feed.visible(category: category), selection: $selection) { item in
+            // Bound only while editing: a list with a selection turns a tap into
+            // a selection, and the row would never push its reader.
+            List(feed.visible(category: category), selection: editMode?.wrappedValue.isEditing == true ? $selection : nil) { item in
                 NavigationLink(value: item.id) {
                     ThreadRowView(item: item)
                 }

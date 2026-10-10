@@ -1,0 +1,34 @@
+name: testflight
+
+# Uploads the iOS app to TestFlight through the R13 reusable workflow in
+# pyrlyn/ci, pinned by commit SHA. desktop/macos/scripts/ipa.sh is its build
+# command and makes the IPA; the reusable workflow checks the certificate and
+# uploads. Dispatch only, so it is never a pull-request check and the required
+# checks are unchanged. It cannot upload until the App Store Connect secrets
+# and the APPLE_TEAM_ID variable are set.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testflight:
+    permissions:
+      contents: read
+      actions: write # cancel-run on failure
+    uses: pyrlyn/ci/.github/workflows/testflight.yml@95d76fd108401b834720bf8cc01606861c40915a # main
+    with:
+      ipa: desktop/macos/build/ipa/MailuneIOS.ipa
+      # The team id is not a secret; ipa.sh refuses anything but ten letters
+      # and digits.
+      build-command: MAILUNE_TEAM_ID='${{ vars.APPLE_TEAM_ID }}' desktop/macos/scripts/ipa.sh
+      # The only image with Xcode 27, which the iOS 26 SDK needs (see swift.yml).
+      runs-on: xcode-27
+      xcode-version: "27"
+    secrets:
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+      APPSTORE_CONNECT_KEY: ${{ secrets.APPSTORE_CONNECT_KEY }}
+      APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+      APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}

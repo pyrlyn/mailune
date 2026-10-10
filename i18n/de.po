@@ -1312,3 +1312,23 @@ msgstr "Die Anmeldung wurde nicht abgeschlossen. Versuche es erneut."
 msgctxt "mail_list.refresh_failed"
 msgid "Couldn’t refresh. Showing the last list."
 msgstr "Aktualisieren fehlgeschlagen. Die letzte Liste wird angezeigt."
+
+msgctxt "intent.summarize"
+msgid "Summarize conversation"
+msgstr "Unterhaltung zusammenfassen"
+
+msgctxt "intent.conversation"
+msgid "Conversation"
+msgstr "Unterhaltung"
+
+msgctxt "intent.query"
+msgid "Search for"
+msgstr "Suchen nach"
+
+msgctxt "intent.no_summary"
+msgid "This conversation has no summary yet."
+msgstr "Für diese Unterhaltung gibt es noch keine Zusammenfassung."
+
+msgctxt "ai.made_on_this_device"
+msgid "Made on this device"
+msgstr "Auf diesem Gerät erstellt"

@@ -28,8 +28,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
 | M6 | todo | P1 | 3 | 0% | |
-| M15 | todo | P1 | 2 | 0% | |
-| M16 | todo | P1 | 2 | 0% | |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | todo | P1 | 3 | 0% | |
 | E12 | todo | P1 | 2 | 0% | |
@@ -48,11 +46,8 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | todo | P1 | 2 | 0% | |
 | L12 | todo | P1 | 2 | 0% | |
 | L13 | todo | P1 | 2 | 0% | |
-| M18 | todo | P1 | 2 | 0% | |
 | I2 | todo | P1 | 3 | 0% | |
 | I6 | todo | P1 | 2 | 0% | |
-| I9 | todo | P1 | 2 | 0% | |
-| I10 | todo | P1 | 2 | 0% | |
 | I7 | todo | P1 | 3 | 0% | |
 | B5 | todo | P1 | 2 | 0% | |
 | W1 | todo | P1 | 2 | 0% | |
@@ -88,7 +83,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X7 | todo | P0 | 2 | 0% | |
 | X8 | todo | P0 | 3 | 0% | |
 | D13 | todo | P1 | 3 | 0% | |
-| I8 | todo | P1 | 3 | 0% | |
+| I8 | todo | P1 | 3 | 60% | |
 | W13 | todo | P1 | 3 | 0% | |
 | B10 | todo | P3 | 3 | 0% | |
 | B11 | todo | P3 | 4 | 0% | |
@@ -362,22 +357,6 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M15. App Intents
-
-Depends on: M11.
-
-Done when: summarise, search, and compose are intent types a unit test can invoke with fixture data.
-
-Execution plan: `desktop/macos` only.
-
-### M16. macOS accessibility
-
-Depends on: M9, M10.
-
-Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
-
-Execution plan: `desktop/macos` only.
-
 ### L1. C library build
 
 Depends on: B6. GTK 4 and `valac` are not installed on this machine.
@@ -442,14 +421,6 @@ Done when: a list description has one fixture row with a subject, and a test rea
 
 Execution plan: `desktop/linux` only.
 
-### M18. macOS release script
-
-Depends on: M13, R10.
-
-Done when: a script builds a DMG layout and an appcast fixture. If the signing identity is missing, the script says so and does not call Apple. Do not notarize for real.
-
-Execution plan: `desktop/macos` only.
-
 ### I2. iOS host
 
 Depends on: I1, M5.
@@ -463,22 +434,6 @@ Execution plan: `desktop/macos` only.
 Depends on: M6. The model catalog is on another branch.
 
 Done when: embeddings are the default on-device job, and a larger job stays off unless a flag is set. The scripted model covers the test.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
-
-### I9. iOS UI test
-
-Depends on: I3, B7.
-
-Done when: one XCUITest selects a fixture thread on the phone layout. If the runner cannot launch, commit the test and say why.
-
-Execution plan: `desktop/macos` only.
-
-### I10. iOS AI surfaces
-
-Depends on: I4, I5, M19.
-
-Done when: the phone reader shows a fixture summary and reply chips.
 
 Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
 
@@ -816,7 +771,11 @@ Depends on: I1, R13. Reuse: the R13 App Store Connect workflow, based on the pyr
 
 Done when: a TestFlight upload can run from that workflow. A real upload waits on R13.
 
-Execution plan: `desktop/macos` on `batch7-imap` only. No real TestFlight upload.
+Execution plan: `desktop/macos` plus one new `.github/workflows/testflight.yml`; the required checks are unchanged. `desktop/macos/scripts/ipa.sh` archives `MailuneIOS` for devices and exports an App Store Connect IPA. Without a team id and signing identity it says so and stops before calling Apple. The workflow is `workflow_dispatch` only and calls the R13 pyrlyn/ci `testflight.yml` reusable workflow, pinned by SHA, with `ipa.sh` as the build command. It is validated with actionlint. No real upload.
+
+What landed so far: `.github/workflows/testflight.yml` (dispatch only, validated with actionlint 1.7.12) calls the R13 pyrlyn/ci `testflight.yml` pinned at `95d76fd`, with the App Store Connect secrets by name and `desktop/macos/scripts/ipa.sh` as its build command. `ipa.sh` archives MailuneIOS and exports an App Store Connect IPA with Xcode's cloud-managed signing (`desktop/macos/ExportOptions-AppStore.plist`). It stops with a message before calling Apple when the team id or the API key is missing. No upload was run.
+
+Left: the R13 workflow cannot run this build yet. Its Build step runs before any secret is available and without mise, so `ipa.sh` gets neither the App Store Connect key for signing nor XcodeGen and translate-toolkit. R13 needs two things before Build: mise, and the API key written to `~/private_keys` (as its upload step already does) with the key id and issuer in the environment. Its `macos-sign` step also requires a Developer ID certificate, which a TestFlight upload does not use. Outside R13: the iOS app has no app icon yet, which App Store Connect rejects, and the `APPLE_TEAM_ID` variable and the secrets must be set.
 
 ### W13. Windows release
 

@@ -1310,3 +1310,23 @@ msgstr "サインインが完了しませんでした。もう一度お試しく
 msgctxt "mail_list.refresh_failed"
 msgid "Couldn’t refresh. Showing the last list."
 msgstr "更新できませんでした。前回のリストを表示しています。"
+
+msgctxt "intent.summarize"
+msgid "Summarize conversation"
+msgstr "会話を要約"
+
+msgctxt "intent.conversation"
+msgid "Conversation"
+msgstr "会話"
+
+msgctxt "intent.query"
+msgid "Search for"
+msgstr "検索語"
+
+msgctxt "intent.no_summary"
+msgid "This conversation has no summary yet."
+msgstr "この会話にはまだ要約がありません。"
+
+msgctxt "ai.made_on_this_device"
+msgid "Made on this device"
+msgstr "このデバイスで作成"

@@ -16,6 +16,18 @@ final class PhoneReaderTests: XCTestCase {
         }
     }
 
+    func testOnDeviceLineNamesTheMacOnlyOnTheMac() {
+        #if os(macOS)
+            XCTAssertEqual(AssistCard.deviceKey, "ai.made_on_device")
+        #else
+            XCTAssertEqual(AssistCard.deviceKey, "ai.made_on_this_device")
+        #endif
+        let line = Copy.text("ai.made_on_this_device", language: "en")
+        XCTAssertNotEqual(line, "ai.made_on_this_device")
+        XCTAssertFalse(line.contains("Mac"))
+        XCTAssertNotEqual(Copy.text("ai.made_on_this_device", language: "ja"), line)
+    }
+
     func testRemoteContentStaysBlockedAtPhoneWidth() throws {
         let receipt = try XCTUnwrap(MessageFixtures.message(forThread: "t3"))
         let presentation = ReaderPresentation(message: receipt, quotesCollapsed: true)
