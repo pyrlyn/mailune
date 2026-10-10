@@ -8,6 +8,10 @@ use std::fmt;
 use std::io::{self, Read, Write};
 use std::sync::{Arc, Mutex, MutexGuard};
 
+use imap_codec::CommandCodec;
+use imap_codec::encode::Encoder;
+use imap_codec::imap_types::command::{Command, CommandBody};
+
 use crate::Error;
 use crate::script::Scripted;
 
@@ -223,16 +227,20 @@ impl<S: Read + Write> Connection<S> {
         Ok(text.into_owned())
     }
 
-    /// Sends `body` under a new tag and returns the untagged responses before the tagged OK,
-    /// with literals read as raw bytes. The line readers above would split a literal at its
-    /// CRLFs and lose bytes that are not UTF-8.
+    /// Encodes `body` with imap-codec under a new tag and returns the untagged responses before
+    /// the tagged OK, with literals read as raw bytes. The line readers above would split a
+    /// literal at its CRLFs and lose bytes that are not UTF-8.
+    ///
+    /// `body` must not need literals: they would wait for a continuation this does not read.
     ///
     /// # Errors
     ///
     /// [`Error::Rejected`] on NO or BAD, [`Error::Response`] for a literal over
     /// [`MAX_LITERAL`], [`Error::Session`] when the stream stops.
-    pub(crate) fn run_raw(&mut self, body: &str) -> Result<Vec<RawResponse>, Error> {
-        let tag = self.send(body)?;
+    pub(crate) fn run_raw(&mut self, body: CommandBody<'_>) -> Result<Vec<RawResponse>, Error> {
+        let tag = self.next_tag();
+        let command = Command::new(tag.as_str(), body).map_err(|_| Error::Argument)?;
+        self.send_bytes(&CommandCodec::new().encode(&command).dump())?;
         let mut responses = Vec::new();
         loop {
             let response = self.read_raw_response()?;

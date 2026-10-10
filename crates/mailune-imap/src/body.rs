@@ -2,17 +2,21 @@
 //! opens it. Initial sync reads only metadata.
 //!
 //! Both requests use `.PEEK`, so opening a body never sets `\Seen` behind the user's back.
-//! `BODY` replies are decoded with imap-codec. imap-codec 1.0 knows neither the `BINARY` item
-//! nor `~{n}` literals (RFC 3516), and refuses literals holding NUL, which decoded binary parts
-//! do; so a `BINARY` reply is read here, from the raw bytes the session kept.
+//! Requests are encoded and replies decoded with imap-codec, including `BINARY` (RFC 3516)
+//! and its `~{n}` literals, which may hold NUL.
 
 use std::io::{Read, Write};
+use std::num::NonZeroU32;
 
 use imap_codec::ResponseCodec;
 use imap_codec::decode::Decoder;
-use imap_codec::imap_types::core::NString;
-use imap_codec::imap_types::fetch::MessageDataItem;
+use imap_codec::imap_types::command::CommandBody;
+use imap_codec::imap_types::core::{NString, NString8, Vec1};
+use imap_codec::imap_types::fetch::{
+    MacroOrMessageDataItemNames, MessageDataItem, MessageDataItemName, Part, Section as ImapSection,
+};
 use imap_codec::imap_types::response::{Data, Response};
+use imap_codec::imap_types::sequence::SequenceSet;
 
 use crate::session::RawResponse;
 use crate::{Connection, Error};
@@ -46,40 +50,22 @@ impl<S: Read + Write> Connection<S> {
     ///
     /// # Errors
     ///
-    /// [`Error::Argument`] for a zero part number or count, [`Error::Rejected`] when the server
-    /// refuses, [`Error::Session`] when the stream stops.
+    /// [`Error::Argument`] for a zero UID, part number or count, [`Error::Rejected`] when the
+    /// server refuses, [`Error::Session`] when the stream stops.
     pub fn fetch_body(
         &mut self,
         uid: u32,
         section: &Section,
         partial: Option<Partial>,
     ) -> Result<Option<Vec<u8>>, Error> {
-        let spec = section_spec(section)?;
-        let range = range_spec(partial)?;
-        let replies = self.run_raw(&format!("UID FETCH {uid} (BODY.PEEK[{spec}]{range})"))?;
-        let codec = ResponseCodec::new();
-        for reply in &replies {
-            let Ok((_, Response::Data(Data::Fetch { items, .. }))) = codec.decode(&reply.bytes)
-            else {
-                continue;
-            };
-            let mut ours = false;
-            let mut data = None;
-            for item in items.as_ref() {
-                match item {
-                    MessageDataItem::Uid(found) => ours = found.get() == uid,
-                    MessageDataItem::BodyExt {
-                        data: NString(value),
-                        ..
-                    } => data = value.as_ref().map(|value| value.as_ref().to_vec()),
-                    _ => {}
-                }
-            }
-            if ours {
-                return Ok(data.map(|bytes| clamp(bytes, partial)));
-            }
-        }
-        Ok(None)
+        let item = MessageDataItemName::BodyExt {
+            section: imap_section(section)?,
+            partial: range(partial)?,
+            peek: true,
+        };
+        let replies = self.run_raw(uid_fetch(uid, item)?)?;
+        let replies = replies.into_iter().map(|reply| reply.bytes);
+        Ok(section_data(replies, uid).map(|bytes| clamp(bytes, partial)))
     }
 
     /// The decoded bytes of part `part` of message `uid` (RFC 3516): the server undoes base64
@@ -99,49 +85,128 @@ impl<S: Read + Write> Connection<S> {
         if !self.has_capability("BINARY") {
             return Err(Error::Unsupported);
         }
-        let spec = if part.is_empty() {
-            String::new()
-        } else {
-            part_path(part)?
+        let item = MessageDataItemName::Binary {
+            section: part_numbers(part)?,
+            partial: range(partial)?,
+            peek: true,
         };
-        let range = range_spec(partial)?;
-        let replies = self.run_raw(&format!("UID FETCH {uid} (BINARY.PEEK[{spec}]{range})"))?;
-        for reply in &replies {
-            if !is_fetch(reply) || !has_uid(reply, uid) {
-                continue;
-            }
-            return binary_data(reply).map(|data| data.map(|bytes| clamp(bytes, partial)));
-        }
-        Ok(None)
+        let replies = self.run_raw(uid_fetch(uid, item)?)?;
+        let replies = replies.iter().map(without_binary_origin);
+        Ok(section_data(replies, uid).map(|bytes| clamp(bytes, partial)))
     }
 }
 
-fn section_spec(section: &Section) -> Result<String, Error> {
-    Ok(match section {
-        Section::Full => String::new(),
-        Section::Header => "HEADER".to_string(),
-        Section::Text => "TEXT".to_string(),
-        Section::Part(path) => part_path(path)?,
+fn uid_fetch(uid: u32, item: MessageDataItemName<'_>) -> Result<CommandBody<'_>, Error> {
+    Ok(CommandBody::Fetch {
+        sequence_set: SequenceSet::try_from(uid).map_err(|_| Error::Argument)?,
+        macro_or_item_names: MacroOrMessageDataItemNames::MessageDataItemNames(vec![item]),
+        uid: true,
     })
 }
 
-fn part_path(path: &[u32]) -> Result<String, Error> {
-    if path.is_empty() || path.contains(&0) {
-        return Err(Error::Argument);
-    }
-    Ok(path
-        .iter()
-        .map(u32::to_string)
-        .collect::<Vec<_>>()
-        .join("."))
+fn imap_section(section: &Section) -> Result<Option<ImapSection<'static>>, Error> {
+    Ok(match section {
+        Section::Full => None,
+        Section::Header => Some(ImapSection::Header(None)),
+        Section::Text => Some(ImapSection::Text(None)),
+        Section::Part(path) => {
+            let path = Vec1::try_from(part_numbers(path)?).map_err(|_| Error::Argument)?;
+            Some(ImapSection::Part(Part(path)))
+        }
+    })
 }
 
-fn range_spec(partial: Option<Partial>) -> Result<String, Error> {
-    match partial {
-        None => Ok(String::new()),
-        Some(Partial { count: 0, .. }) => Err(Error::Argument),
-        Some(Partial { offset, count }) => Ok(format!("<{offset}.{count}>")),
+fn part_numbers(path: &[u32]) -> Result<Vec<NonZeroU32>, Error> {
+    path.iter()
+        .map(|&number| NonZeroU32::new(number).ok_or(Error::Argument))
+        .collect()
+}
+
+fn range(partial: Option<Partial>) -> Result<Option<(u32, NonZeroU32)>, Error> {
+    partial
+        .map(|Partial { offset, count }| {
+            NonZeroU32::new(count)
+                .map(|count| (offset, count))
+                .ok_or(Error::Argument)
+        })
+        .transpose()
+}
+
+/// The section bytes in the FETCH reply for `uid`. A NIL section and a missing reply are both
+/// `None`; replies imap-codec cannot decode are skipped as untrusted noise.
+fn section_data(replies: impl Iterator<Item = Vec<u8>>, uid: u32) -> Option<Vec<u8>> {
+    let codec = ResponseCodec::new();
+    for reply in replies {
+        let Ok((_, Response::Data(Data::Fetch { items, .. }))) = codec.decode(&reply) else {
+            continue;
+        };
+        let mut ours = false;
+        let mut data = None;
+        for item in items.as_ref() {
+            match item {
+                MessageDataItem::Uid(found) => ours = found.get() == uid,
+                MessageDataItem::BodyExt { data: value, .. }
+                | MessageDataItem::Binary {
+                    value: NString8::NString(value),
+                    ..
+                } => data = nstring_bytes(value),
+                MessageDataItem::Binary {
+                    value: NString8::Literal8(literal),
+                    ..
+                } => data = Some(literal.data.to_vec()),
+                _ => {}
+            }
+        }
+        if ours {
+            return data;
+        }
     }
+    None
+}
+
+fn nstring_bytes(value: &NString<'_>) -> Option<Vec<u8>> {
+    value.0.as_ref().map(|value| value.as_ref().to_vec())
+}
+
+/// RFC 3516 and RFC 9051 say a partial `BINARY` reply names its origin (`BINARY[2]<4> ~{n}`),
+/// and servers send it, but the ABNF of both leaves it out and imap-codec follows the ABNF.
+/// Dropping the origin lets imap-codec decode the reply; it is the offset we asked for. Only
+/// bytes outside literals are looked at, so message content never reads as protocol.
+fn without_binary_origin(reply: &RawResponse) -> Vec<u8> {
+    const NAME: &[u8] = b"BINARY[";
+    let bytes = &reply.bytes;
+    let inside = |at: usize| reply.literals.iter().any(|range| range.contains(&at));
+    let name = (0..bytes.len()).find(|&at| {
+        !inside(at)
+            && bytes
+                .get(at..at + NAME.len())
+                .is_some_and(|window| window.eq_ignore_ascii_case(NAME))
+    });
+    let origin = name.and_then(|name| {
+        let after_name = name + NAME.len();
+        let section = bytes.get(after_name..)?;
+        let close = after_name
+            + section
+                .iter()
+                .position(|&byte| !(byte.is_ascii_digit() || byte == b'.'))?;
+        let open = close + 1;
+        let digits = bytes.get(open + 1..)?;
+        let count = digits
+            .iter()
+            .take_while(|byte| byte.is_ascii_digit())
+            .count();
+        let shut = open + 1 + count;
+        let well_formed = bytes.get(close) == Some(&b']')
+            && bytes.get(open) == Some(&b'<')
+            && count > 0
+            && bytes.get(shut) == Some(&b'>');
+        well_formed.then_some(open..=shut)
+    });
+    let mut bytes = bytes.clone();
+    if let Some(origin) = origin {
+        bytes.drain(origin);
+    }
+    bytes
 }
 
 /// A server that sends more than was asked for is cut to the range.
@@ -152,85 +217,10 @@ fn clamp(mut bytes: Vec<u8>, partial: Option<Partial>) -> Vec<u8> {
     bytes
 }
 
-/// The first position of `needle` that is not inside a literal, so message bytes that happen
-/// to read like protocol are never mistaken for it.
-fn find_outside(reply: &RawResponse, needle: &[u8], from: usize) -> Option<usize> {
-    let inside = |at: usize| reply.literals.iter().any(|range| range.contains(&at));
-    (from..reply
-        .bytes
-        .len()
-        .saturating_sub(needle.len())
-        .saturating_add(1))
-        .find(|&at| !inside(at) && reply.bytes.get(at..at + needle.len()) == Some(needle))
-}
-
-fn is_fetch(reply: &RawResponse) -> bool {
-    reply.bytes.starts_with(b"* ") && find_outside(reply, b" FETCH (", 0).is_some()
-}
-
-fn has_uid(reply: &RawResponse, uid: u32) -> bool {
-    let mut from = 0;
-    while let Some(at) = find_outside(reply, b"UID ", from) {
-        let boundary = matches!(reply.bytes.get(at.wrapping_sub(1)), Some(b'(' | b' '));
-        let digits: Vec<u8> = reply.bytes[at + 4..]
-            .iter()
-            .copied()
-            .take_while(u8::is_ascii_digit)
-            .collect();
-        if boundary
-            && std::str::from_utf8(&digits)
-                .ok()
-                .and_then(|text| text.parse().ok())
-                == Some(uid)
-        {
-            return true;
-        }
-        from = at + 1;
-    }
-    false
-}
-
-/// The value after `BINARY[...]<n> `: a literal, a literal8, a quoted string, or NIL.
-fn binary_data(reply: &RawResponse) -> Result<Option<Vec<u8>>, Error> {
-    let at = find_outside(reply, b"BINARY[", 0).ok_or(Error::Response)?;
-    let close = find_outside(reply, b"]", at).ok_or(Error::Response)?;
-    let mut cursor = close + 1;
-    if reply.bytes.get(cursor) == Some(&b'<') {
-        cursor = find_outside(reply, b">", cursor).ok_or(Error::Response)? + 1;
-    }
-    if reply.bytes.get(cursor) != Some(&b' ') {
-        return Err(Error::Response);
-    }
-    cursor += 1;
-    let rest = reply.bytes.get(cursor..).ok_or(Error::Response)?;
-    if rest.starts_with(b"NIL") {
-        return Ok(None);
-    }
-    if rest.starts_with(b"~{") || rest.starts_with(b"{") {
-        let literal = reply
-            .literals
-            .iter()
-            .find(|range| range.start > cursor)
-            .ok_or(Error::Response)?;
-        return Ok(Some(reply.bytes[literal.clone()].to_vec()));
-    }
-    if rest.first() == Some(&b'"') {
-        let mut out = Vec::new();
-        let mut bytes = rest.iter().skip(1);
-        while let Some(&byte) = bytes.next() {
-            match byte {
-                b'"' => return Ok(Some(out)),
-                b'\\' => out.push(*bytes.next().ok_or(Error::Response)?),
-                _ => out.push(byte),
-            }
-        }
-    }
-    Err(Error::Response)
-}
-
 #[cfg(test)]
 mod tests {
     use super::{Partial, Section};
+    use crate::session::RawResponse;
     use crate::sync::tests::{config, day};
     use crate::{Connection, Error, MemStream, Scripted};
 
@@ -351,6 +341,10 @@ mod tests {
             session.fetch_body(1, &Section::Part(Vec::new()), None),
             Err(Error::Argument)
         ));
+        assert!(matches!(
+            session.fetch_binary(0, &[1], None),
+            Err(Error::Argument)
+        ));
         // The session still works after a refused request.
         assert!(
             session
@@ -371,15 +365,33 @@ mod tests {
 
     #[test]
     fn protocol_text_inside_a_literal_is_not_parsed() {
-        let reply = crate::session::RawResponse {
-            bytes: b"* 1 FETCH (BINARY[1] {15}\r\nUID 7 BINARY[2] UID 3)\r\n".to_vec(),
-            literals: std::iter::once(27..42).collect(),
-        };
-        assert!(super::has_uid(&reply, 3));
-        assert!(!super::has_uid(&reply, 7));
+        let literal = b"BINARY[2]<9> UID 7";
+        let mut bytes = b"* 1 FETCH (UID 3 BINARY[1]<0> ~{18}\r\n".to_vec();
+        let start = bytes.len();
+        bytes.extend_from_slice(literal);
+        let literals = std::iter::once(start..bytes.len()).collect();
+        bytes.extend_from_slice(b")\r\n");
+        let reply = RawResponse { bytes, literals };
+
+        let decodable = super::without_binary_origin(&reply);
+        assert!(decodable.starts_with(b"* 1 FETCH (UID 3 BINARY[1] ~{18}\r\n"));
         assert_eq!(
-            super::binary_data(&reply).unwrap().as_deref(),
-            Some(&b"UID 7 BINARY[2]"[..])
+            super::section_data(std::iter::once(decodable.clone()), 3).as_deref(),
+            Some(&literal[..])
+        );
+        assert_eq!(super::section_data(std::iter::once(decodable), 7), None);
+    }
+
+    #[test]
+    fn binary_replies_without_an_origin_are_left_alone() {
+        let reply = RawResponse {
+            bytes: b"* 1 FETCH (UID 3 BINARY[1.2] \"a<1>\")\r\n".to_vec(),
+            literals: Vec::new(),
+        };
+        assert_eq!(super::without_binary_origin(&reply), reply.bytes);
+        assert_eq!(
+            super::section_data(std::iter::once(reply.bytes), 3).as_deref(),
+            Some(&b"a<1>"[..])
         );
     }
 }
