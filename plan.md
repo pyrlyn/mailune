@@ -31,7 +31,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | E1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -325,14 +324,6 @@ Depends on: B8. Reuse: `axum` from `rust.md`.
 Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### E4. Web localisation catalogs
-
-Depends on: E2.
-
-Done when: one English catalog and one other catalog load by language code, and a missing key falls back to English.
-
-Execution plan: `web/` only. Do not add a translation toolchain.
 
 ### S12. Storage benchmarks
 
