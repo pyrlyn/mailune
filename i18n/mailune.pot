@@ -429,7 +429,7 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 
-msgctxt "compose.confirm_send"
+msgctxt "compose.confirm_recipients"
 msgid "I have checked the recipients and want to send this"
 msgstr ""
 
@@ -1143,4 +1143,72 @@ msgstr ""
 
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
+msgstr ""
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr ""
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr ""
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr ""
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr ""
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr ""
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr ""
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr ""
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr ""
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr ""
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr ""
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr ""
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr ""
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr ""
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr ""
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr ""
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr ""
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
 msgstr ""
