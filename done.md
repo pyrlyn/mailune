@@ -1338,6 +1338,56 @@ Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `chan
 
 What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
 
+### P18. JMAP push
+
+Depends on: P17.
+
+Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
+
+Execution plan: `mailune-jmap` `push.rs`. The session keeps `eventSourceUrl` and the RFC 8887 WebSocket capability. A typed `StateChange` (account, type, state, pushState); EventSource `state` and `ping` events parsed with a maintained SSE parser if one fits; RFC 8887 frames (`StateChange`, `Response`, `RequestError`) decoded and `WebSocketPushEnable`/`Disable` encoded; the `{types}`, `{closeafter}`, `{ping}` URL template expanded. Tests feed fixture frames; no TCP.
+
+What landed: New module `push.rs` in `mailune-jmap`. The session now keeps `eventSourceUrl` and the RFC 8887 WebSocket capability (`url`, `supportsPush`). `event_source_request` expands the RFC 6570 template (`types`, `closeafter`, `ping`) into an authorized `GET` with `Accept: text/event-stream` for the host's streaming transport; `event_source` turns body chunks (split anywhere) into typed `PushEvent::State(StateChange)` and `Ping` through sse-stream 0.3.0, skipping unknown event types. `ws_message` decodes RFC 8887 `StateChange` (with `pushState`), `Response` and `RequestError` frames, and `push_enable`/`push_disable` encode the client messages. `StateChange::is_newer` tells the caller which saved state is behind. No TCP: tests feed fixture frames. New deps: sse-stream 0.3.0 (eventsource-stream 0.2.3, used by cox, has had no release since 2022-02) and futures-util 0.3.34, already in the tree.
+
+### P32. Relay client
+
+Depends on: P31, P16.
+
+Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
+
+Execution plan: `mailune-push` `client.rs`. A `RelayClient` turns caller-supplied random bytes into an unguessable channel, builds the webhook URL for the provider and a `POST /register` request (provider, channel, device handle; no token, no mail) for the injected `Http`, and keeps channel-to-account routes on the device. The relay gains `POST /register` (screened, an existing channel is not overwritten). An empty wake marks the device's relay-backed accounts due; `take_due` hands them to the P16 scheduler. Test: the client registers through an `Http` that drives the router in process, a Graph webhook wakes the device, and that account is due. No socket, no APNs or FCM.
+
+What landed: `RelayClient` in `mailune-push` (`client.rs`). It turns 16 bytes of host randomness into a base64url channel, registers `{provider, channel, device}` with the relay over the injected `Http`, and returns the webhook URL for the provider subscription; the channel-to-account map stays on the device. The relay gains `POST /register`: unknown keys, a short or non-base64url channel, and a device handle that is empty, has spaces, or looks like a bearer token are refused (422), and a taken channel is not overwritten (409), so knowing a channel cannot re-point it. `Registry` now has `register`. An empty wake marks every account registered on the device due, and `take_due` hands them to the P16 scheduler once. The test registers through an `Http` that drives the router in process, posts a Graph webhook to the returned URL, and sees that account due. No socket, no APNs or FCM. The wake stays empty, so with several relay accounts on one device all of them sync: naming the account would need data in the push that Apple or Google would see (a creator decision, recorded in the PR).
+
+### A13. Smart reply suggestions
+
+Depends on: A11. Reuse: the scripted engine.
+
+Done when: a thread yields three reply suggestions.
+
+Execution plan: `mailune-ai` `reply.rs`. A versioned `reply-suggestions` template (DraftReply) asks for JSON with three replies; the thread is rendered with `render_thread` and completed through any `Provider`, so the privacy router and the cloud gate (`allow_cloud`) keep encrypted mail local. A policy outside the model admits exactly three distinct, non-empty, short, single-line suggestions and fails closed with `BadOutput` otherwise. Suggestions are composer text; nothing is sent. Tests use the scripted engine; the prompt registry snapshot gains the template.
+
+What landed: `mailune-ai` `reply.rs`. A new `reply-suggestions` v1 template (DraftReply, in the registry snapshot) asks for JSON with three replies. `suggest_replies` renders the thread with `render_thread` and completes it through any `Provider`, carrying the thread's privacy, so a cloud provider's `build_request` refuses encrypted mail (tested). `admit_replies` is the policy outside the model: exactly three distinct (case-insensitive), non-empty, single-line suggestions of at most 160 characters with no control character and no link, and no extra JSON keys; anything else is `BadOutput`, nothing is trimmed into shape. Suggestions are composer text; nothing is sent. Tests use the scripted engine.
+
+### A23. Language detection
+
+Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
+
+Done when: a message is labelled with a language. No translation call.
+
+Execution plan: `mailune-ai` `language.rs` on a maintained detector: survey whatlang, lingua, and whichlang on crates.io. Detect on the subject and body with quoted lines and the signature stripped (`redact_for_cloud`); return an ISO 639-3 code with confidence, and no label when the detector is not reliable. No translation call. Row in `toolchain.md`.
+
+What landed: `mailune-ai` `language.rs` on whatlang 0.18.0. `label_language` detects on the subject and the body with quoted lines and the signature stripped (`redact_for_cloud`), so a reply is not labelled with the language it quotes; `detect_language` takes plain text. A label is an ISO 639-3 code, the English name, and the confidence; when whatlang says the result is not reliable (a short "ok", or Cyrillic it cannot tell from Bulgarian) there is no label rather than a guess. No translation call and no model call, so it runs for encrypted mail too. Survey (crates.io, 2026-10-10): whatlang 0.18.0 (2025-10-16, MIT, pure Rust, 69 languages, 83 KB crate, one dependency); lingua 1.8.0 (2026-03-09, Apache-2.0, more accurate but a 3.3 MB crate plus an optional model crate per language, 104 declared dependencies); whichlang 0.1.1 (2025-01-21, MIT, 16 languages).
+
+### A31. Voice dictation
+
+Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
+
+Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
+
+Execution plan: `mailune-ai` `dictation.rs`. A `Recognizer` trait over 16 kHz mono PCM the host captured (the core never opens the microphone), a `ScriptedRecognizer` for tests, and `dictate` that turns recognized segments into composer text. Check whether `whisper-rs` can be linked here; `mailune-ai` is the pure domain crate and is checked on wasm32, so if it cannot, keep the trait and say why in the commit.
+
+What landed: `mailune-ai` `dictation.rs`: a `Recognizer` trait over 16 kHz mono samples the host recorded (the core never opens the microphone), a `ScriptedRecognizer`, and `dictate`, which drops whisper's bracketed non-speech segments (`[BLANK_AUDIO]`, `(wind blowing)`), strips control characters, joins words with single spaces, and refuses a clip over 120 seconds or with non-finite samples before the recognizer sees it. The transcript is composer text only. `whisper-rs` is not linked: `whisper-rs-sys` 0.15.0 (behind whisper-rs 0.16) fails to build for `wasm32-unknown-unknown` (`stdio.h` not found while CMake configures whisper.cpp), and `mailune-ai` is the pure domain crate that CI checks for wasm32. Native builds work (cox-voice links it), so the whisper.cpp recognizer belongs in its own adapter crate, as `rust.md` asks for heavy native dependencies. Tests download no model and open no microphone.
+
 ### S5. FTS5 index
 
 Depends on: S3. Reuse: FTS5.

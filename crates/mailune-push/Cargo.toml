@@ -10,7 +10,11 @@ description = "Push relay: provider webhooks in, empty wakes out, no tokens or m
 [dependencies]
 axum = { workspace = true }
 base64 = { workspace = true }
+# The relay client registers over the injected `Http` transport.
+mailune-protocol = { path = "../mailune-protocol" }
+serde = { workspace = true }
 serde_json = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt"] }

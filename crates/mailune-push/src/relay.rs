@@ -3,6 +3,7 @@
 //! it with an empty push. The device then syncs with its own credentials.
 
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use axum::Router;
@@ -11,8 +12,9 @@ use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
+use serde::Deserialize;
 
-use crate::screen::{Provider, Refusal, screen};
+use crate::screen::{Provider, Refusal, looks_like_credential, screen};
 
 /// Graph's validation token is short; anything longer is not one.
 const MAX_VALIDATION: usize = 1024;
@@ -22,10 +24,32 @@ const MAX_VALIDATION: usize = 1024;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DeviceHandle(pub String);
 
+/// A registration body is three short strings.
+const MAX_REGISTER: usize = 1024;
+/// 16 random bytes in unpadded base64url; shorter is guessable.
+const MIN_CHANNEL: usize = 22;
+const MAX_CHANNEL: usize = 64;
+const MAX_DEVICE: usize = 256;
+
 /// Maps a webhook channel to the device it wakes.
 pub trait Registry: Send + Sync + 'static {
     /// The device for `channel`, if one is registered.
     fn device(&self, provider: Provider, channel: &str) -> Option<DeviceHandle>;
+
+    /// Routes `channel` for `provider` to `device`. Returns `false` and
+    /// changes nothing when the channel is taken: whoever knows a channel
+    /// must not be able to point it at another device.
+    fn register(&self, provider: Provider, channel: &str, device: DeviceHandle) -> bool;
+}
+
+/// What a device sends to `POST /register`. Unknown keys are refused, so a
+/// client cannot hand the relay a token or mail by mistake.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Registration {
+    provider: String,
+    channel: String,
+    device: String,
 }
 
 /// Delivers an empty wake. Real APNs and FCM senders implement this; tests
@@ -41,18 +65,6 @@ pub struct MemoryRegistry {
     channels: Mutex<HashMap<(Provider, String), DeviceHandle>>,
 }
 
-impl MemoryRegistry {
-    /// Routes `channel` for `provider` to `device`.
-    pub fn register(&self, provider: Provider, channel: &str, device: DeviceHandle) {
-        // A poisoned map still holds valid entries; a panic elsewhere must
-        // not stop wakes.
-        self.channels
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .insert((provider, channel.to_string()), device);
-    }
-}
-
 impl Registry for MemoryRegistry {
     fn device(&self, provider: Provider, channel: &str) -> Option<DeviceHandle> {
         self.channels
@@ -61,6 +73,27 @@ impl Registry for MemoryRegistry {
             .get(&(provider, channel.to_string()))
             .cloned()
     }
+
+    fn register(&self, provider: Provider, channel: &str, device: DeviceHandle) -> bool {
+        // A poisoned map still holds valid entries; a panic elsewhere must
+        // not stop wakes.
+        let mut channels = self.channels.lock().unwrap_or_else(PoisonError::into_inner);
+        match channels.entry((provider, channel.to_string())) {
+            Entry::Occupied(_) => false,
+            Entry::Vacant(slot) => {
+                slot.insert(device);
+                true
+            }
+        }
+    }
+}
+
+/// A channel id the relay accepts: base64url, long enough not to be guessed.
+pub(crate) fn valid_channel(channel: &str) -> bool {
+    (MIN_CHANNEL..=MAX_CHANNEL).contains(&channel.len())
+        && channel
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_')
 }
 
 struct Relay<R, N> {
@@ -68,11 +101,44 @@ struct Relay<R, N> {
     notifier: N,
 }
 
-/// The relay's routes: `POST /hook/{gmail|graph}/{channel}`.
+/// The relay's routes: `POST /hook/{gmail|graph}/{channel}` for providers
+/// and `POST /register` for devices.
 pub fn router<R: Registry, N: Notifier>(registry: R, notifier: N) -> Router {
     Router::new()
         .route("/hook/{provider}/{channel}", post(hook::<R, N>))
+        .route("/register", post(register::<R, N>))
         .with_state(Arc::new(Relay { registry, notifier }))
+}
+
+async fn register<R: Registry, N: Notifier>(
+    State(relay): State<Arc<Relay<R, N>>>,
+    body: Bytes,
+) -> Response {
+    if body.len() > MAX_REGISTER {
+        return StatusCode::PAYLOAD_TOO_LARGE.into_response();
+    }
+    let Ok(registration) = serde_json::from_slice::<Registration>(&body) else {
+        return StatusCode::UNPROCESSABLE_ENTITY.into_response();
+    };
+    let Some(provider) = Provider::from_path(&registration.provider) else {
+        return StatusCode::NOT_FOUND.into_response();
+    };
+    let device = registration.device;
+    let opaque = !device.is_empty()
+        && device.len() <= MAX_DEVICE
+        && device.bytes().all(|byte| byte.is_ascii_graphic())
+        && !looks_like_credential(&device);
+    if !valid_channel(&registration.channel) || !opaque {
+        return StatusCode::UNPROCESSABLE_ENTITY.into_response();
+    }
+    if relay
+        .registry
+        .register(provider, &registration.channel, DeviceHandle(device))
+    {
+        StatusCode::CREATED.into_response()
+    } else {
+        StatusCode::CONFLICT.into_response()
+    }
 }
 
 async fn hook<R: Registry, N: Notifier>(
@@ -129,7 +195,7 @@ mod tests {
     use serde_json::json;
     use tower::ServiceExt;
 
-    use super::{DeviceHandle, MemoryRegistry, Notifier, router};
+    use super::{DeviceHandle, MemoryRegistry, Notifier, Registry, router};
     use crate::screen::Provider;
 
     #[derive(Clone, Default)]
@@ -190,6 +256,39 @@ mod tests {
         let (status, _) = post(&app, "/hook/graph/c-ms?validationToken=", String::new()).await;
         assert_eq!(status, StatusCode::BAD_REQUEST);
         assert!(recorder.0.lock().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn a_device_registers_once_and_bad_registrations_are_refused() {
+        let (app, _) = relay();
+        let channel = "AAECAwQFBgcICQoLDA0ODw";
+        let register = |provider: &str, channel: &str, device: &str| {
+            json!({ "provider": provider, "channel": channel, "device": device }).to_string()
+        };
+        let (status, _) = post(&app, "/register", register("graph", channel, "dev-3")).await;
+        assert_eq!(status, StatusCode::CREATED);
+        let (status, _) = post(&app, "/register", register("graph", channel, "evil")).await;
+        assert_eq!(status, StatusCode::CONFLICT);
+        let (status, _) = post(&app, "/register", register("gmail", channel, "dev-3")).await;
+        assert_eq!(status, StatusCode::CREATED);
+
+        let refused = [
+            register("graph", "short", "dev-3"),
+            register("graph", "AAECAwQFBgcICQoLDA0OD/", "dev-3"),
+            register("graph", "BAECAwQFBgcICQoLDA0ODw", "Bearer abc"),
+            register("graph", "BAECAwQFBgcICQoLDA0ODw", "two words"),
+            json!({ "provider": "graph", "channel": "BAECAwQFBgcICQoLDA0ODw",
+                "device": "dev-3", "access_token": "x" })
+            .to_string(),
+        ];
+        for body in refused {
+            let (status, _) = post(&app, "/register", body.clone()).await;
+            assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{body}");
+        }
+        let (status, _) = post(&app, "/register", register("imap", channel, "d")).await;
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        let (status, _) = post(&app, "/register", " ".repeat(2048)).await;
+        assert_eq!(status, StatusCode::PAYLOAD_TOO_LARGE);
     }
 
     #[tokio::test]
