@@ -9,6 +9,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
 | Xcode | system (App Store) | Swift, SwiftPM and `xcodebuild` for the macOS shell under `desktop/macos` (arm64 only) | https://developer.apple.com/xcode/ |
 | XcodeGen | mise (`mise exec xcodegen@2.46.0` in `desktop/macos/scripts/test.sh`; not in `mise.toml`, which Linux CI installs) | Generates `Mailune.xcodeproj` from `desktop/macos/project.yml` | https://github.com/yonaskolb/XcodeGen |
+| hdiutil | system (macOS) | Makes and checks the release DMG in `desktop/macos/scripts/release.sh` | https://developer.apple.com/library/archive/documentation/Darwin/Reference/ManPages/man1/hdiutil.1.html |
+| actionlint | mise (`mise exec actionlint@1.7.12 -- actionlint`) | Validates `.github/workflows/*.yml`, including `testflight.yml` | https://github.com/rhysd/actionlint |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
 | node | mise | Runs Vite, Vitest and TypeScript for `web/` | https://github.com/nodejs/node |
 | npm | with node | Installs `web/` packages from `web/package-lock.json` | https://github.com/npm/cli |
