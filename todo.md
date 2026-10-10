@@ -20,7 +20,6 @@
 - S5. FTS5 index
 - S7. Change feed
 - A31. Voice dictation
-- E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
 - B3. Swift package

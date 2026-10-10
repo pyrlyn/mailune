@@ -26,7 +26,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | S5 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | A31 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| E4 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | S12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
@@ -272,14 +271,6 @@ Depends on: A1. Reuse: `whisper-rs` from `rust.md`.
 Done when: a scripted recognizer returns text for the composer. Tests do not download a model or open the microphone. If `whisper-rs` does not compile, keep the trait and say why in the commit.
 
 Execution plan: `mailune-ai` only.
-
-### E4. Web localisation catalogs
-
-Depends on: E2.
-
-Done when: one English catalog and one other catalog load by language code, and a missing key falls back to English.
-
-Execution plan: `web/` only. Do not add a translation toolchain.
 
 ### S12. Storage benchmarks
 
