@@ -10,10 +10,12 @@ description = "JMAP mail adapter over an injected HTTP transport"
 # jmap-client is not linked: 0.4.3 always depends on reqwest and sends its
 # own requests, so it cannot run over the injected `Http` transport.
 [dependencies]
+futures-util = { workspace = true }
 mailune-core = { path = "../mailune-core" }
 mailune-protocol = { path = "../mailune-protocol" }
 serde = { workspace = true }
 serde_json = { workspace = true }
+sse-stream = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]

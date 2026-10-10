@@ -70,10 +70,12 @@ impl Store {
             return Ok(Vec::new());
         }
         // Diesel cannot model FTS5 `MATCH` or `bm25()`. The weights follow the column order
-        // in the migration: subject, addresses, body.
+        // in the migration: subject, addresses, body. CROSS JOIN pins the index as the outer
+        // loop: with a plain JOIN SQLite drove from the account's `search_docs` rows and ran
+        // the MATCH once per row, 2.4 minutes for a common word at 100k messages.
         let hits: Vec<Hit> = diesel::sql_query(
             "SELECT d.message_id AS message_id \
-             FROM message_fts JOIN search_docs AS d ON d.docid = message_fts.rowid \
+             FROM message_fts CROSS JOIN search_docs AS d ON d.docid = message_fts.rowid \
              WHERE message_fts MATCH ? AND d.account_id = ? \
              ORDER BY bm25(message_fts, 4.0, 2.0, 1.0), d.message_id \
              LIMIT ?",
