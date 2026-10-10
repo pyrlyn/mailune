@@ -10,7 +10,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C11 | todo | P0 | 2 | 10% | |
 | F5 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
-| R1 | todo | P0 | 2 | 10% | |
 | R17 | todo | P0 | 2 | 40% | |
 | X1 | todo | P0 | 3 | 0% | |
 | X2 | todo | P0 | 2 | 0% | |
@@ -138,14 +137,6 @@ Depends on: F2, X4. Reuse: X4 gettext-catalog (from cox-i18n); research/mail-app
 Done when: en + ru + de/fr/ja load; missing key falls back to msgid. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: catalogs plus a loader in `mailune-app`. Do not edit `mailune-core`. `X4` is not in this repo.
-
-### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
-
-Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
-
-Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
-
-Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 ### R17. Brand entry (pyrlyn/brand brands/mailune) and landing docs/site.md
 
