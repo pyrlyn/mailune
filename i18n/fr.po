@@ -1328,3 +1328,7 @@ msgstr "Rechercher"
 msgctxt "intent.no_summary"
 msgid "This conversation has no summary yet."
 msgstr "Cette conversation n’a pas encore de résumé."
+
+msgctxt "ai.made_on_this_device"
+msgid "Made on this device"
+msgstr "Créé sur cet appareil"

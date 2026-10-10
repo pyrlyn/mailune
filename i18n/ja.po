@@ -1326,3 +1326,7 @@ msgstr "検索語"
 msgctxt "intent.no_summary"
 msgid "This conversation has no summary yet."
 msgstr "この会話にはまだ要約がありません。"
+
+msgctxt "ai.made_on_this_device"
+msgid "Made on this device"
+msgstr "このデバイスで作成"
