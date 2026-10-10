@@ -2,7 +2,6 @@
 
 - C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 - C11. Threat model and trust boundaries document (core, AI, MCP)
-- F4. mailune-config: typed TOML, layering, committed JSON Schema
 - F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 - F10. Gettext catalogs for core-originated strings
 - R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
@@ -26,9 +25,6 @@
 - T4. Queue property tests
 - A31. Voice dictation
 - E1. mailune-server
-- E2. Web frontend scaffold
-- E3. Web tokens and icons
-- E4. Web localisation catalogs
 - S12. Storage benchmarks
 - P18. JMAP push
 - B2. UniFFI records
@@ -40,14 +36,7 @@
 - P32. Relay client
 - T6. Performance budgets
 - R8. Integration compose file
-- E5. Web shell and thread list
-- E6. Web reader
-- E7. Web composer
-- E8. Web AI surfaces
-- E9. Web offline cache
-- E11. Web end-to-end test
 - E12. Server container
-- R7. Web CI
 - B6. C ABI
 - L1. C library build
 - L2. Payload schema
@@ -104,10 +93,6 @@
 - X8. Extract llm-testkit
 - D13. Android release
 - I8. TestFlight pipeline
-- R11. Windows signing workflow
-- R12. Flatpak workflow
-- R13. TestFlight workflow
-- R14. Play workflow
 - W13. Windows release
 - B10. BoltFFI survey
 - S14. usearch for vectors

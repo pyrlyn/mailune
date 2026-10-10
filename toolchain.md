@@ -10,6 +10,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | Xcode | system (App Store) | Swift, SwiftPM and `xcodebuild` for the macOS shell under `desktop/macos` (arm64 only) | https://developer.apple.com/xcode/ |
 | XcodeGen | mise (`mise exec xcodegen@2.46.0` in `desktop/macos/scripts/test.sh`; not in `mise.toml`, which Linux CI installs) | Generates `Mailune.xcodeproj` from `desktop/macos/project.yml` | https://github.com/yonaskolb/XcodeGen |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
+| node | mise | Runs Vite, Vitest and TypeScript for `web/` | https://github.com/nodejs/node |
+| npm | with node | Installs `web/` packages from `web/package-lock.json` | https://github.com/npm/cli |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
@@ -19,7 +21,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; blob-store content addresses |
 | sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
-| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot |
+| insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot; the sanitised-HTML fixture the web reader renders |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
 | serde | local | https://github.com/serde-rs/serde | Contract serialization |
 | serde_json | local | https://github.com/serde-rs/json | Schema snapshot value and scenario replay JSON |
@@ -51,3 +53,23 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| figment | local | https://github.com/SergioBenitez/Figment | `mailune-config` layer merge; `Jail` in its tests |
+| toml | local | https://github.com/toml-rs/toml | `mailune-config` parses each layer alone so errors keep file:line |
+
+npm (`web/package.json`):
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| react | local | https://github.com/facebook/react | Web client UI |
+| react-dom | local | https://github.com/facebook/react | Renders the web client into the page |
+| typescript | local (dev) | https://github.com/microsoft/TypeScript | Type checks `web/` |
+| vite | local (dev) | https://github.com/vitejs/vite | Dev server and production build of `web/` |
+| @vitejs/plugin-react | local (dev) | https://github.com/vitejs/vite-plugin-react | JSX and fast refresh in Vite |
+| vitest | local (dev) | https://github.com/vitest-dev/vitest | Web tests |
+| happy-dom | local (dev) | https://github.com/capricorn86/happy-dom | In-memory DOM for component tests; it opens no socket |
+| json-schema-to-typescript | local (dev) | https://github.com/bcherny/json-schema-to-typescript | Generates `web/src/contract.gen.ts` from the contract JSON Schema |
+| ajv | local (dev) | https://github.com/ajv-validator/ajv | Validates web payloads against the contract JSON Schema in tests |
+| @playwright/test | local (dev) | https://github.com/microsoft/playwright | One end-to-end test in `web/e2e`; `npx playwright install chromium` fetches the pinned browser |
+| @types/react | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React types |
+| @types/react-dom | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React DOM types |
+| @types/node | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | Node types for the generator script and tests |

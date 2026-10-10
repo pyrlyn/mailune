@@ -196,7 +196,9 @@ pub(crate) fn escape(segment: &str) -> String {
     out
 }
 
+// These tests write through mailune-store, which has no SQLite on wasm32.
 #[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 mod tests {
     use mailune_protocol::{AccountId, HttpResponse, MailboxId, MailboxRole, MessageId, Secret};
     use mailune_store::{Account, Counts, Mailbox, Store, StoredMessage};
