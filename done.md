@@ -1345,3 +1345,11 @@ Depends on: S3. Reuse: FTS5.
 Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
 
 Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
+
+### S7. Change feed
+
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+
+Done when: a second connection in the same process observes a write as a typed invalidation.
+
+Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.

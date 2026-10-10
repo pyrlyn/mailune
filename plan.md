@@ -25,7 +25,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C5 | todo | P1 | 3 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
 | P10 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| S7 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | T4 | todo | P1 | 3 | 0% | |
 | A31 | todo | P1 | 2 | 0% | |
 | E1 | todo | P1 | 3 | 0% | |
@@ -262,14 +261,6 @@ Depends on: P7. Reuse: imap-codec.
 Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
 
 Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
-
-### S7. Change feed
-
-Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
-
-Done when: a second connection in the same process observes a write as a typed invalidation.
-
-Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
 
 ### T4. Queue property tests
 
