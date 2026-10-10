@@ -37,7 +37,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | M6 | todo | P1 | 3 | 0% | |
 | M15 | todo | P1 | 2 | 0% | |
 | M16 | todo | P1 | 2 | 0% | |
-| P32 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | R8 | todo | P1 | 3 | 0% | |
 | E12 | todo | P1 | 2 | 0% | |
@@ -334,14 +333,6 @@ Depends on: M1, B2.
 Done when: Keychain, notifications, network path, web auth, and open-URL sit behind protocols with fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
-
-### P32. Relay client
-
-Depends on: P31, P16.
-
-Done when: a device registers and a wake marks that account due for sync. No socket to Apple or Google.
-
-Execution plan: `mailune-push` `client.rs`. A `RelayClient` turns caller-supplied random bytes into an unguessable channel, builds the webhook URL for the provider and a `POST /register` request (provider, channel, device handle; no token, no mail) for the injected `Http`, and keeps channel-to-account routes on the device. The relay gains `POST /register` (screened, an existing channel is not overwritten). An empty wake marks the device's relay-backed accounts due; `take_due` hands them to the P16 scheduler. Test: the client registers through an `Http` that drives the router in process, a Graph webhook wakes the device, and that account is due. No socket, no APNs or FCM.
 
 ### T6. Performance budgets
 

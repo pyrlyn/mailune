@@ -2079,7 +2079,10 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "base64 0.23.1",
+ "mailune-protocol",
+ "serde",
  "serde_json",
+ "thiserror 2.0.21",
  "tokio",
  "tower",
 ]

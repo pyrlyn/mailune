@@ -31,7 +31,6 @@
 - M6. Apple on-device model
 - M15. App Intents
 - M16. macOS accessibility
-- P32. Relay client
 - T6. Performance budgets
 - R8. Integration compose file
 - E12. Server container

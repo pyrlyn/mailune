@@ -58,6 +58,14 @@ impl Provider {
             _ => None,
         }
     }
+
+    /// The webhook path segment, the inverse of [`Self::from_path`].
+    pub fn path(self) -> &'static str {
+        match self {
+            Self::Gmail => "gmail",
+            Self::Graph => "graph",
+        }
+    }
 }
 
 /// Accepts a body that only says something changed.
@@ -117,7 +125,7 @@ fn walk(value: &Value) -> Result<(), Refusal> {
 }
 
 /// Bearer headers, Google access tokens, and JWTs.
-fn looks_like_credential(text: &str) -> bool {
+pub(crate) fn looks_like_credential(text: &str) -> bool {
     let text = text.trim();
     let jwt = text.starts_with("eyJ") && text.split('.').count() == 3;
     jwt || text.starts_with("ya29.") || text.to_ascii_lowercase().starts_with("bearer ")
