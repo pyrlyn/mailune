@@ -48,6 +48,25 @@ public final class FakeOutbox: Outbox {
     }
 }
 
+/// Drafts started outside the composer, such as by a Shortcut. The shell opens
+/// each one in the composer, so it still needs a confirmed send.
+@MainActor
+@Observable
+public final class ComposeRequests {
+    public private(set) var pending: Draft?
+
+    public init() {}
+
+    public func open(_ draft: Draft) {
+        pending = draft
+    }
+
+    public func take() -> Draft? {
+        defer { pending = nil }
+        return pending
+    }
+}
+
 /// Chips, confirm, send later and undo send. Nothing reaches the outbox
 /// except through `confirmSend`, and that only after `requestSend`.
 @MainActor
@@ -73,18 +92,28 @@ public final class Composer {
     /// Splits typed text into chips and returns the parts that are not addresses.
     @discardableResult
     public func addRecipients(_ text: String) -> [String] {
-        var rejected: [String] = []
-        for part in text.split(whereSeparator: { $0 == "," || $0 == ";" || $0.isWhitespace }) {
-            let address = String(part)
-            guard Self.looksLikeAddress(address) else {
-                rejected.append(address)
-                continue
-            }
-            if !draft.to.contains(where: { $0.caseInsensitiveCompare(address) == .orderedSame }) {
-                draft.to.append(address)
-            }
+        let (accepted, rejected) = Self.addresses(in: text)
+        for address in accepted
+            where !draft.to.contains(where: { $0.caseInsensitiveCompare(address) == .orderedSame })
+        {
+            draft.to.append(address)
         }
         return rejected
+    }
+
+    /// Typed text split at commas, semicolons and spaces into addresses, each
+    /// once whatever its case, and the parts that are not addresses.
+    public nonisolated static func addresses(in text: String) -> (accepted: [String], rejected: [String]) {
+        var accepted: [String] = []
+        var rejected: [String] = []
+        for part in text.split(whereSeparator: { $0 == "," || $0 == ";" || $0.isWhitespace }).map(String.init) {
+            if !looksLikeAddress(part) {
+                rejected.append(part)
+            } else if !accepted.contains(where: { $0.caseInsensitiveCompare(part) == .orderedSame }) {
+                accepted.append(part)
+            }
+        }
+        return (accepted, rejected)
     }
 
     public func removeRecipient(_ address: String) {

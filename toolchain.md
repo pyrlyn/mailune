@@ -9,6 +9,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | cargo-nextest | global | Workspace test runner | https://github.com/nextest-rs/nextest |
 | Xcode | system (App Store) | Swift, SwiftPM and `xcodebuild` for the macOS shell under `desktop/macos` (arm64 only) | https://developer.apple.com/xcode/ |
 | XcodeGen | mise (`mise exec xcodegen@2.46.0` in `desktop/macos/scripts/test.sh`; not in `mise.toml`, which Linux CI installs) | Generates `Mailune.xcodeproj` from `desktop/macos/project.yml` | https://github.com/yonaskolb/XcodeGen |
+| hdiutil | system (macOS) | Makes and checks the release DMG in `desktop/macos/scripts/release.sh` | https://developer.apple.com/library/archive/documentation/Darwin/Reference/ManPages/man1/hdiutil.1.html |
+| actionlint | mise (`mise exec actionlint@1.7.12 -- actionlint`) | Validates `.github/workflows/*.yml`, including `testflight.yml` | https://github.com/rhysd/actionlint |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
 | java | mise (`desktop/android/mise.toml`) | Runs Gradle for the Android shell | https://openjdk.org |
 | gradle | mise (`desktop/android/mise.toml`) | Builds and tests `desktop/android` | https://github.com/gradle/gradle |
@@ -41,7 +43,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification; S/MIME signatures and key transport |
 | rand | local | https://github.com/rust-random/rand | DKIM test keys, OpenPGP key generation, S/MIME content keys, `mailune-server` tokens |
-| imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
+| imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses, including RFC 3516 BINARY; exact `=2.0.0-alpha.9` pin because 1.x has no BINARY and alphas break the API |
 | chrono | local | https://github.com/chronotope/chrono | IMAP SEARCH SINCE dates for the sync window |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |

@@ -14,10 +14,12 @@
         @Environment(\.horizontalSizeClass) private var sizeClass
         private let preferences: any PreferencesStore
         private let host: HostServices
+        private let requests: ComposeRequests
 
-        public init(preferences: any PreferencesStore, host: HostServices) {
+        public init(preferences: any PreferencesStore, host: HostServices, requests: ComposeRequests = ComposeRequests()) {
             self.preferences = preferences
             self.host = host
+            self.requests = requests
         }
 
         nonisolated public static func layout(for sizeClass: UserInterfaceSizeClass?) -> Layout {
@@ -27,19 +29,19 @@
         public var body: some View {
             switch Self.layout(for: sizeClass) {
             case .stack:
-                PhoneStack(preferences: preferences)
+                PhoneStack(preferences: preferences, requests: requests)
             case .split:
-                ShellView(preferences: preferences, host: host)
+                ShellView(preferences: preferences, host: host, requests: requests)
             }
         }
     }
 
     struct PhoneStack: View {
         let preferences: any PreferencesStore
+        let requests: ComposeRequests
         @State private var feed = ThreadFeed()
         @State private var outbox = FakeOutbox()
-        @State private var composing = false
-        @State private var startDraft = Draft()
+        @State private var composing: ComposeSheet?
 
         var body: some View {
             NavigationStack {
@@ -66,21 +68,25 @@
                         }
                     }
             }
-            .sheet(isPresented: $composing) {
+            .onChange(of: requests.pending, initial: true) {
+                if let draft = requests.take() {
+                    compose(draft)
+                }
+            }
+            .sheet(item: $composing) { sheet in
                 // A sheet on iOS shows toolbar items only inside a navigation container.
                 NavigationStack {
                     ComposerView(
                         outbox: outbox,
                         undoWindow: TimeInterval(preferences.current().undoSendSeconds),
-                        draft: startDraft
+                        draft: sheet.draft
                     )
                 }
             }
         }
 
         private func compose(_ draft: Draft) {
-            startDraft = draft
-            composing = true
+            composing = ComposeSheet(draft: draft)
         }
     }
 #endif

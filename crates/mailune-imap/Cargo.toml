@@ -9,7 +9,7 @@ description = "IMAP mailbox roles and a scripted session"
 
 [dependencies]
 chrono = { workspace = true }
-imap-codec = { workspace = true, features = ["quirk_rectify_numbers"] }
+imap-codec = { workspace = true, features = ["quirk_missing_text", "quirk_rectify_numbers"] }
 mailune-mime = { path = "../mailune-mime" }
 mailune-protocol = { path = "../mailune-protocol" }
 thiserror = { workspace = true }

@@ -80,8 +80,11 @@ html2text = "0.17.1"
 rsa = { version = "0.9.10", features = ["sha2"] }
 # DKIM test keys and OpenPGP key generation. 0.8 matches rsa 0.9 and pgp 0.20. 0.8.8 checked on crates.io 2026-10-08.
 rand = "0.8.8"
-# mailune-imap: IMAP codec. 1.0.0 is the stable line chosen in docs/imap-stack.md. Checked on crates.io 2026-10-08.
-imap-codec = "1.0.0"
+# mailune-imap: IMAP codec. Exact pre-release pin: the 1.x line is frozen at 1.0.0 and has no RFC 3516
+# BINARY, which 2.0 has built in. 2.0 alphas break the API between releases, so bump only deliberately.
+# 2.0.0-alpha.9 checked on crates.io 2026-10-10. Defaults off: 2.0 turns every quirk on by default,
+# so the two quirks 1.0 enabled by default are listed in mailune-imap instead.
+imap-codec = { version = "=2.0.0-alpha.9", default-features = false }
 # mailune-imap: SEARCH SINCE dates. imap-codec already links 0.4.45, the latest on crates.io (checked 2026-10-08).
 chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 # mailune-mime: RFC 5545 parse. 0.17.14 checked on crates.io 2026-10-08.

@@ -1458,6 +1458,56 @@ Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do n
 
 What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
 
+### M15. App Intents
+
+Depends on: M11.
+
+Done when: summarise, search, and compose are intent types a unit test can invoke with fixture data.
+
+Execution plan: `desktop/macos` only. `MailuneUI/Intents.swift`: a thread `AppEntity` with a string query over the fixture rows, and three App Intents. Summarise returns the thread's summary through `AssistPolicy`, so cloud text about encrypted mail stays hidden. Search runs the M11 `SearchQuery` over the same rows the thread list shows. Compose builds a `mailto:` link that the app's existing `MailtoLink` handler opens in the composer, so the intent can never send and confirm-before-send still applies. The app target lists the package's intents. Titles come from `i18n/` keys. Tests call each intent's logic and `perform()` with fixtures.
+
+What landed: `MailuneUI/Intents.swift` defines three App Intents. A thread `AppEntity` with a string query over the fixture rows carries the subject and sender only, never message text. Summarize returns the thread's summary through `AssistPolicy`, so cloud text about encrypted mail stays hidden. Search runs the M11 `SearchQuery` over the thread rows and reports a bad or unsupported query. Compose has no outbox: it hands a draft to `ComposeRequests`, which the Mac shell, the iPad split and the phone stack open in the composer, so a send still needs the confirm step. `Composer.addresses(in:)` is now the one recipient splitter for the composer and the intent. Both apps list the package through `AppIntentsPackage`, and the build exports `Metadata.appintents` with the three intents. Titles are i18n keys read from the MailuneUI bundle; the new `intent.*` keys have de, fr and ja translations. `IntentTests` runs each intent's `perform()` on fixtures. The Shortcuts app itself was not checked by hand.
+
+### M16. macOS accessibility
+
+Depends on: M9, M10.
+
+Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
+
+Execution plan: `desktop/macos` only. The reader marks the subject as a heading and labels the sender, the badge and the assist card; the composer labels the body editor and the recipient chips. Keyboard path: select a thread, ⌘R replies, ⌘↩ asks to send, and Return confirms. The shortcuts live in one table, and a test checks they do not collide. The palette keeps its colour components so a test can compute the WCAG contrast of ink on canvas and fail below 4.5:1.
+
+What landed: The reader marks the subject as a heading, labels the sender ("From Ana Ruiz"), groups the assist card under "Summary" and the blocked-content banner into one element, and hides the action-item tick that VoiceOver read as "Selected". The composer labels the body editor ("Message body"), the To field and each recipient chip. Keyboard path: arrow keys pick a thread, ⌘R replies (a new Reply button), ⌘↩ asks to send, and Return confirms. Every shortcut lives in one `MailuneShortcut` table; a test checks they are distinct and leave the macOS ones alone. The palette keeps its sRGB numbers (`MailunePalette`), and a test computes the WCAG 2.2 ratio of ink on canvas (14.9:1) and fails below 7:1; the formula is checked against 21:1 and #777777 on white. `AccessibilityUITests.testReaderAndComposerAreLabelled` reads the tree VoiceOver reads and passed locally and in CI. `testReplyAndSendFromTheKeyboard` drives that path with keys; it passed in the swift workflow's `ui` job, but not on the agent's Mac, where XCUITest could not deliver key events from that session. Found and fixed on the way: a composer sheet shown by a Bool could open with the previous draft, so Reply and the M19 reply chips opened an empty composer; both shells now use `sheet(item:)`.
+
+### M18. macOS release script
+
+Depends on: M13, R10.
+
+Done when: a script builds a DMG layout and an appcast fixture. If the signing identity is missing, the script says so and does not call Apple. Do not notarize for real.
+
+Execution plan: `desktop/macos` only. `scripts/release.sh` builds the Release app, or takes `--app`, and lays out a DMG folder (the app plus an `Applications` link). It makes the DMG with `hdiutil` and writes a Sparkle-style `appcast.xml` fixture with the version, the length and a placeholder signature. It signs only when `MAILUNE_SIGN_IDENTITY` is set; otherwise it says so and calls nothing at Apple. It never notarizes. `scripts/test.sh` runs it on the Debug app in a temporary folder and checks the layout and the appcast.
+
+What landed: `scripts/release.sh` builds the Release app or takes `--app`, lays out `Mailune-X.Y.Z.dmg` with `hdiutil` (the app plus an `Applications` link, the layout pyrlyn/ci `release-apple-desktop.yml` makes), verifies it, and writes a Sparkle `appcast.xml` fixture with the version, build, minimum macOS, DMG length and a placeholder EdDSA signature. It signs only with `MAILUNE_SIGN_IDENTITY`; without it, it says so and calls nothing at Apple. It never notarizes. `scripts/release_test.sh` runs it on the Debug app with codesign, xcrun, notarytool, altool and curl replaced by recording stubs, then mounts the DMG and checks its contents and the appcast; removing the Applications link made it fail. `scripts/test.sh` runs it. The feed URL uses a `desktop-v` tag as ketch does; the macOS release tag prefix is not decided yet.
+
+### I9. iOS UI test
+
+Depends on: I3, B7.
+
+Done when: one XCUITest selects a fixture thread on the phone layout. If the runner cannot launch, commit the test and say why.
+
+Execution plan: `desktop/macos` only. A `MailuneIOSUITests` target and scheme. The iOS app honours `-mailune-ui-test` (fake preferences). One XCUITest launches on an iPhone simulator, taps the `thread-t1` fixture row, and sees the reader. `scripts/test.sh` compiles it; `scripts/uitest.sh` also runs it on the newest iPhone simulator. If the runner cannot launch, the test stays committed and the card says why.
+
+What landed: `MailuneIOSUITests/PhoneThreadUITests.swift`, in a new `MailuneIOSUITests` target and scheme, launches the iPhone layout with `-mailune-ui-test` (fake saved settings), taps the `thread-t1` fixture row and sees the pushed reader. It passed on an iPhone simulator through `xcodebuild test`. It caught a bug: the phone list always had a selection binding, so a tap selected the row and never pushed the reader; the binding is now passed only in Edit mode. `scripts/test.sh` compiles the test, `scripts/uitest.sh` runs it on the newest iPhone simulator, and the simulator lookup moved to `scripts/simulator.sh`.
+
+### I10. iOS AI surfaces
+
+Depends on: I4, I5, M19.
+
+Done when: the phone reader shows a fixture summary and reply chips.
+
+Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. The phone stack already pushes the M19 `ReaderView` with its `AssistCard`, so nothing is duplicated. At phone width the reply chips stack when a row does not fit. A test hosts the reader at 390 pt and checks it fits. The I9 XCUITest checks the summary and the reply chips on the phone.
+
+What landed: The phone reader is the M19 `ReaderView` and `AssistCard`, so nothing is duplicated. At phone width the three reply chips now stack (`ViewThatFits`) instead of wrapping to a few words a line. Off the Mac, the provenance line says "Made on this device" (new `ai.made_on_this_device` key with de, fr and ja). `PhoneThreadUITests.testPhoneReaderShowsTheSummaryAndReplyChips` passed on the simulator. It checks the fixture summary, three stacked chips inside the screen, and a chip opening the composer with the reply filled in. `mailune-ai` is not edited.
+
 ### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
 
 Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
@@ -1557,3 +1607,13 @@ Done when: BODY.PEEK partial and BINARY requests return the requested bytes from
 Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
 
 What landed: `body.rs` with `Section`, `Partial`, `Connection::fetch_body` (`BODY.PEEK`, decoded with imap-codec) and `Connection::fetch_binary` (`BINARY.PEEK`, needs the `BINARY` capability). imap-codec 1.0.0 has no RFC 3516 support and refuses literals holding NUL, so BINARY replies are parsed from the raw bytes a new binary-safe session reader keeps (literals capped at 64 MiB). The scripted server answers both forms from message metadata; its attachment carries a NUL byte.
+
+### P35. Move mailune-imap to imap-codec 2.0
+
+Approved by the creator on 2026-10-10, including the bump of the pinned `imap-codec = "1.0.0"` to the exact pre-release `=2.0.0-alpha.9` (imap-types 2.0.0-alpha.7 comes with it). imap-codec 1.0.0 has no RFC 3516 BINARY support and refuses literals holding NUL, so P10 parses BINARY replies by hand in `body.rs`. 2.0 has BINARY built in: `MessageDataItemName::Binary`, `MessageDataItem::Binary` with an `NString8` value, and `Literal8` (`~{n}`) that may hold NUL.
+
+Done when: `mailune-imap` builds and its existing tests pass on imap-codec `=2.0.0-alpha.9` with the same behaviour; BINARY FETCH requests are encoded and replies decoded through imap-codec; the hand-written BINARY parsing is deleted; the 64 MiB cap on what is read from the wire stays. The pin comment in `Cargo.toml` and the `toolchain.md` row say why the pin is an exact pre-release.
+
+Execution plan: `Cargo.toml` (pin and comment, same quirk features as 1.0's defaults), `Cargo.lock`, `toolchain.md`, `crates/mailune-imap` only. Fix the 1.0 to 2.0 API breaks in `list.rs`, `sync.rs` and the script tests. In `body.rs`, build both FETCH requests as imap-types `CommandBody::Fetch` and encode them with `CommandCodec`; decode BODY and BINARY replies with `ResponseCodec`; delete `find_outside`, `is_fetch`, `has_uid` and `binary_data`. The session's binary-safe reader stays: it is what frames literals off the wire under the 64 MiB cap. Verify with the existing `body.rs` tests plus the workspace gates (fmt, clippy native and wasm32, nextest). The fuzz workspace does not use imap-codec.
+
+What landed: the workspace pins `imap-codec = { version = "=2.0.0-alpha.9", default-features = false }` and `mailune-imap` keeps 1.0's default quirks, `quirk_missing_text` and `quirk_rectify_numbers` (2.0 enables every quirk by default; no quirk was renamed). The existing code compiled on 2.0 unchanged. `body.rs` builds both requests as imap-types `CommandBody::Fetch`, `Connection::run_raw` encodes them with `CommandCodec`, and both replies decode with `ResponseCodec` (`MessageDataItem::Binary` with `NString8`/`Literal8`). The hand-written BINARY parser is gone. One step stays hand-written: imap-codec follows the RFC 3516 and RFC 9051 ABNF, which has no origin octet after `BINARY[...]`, while their prose and servers send one on a partial reply, so `body.rs` drops it before decoding (outside literals only). The session's binary-safe reader stays: it frames literals off the wire under the 64 MiB cap. A zero UID is now refused before sending.

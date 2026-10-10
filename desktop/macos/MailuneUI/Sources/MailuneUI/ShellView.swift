@@ -8,18 +8,23 @@ public struct ShellView: View {
     @State private var selected: Set<String> = []
     @State private var palette = false
     @State private var query = ""
-    @State private var composing = false
+    @State private var composing: ComposeSheet?
     @State private var outbox = FakeOutbox()
     @State private var feed = ThreadFeed()
     @State private var search = ""
     @State private var asking = false
-    @State private var startDraft = Draft()
     private let preferences: any PreferencesStore
     private let host: HostServices
+    private let requests: ComposeRequests
 
-    public init(preferences: any PreferencesStore = FakePreferencesStore(), host: HostServices = .fake()) {
+    public init(
+        preferences: any PreferencesStore = FakePreferencesStore(),
+        host: HostServices = .fake(),
+        requests: ComposeRequests = ComposeRequests()
+    ) {
         self.preferences = preferences
         self.host = host
+        self.requests = requests
     }
 
     private var openMessage: MailMessage? {
@@ -43,8 +48,7 @@ public struct ShellView: View {
                     message: message,
                     assist: AssistPolicy.fixture(for: message)
                 ) { text in
-                    startDraft = .reply(to: message, body: text)
-                    composing = true
+                    composing = ComposeSheet(draft: .reply(to: message, body: text))
                 }
                 .id(message.id)
             } else {
@@ -59,14 +63,13 @@ public struct ShellView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    startDraft = Draft()
-                    composing = true
+                    composing = ComposeSheet(draft: Draft())
                 } label: {
                     // The app target's asset catalog holds this image.
                     Image("ToolbarCompose")
                 }
                 .accessibilityLabel(Copy.text("app.compose"))
-                .keyboardShortcut("n", modifiers: .command)
+                .keyboardShortcut(MailuneShortcut.compose)
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("search.ask")) { asking = true }
@@ -81,20 +84,24 @@ public struct ShellView: View {
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(Copy.text("shell.commands")) { palette = true }
-                    .keyboardShortcut("k", modifiers: .command)
+                    .keyboardShortcut(MailuneShortcut.commands)
             }
         }
-        .sheet(isPresented: $composing) {
+        .sheet(item: $composing) { sheet in
             ComposerView(
                 outbox: outbox,
                 undoWindow: TimeInterval(preferences.current().undoSendSeconds),
-                draft: startDraft
+                draft: sheet.draft
             )
         }
         .onOpenURL { url in
             if let draft = MailtoLink.draft(from: url) {
-                startDraft = draft
-                composing = true
+                composing = ComposeSheet(draft: draft)
+            }
+        }
+        .onChange(of: requests.pending, initial: true) {
+            if let draft = requests.take() {
+                composing = ComposeSheet(draft: draft)
             }
         }
         .task(id: feed.archived) {

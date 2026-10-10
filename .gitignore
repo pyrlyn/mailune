@@ -3,6 +3,8 @@ __pycache__/
 /desktop/macos/Mailune.xcodeproj/
 /desktop/macos/DerivedData/
 /desktop/macos/DerivedData-ios/
+/desktop/macos/DerivedData-ipa/
+/desktop/macos/build/
 /desktop/macos/**/.build/
 /desktop/macos/**/.swiftpm/
 /desktop/macos/MailuneUI/Sources/MailuneUI/Catalogs/
