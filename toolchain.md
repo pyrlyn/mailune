@@ -69,6 +69,7 @@ npm (`web/package.json`):
 | happy-dom | local (dev) | https://github.com/capricorn86/happy-dom | In-memory DOM for component tests; it opens no socket |
 | json-schema-to-typescript | local (dev) | https://github.com/bcherny/json-schema-to-typescript | Generates `web/src/contract.gen.ts` from the contract JSON Schema |
 | ajv | local (dev) | https://github.com/ajv-validator/ajv | Validates web payloads against the contract JSON Schema in tests |
+| @playwright/test | local (dev) | https://github.com/microsoft/playwright | One end-to-end test in `web/e2e`; `npx playwright install chromium` fetches the pinned browser |
 | @types/react | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React types |
 | @types/react-dom | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | React DOM types |
 | @types/node | local (dev) | https://github.com/DefinitelyTyped/DefinitelyTyped | Node types for the generator script and tests |

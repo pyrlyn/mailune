@@ -49,11 +49,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | R8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E9 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| E11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| R7 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -410,30 +406,6 @@ Done when: a compose file names Stalwart and Dovecot, and a test reads that file
 
 Execution plan: `docker-compose.yml` plus one test in `mailune-cli`.
 
-### E8. Web AI surfaces
-
-Depends on: E6, E7. Summary, replies, and compose assist already exist in `mailune-ai`.
-
-Done when: the reader shows a summary and reply chips from fixture data, and the composer shows an assist result. No model call.
-
-Execution plan: `web/` only. Do not edit `mailune-ai`.
-
-### E9. Web offline cache
-
-Depends on: E5.
-
-Done when: a service worker caches the latest thread list and serves it when the test marks the network offline. No real push server.
-
-Execution plan: `web/` only.
-
-### E11. Web end-to-end test
-
-Depends on: E5, B7.
-
-Done when: one Playwright test opens the shell, selects a fixture thread, and sees the subject. If the browser cannot be installed, commit the spec and say why.
-
-Execution plan: `web/` only.
-
 ### E12. Server container
 
 Depends on: E1. Another agent owns `docker-compose.yml`.
@@ -441,14 +413,6 @@ Depends on: E1. Another agent owns `docker-compose.yml`.
 Done when: a Dockerfile builds the server binary on paper (the file exists and names the binary) and `docs/self-host.md` says how to run it. Do not start Docker in tests. Do not edit `docker-compose.yml`.
 
 Execution plan: `Dockerfile` and `docs/self-host.md` only.
-
-### R7. Web CI
-
-Depends on: E2.
-
-Done when: a new workflow runs vitest. Do not edit `.github/workflows/ci.yml` and do not change required checks.
-
-Execution plan: `.github/workflows/web.yml` only.
 
 ### B6. C ABI
 

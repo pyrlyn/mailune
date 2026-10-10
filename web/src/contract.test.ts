@@ -50,6 +50,38 @@ describe("generated contract types", () => {
     expect(validate({ send_now: {} })).toBe(false);
     expect(validate({ save_draft: { to: "ada@example.com", subject: "Hi", body: "" } })).toBe(false);
   });
+
+  it("reject a count Rust cannot hold", () => {
+    const validate = validator("Event");
+    const row = (message_count: number) => ({
+      snapshot: {
+        threads: [
+          {
+            id: "t1",
+            account: "local",
+            from: { name: null, email: "ada@example.com" },
+            subject: "",
+            snippet: "",
+            stamp: "",
+            message_count,
+            unread: false,
+            flagged: false,
+            important: false,
+            pinned: false,
+            snoozed: false,
+            draft: false,
+            has_attachment: false,
+            category: "primary",
+            mailbox: "inbox",
+            labels: [],
+          },
+        ],
+      },
+    });
+    expect(validate(row(1))).toBe(true);
+    expect(validate(row(-1))).toBe(false);
+    expect(validate(row(1.5))).toBe(false);
+  });
 });
 
 describe("UI text", () => {

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Composer } from "./Composer";
+import type { AssistResult, ThreadAi } from "./ai";
+import { Composer, emptyDraft, type Draft } from "./Composer";
+import { Insights } from "./Insights";
 import type { Address, Submission, ThreadRow } from "./contract.gen";
 import { Reader } from "./Reader";
 import { InboxIcon } from "./icons";
@@ -24,19 +26,27 @@ function sender(address: Address): string {
 export function Shell({
   threads,
   bodies = {},
+  ai = {},
+  assist,
   onSubmit = () => {},
 }: {
   threads: ThreadRow[];
   bodies?: Readonly<Record<string, SanitizedHtml>>;
+  ai?: Readonly<Record<string, ThreadAi>>;
+  assist?: AssistResult;
   onSubmit?: (submission: Submission) => void;
 }) {
   const mailboxes = mailboxesOf(threads);
   const [mailbox, setMailbox] = useState(mailboxes[0] ?? "inbox");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [composing, setComposing] = useState(false);
+  // A fresh `started` remounts the composer, so a new draft replaces the old one.
+  const [compose, setCompose] = useState<{ draft: Draft; started: number } | null>(null);
+  const startCompose = (draft: Draft) =>
+    setCompose((current) => ({ draft, started: (current?.started ?? 0) + 1 }));
   const listed = threads.filter((thread) => thread.mailbox === mailbox);
   const open = threads.find((thread) => thread.id === openId) ?? null;
   const body = open ? bodies[open.id] : undefined;
+  const insights = open ? ai[open.id] : undefined;
 
   return (
     <div className="shell">
@@ -45,7 +55,7 @@ export function Shell({
           <InboxIcon />
           {t("app.mail")}
         </h1>
-        <button type="button" className="compose" onClick={() => setComposing(true)}>
+        <button type="button" className="compose" onClick={() => startCompose(emptyDraft)}>
           {t("app.compose")}
         </button>
         <ul>
@@ -73,7 +83,7 @@ export function Shell({
                 aria-current={thread.id === openId ? "true" : undefined}
                 onClick={() => {
                   setOpenId(thread.id);
-                  setComposing(false);
+                  setCompose(null);
                 }}
               >
                 <span className="row-from">{sender(thread.from)}</span>
@@ -86,12 +96,15 @@ export function Shell({
         </ul>
       </section>
       <main className="pane" aria-label={t("app.message")}>
-        {composing ? (
+        {compose ? (
           <Composer
+            key={compose.started}
+            initial={compose.draft}
+            assist={assist}
             onDraft={onSubmit}
             onSend={(submission) => {
               onSubmit(submission);
-              setComposing(false);
+              setCompose(null);
             }}
           />
         ) : open ? (
@@ -100,6 +113,14 @@ export function Shell({
             <p className="meta">
               {sender(open.from)} · {open.from.email}
             </p>
+            {insights ? (
+              <Insights
+                ai={insights}
+                onReply={(reply) =>
+                  startCompose({ to: open.from.email, subject: t("thread.re", open.subject), body: reply })
+                }
+              />
+            ) : null}
             {body ? <Reader body={body} /> : <p>{open.snippet}</p>}
           </article>
         ) : (

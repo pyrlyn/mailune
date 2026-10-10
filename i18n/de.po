@@ -788,6 +788,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr "VORSCHLÄGE"
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr "Antwortvorschläge"
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr "Zusammenfassung"
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr "FLÄCHEN"
@@ -1060,6 +1068,10 @@ msgstr "Gerade aktualisiert"
 msgctxt "data.updates"
 msgid "Updates"
 msgstr "Updates"
+
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
+msgstr "Vorschlag übernehmen"
 
 msgctxt "settings.vacation_responder"
 msgid "Vacation responder"
