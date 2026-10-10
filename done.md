@@ -1327,3 +1327,13 @@ Done when: pyrlyn/ci has a reusable workflow that uploads a signed Android App B
 Execution plan: `packages/infra` worktree. New reusable Play workflow only. Do not push.
 
 What landed: pyrlyn/ci `.github/workflows/play.yml` (pyrlyn/ci PR #57, commit `1941a53`). It checks the bundle with `jarsigner -verify -strict` and uploads it through `r0adkll/upload-google-play` (pinned v1.1.5) with `PLAY_SERVICE_ACCOUNT_JSON`. Track and status are validated, and a pull request never uploads. No Mailune workflow calls it, so the required checks are unchanged.
+
+### R1. Core CI: pyrlyn/ci ci-rust.yml matrix + changes.yml + pipeline.yml
+
+Depends on: F2. Reuse: pyrlyn/ci ci-rust.yml, changes.yml, pipeline.yml; packages/crates path-gates.
+
+Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
+
+Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
+
+What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
