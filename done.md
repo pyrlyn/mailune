@@ -1361,3 +1361,11 @@ Depends on: S3. Reuse: `divan` from `rust.md`.
 Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
 
 Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
+
+### P10. Lazy body fetch
+
+Depends on: P7. Reuse: imap-codec.
+
+Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
+
+Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.

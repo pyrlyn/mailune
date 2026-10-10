@@ -18,7 +18,6 @@
 - C4. S/MIME verify and decrypt
 - C5. S/MIME sign and encrypt
 - C7. DKIM ed25519, simple, and l=
-- P10. Lazy body fetch
 - T4. Queue property tests
 - A31. Voice dictation
 - E1. mailune-server
