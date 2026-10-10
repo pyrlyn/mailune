@@ -56,6 +56,9 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | axum | local | https://github.com/tokio-rs/axum | Push relay webhook router; `mailune-server`: HTTP and the WebSocket upgrade |
 | tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime in `mailune-mcp`; push relay router tests (dev); `mailune-server` runtime and TCP listener |
 | tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |
+| sse-stream | local | https://github.com/4t145/sse-stream | Decodes the JMAP EventSource push stream in `mailune-jmap` |
+| futures-util | local | https://github.com/rust-lang/futures-rs | Maps the SSE block stream to typed JMAP push events; `mailune-server` tests (dev): send and receive on the client socket |
+| whatlang | local | https://github.com/greyblake/whatlang-rs | On-device language label for a message in `mailune-ai` |
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
@@ -66,7 +69,6 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | aes | local | https://github.com/RustCrypto/block-ciphers | `mailune-smime`: AES content cipher |
 | cbc | local | https://github.com/RustCrypto/block-modes | `mailune-smime`: CBC mode for S/MIME content |
 | tokio-tungstenite | local (dev) | https://github.com/snapview/tokio-tungstenite | `mailune-server` tests: real WebSocket client; the line axum already uses |
-| futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
 | proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
 | divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` T6 budget benches at 100k messages |

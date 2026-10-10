@@ -8,16 +8,19 @@ mod attachment;
 pub mod catalog;
 mod cloud;
 mod compose;
+mod dictation;
 mod digest;
 mod engine;
 mod eval;
 mod guard;
+mod language;
 mod ledger;
 mod phishing;
 mod platform;
 mod priority;
 mod prompts;
 mod redact;
+mod reply;
 mod router;
 mod rules;
 mod style;
@@ -34,6 +37,7 @@ pub use agent::{
 pub use attachment::{ATTACHMENT_LIMIT, Attachment, attachment_text, summarize_attachment};
 pub use cloud::{CloudApi, CloudRequest, KeyHeader, build_request, parse_response};
 pub use compose::{ComposeAction, Tone, assist};
+pub use dictation::{MAX_SECONDS, Recognizer, SAMPLE_RATE, ScriptedRecognizer, dictate};
 pub use digest::{Digest, DigestEntry, DigestThread, daily_digest};
 pub use engine::{
     Generate, LocalEngine, LocalProvider, OutputFormat, SCRIPTED_DIMENSIONS, ScriptedEngine,
@@ -41,6 +45,7 @@ pub use engine::{
 };
 pub use eval::{Cassette, EvalCall, EvalResult, replay, run_cassettes, token_f1};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
+pub use language::{LanguageLabel, detect_language, label_language};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use phishing::{
     Assessment, AuthOutcome, LinkFlags, ModelVerdict, PhishingSignals, Reason, Risk,
@@ -50,6 +55,7 @@ pub use platform::{PlatformBridge, map_capability};
 pub use priority::{Priority, PriorityInput, assess};
 pub use prompts::{PromptTemplate, lookup, registry, render};
 pub use redact::redact_for_cloud;
+pub use reply::{MAX_REPLY_CHARS, REPLY_COUNT, admit_replies, suggest_replies};
 pub use router::{FeaturePolicy, RouteRequest, Router, probe};
 pub use rules::{
     Condition, EnabledRule, ProposedRule, RuleAction, RuleMessage, RulePreview, rule_from_sentence,
