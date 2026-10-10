@@ -8,8 +8,8 @@ Checked 2026-10-08.
 
 - <https://crates.io/api/v1/crates/imap-codec>: 2.0.0-alpha.9 is the newest publish (2026-07-19); 1.0.0 is still the only stable release.
 - imap-types 2.0.0-alpha.7 `src/fetch.rs` and `src/extensions/binary.rs` (crates.io package): `MessageDataItemName::Binary`, `MessageDataItem::Binary` with an `NString8` value, and `Literal8`, which may hold NUL.
-- imap-codec 2.0.0-alpha.9 `Cargo.toml`: the default feature `quirk` turns on every quirk, so the workspace sets `default-features = false` and keeps 1.0's defaults, `quirk_missing_text` and `quirk_rectify_numbers`.
-- imap-codec 2.0.0-alpha.9 `src/fetch.rs` (`msg_att_static`) decodes `"BINARY" section-binary SP (nstring / literal8)` with no origin octet, as the ABNF in <https://www.rfc-editor.org/rfc/rfc3516.txt> section 7 and <https://www.rfc-editor.org/rfc/rfc9051.txt> section 9 has it. The prose of both (RFC 3516 section 4.3, RFC 9051 section 7.5.2) says a partial reply is `BINARY[section]<<number>>`. `main` on <https://github.com/duesee/imap-codec> was the same on 2026-10-10. `body.rs` drops that origin before decoding.
+- imap-codec 2.0.0-alpha.9 `Cargo.toml`: the default feature `quirk` turns on eleven quirks, 1.0's `quirk_missing_text` and `quirk_rectify_numbers` among them. The workspace keeps that default, so replies with the server bugs it lists (trailing spaces, a `NIL` body encoding, missing spaces between addresses, an empty continuation) still decode. The two opt-in quirks, `quirk_crlf_relaxed` and `quirk_id_empty_to_nil`, stay off.
+- imap-codec 2.0.0-alpha.9 `src/fetch.rs` (`msg_att_static`) decodes `"BINARY" section-binary SP (nstring / literal8)` with no origin octet, as the ABNF in <https://www.rfc-editor.org/rfc/rfc3516.txt> section 7 and <https://www.rfc-editor.org/rfc/rfc9051.txt> section 9 has it. The prose of both (RFC 3516 section 4.3, RFC 9051 section 7.5.2) says a partial reply is `BINARY[section]<<number>>`. `main` on <https://github.com/duesee/imap-codec> was the same on 2026-10-10. `body.rs` drops that origin before decoding, until <https://github.com/duesee/imap-codec/issues/737> (opened 2026-10-10) is resolved upstream.
 
 ## What was opened
 
