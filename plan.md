@@ -25,7 +25,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | C5 | todo | P1 | 3 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
 | P10 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
-| S5 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | S7 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | T4 | todo | P1 | 3 | 0% | |
 | A31 | todo | P1 | 2 | 0% | |
@@ -263,14 +262,6 @@ Depends on: P7. Reuse: imap-codec.
 Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
 
 Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.
-
-### S5. FTS5 index
-
-Depends on: S3. Reuse: FTS5.
-
-Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
-
-Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
 
 ### S7. Change feed
 

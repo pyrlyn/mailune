@@ -1337,3 +1337,11 @@ Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt u
 Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
+
+### S5. FTS5 index
+
+Depends on: S3. Reuse: FTS5.
+
+Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
+
+Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
