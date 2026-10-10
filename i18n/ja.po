@@ -1214,3 +1214,59 @@ msgstr "{0}を削除"
 msgctxt "compose.invalid_recipient"
 msgid "Not an email address: {0}"
 msgstr "メールアドレスではありません: {0}"
+
+msgctxt "search.ask"
+msgid "Ask"
+msgstr "質問"
+
+msgctxt "search.ask_prompt"
+msgid "Ask about your mail"
+msgstr "メールについて質問"
+
+msgctxt "search.no_answer"
+msgid "No message answers that."
+msgstr "答えになるメッセージはありません。"
+
+msgctxt "search.source"
+msgid "Source: {0}"
+msgstr "出典: {0}"
+
+msgctxt "search.bad_query"
+msgid "Can’t read “{0}”"
+msgstr "「{0}」を読み取れません"
+
+msgctxt "search.unsupported"
+msgid "“{0}” can’t be searched here yet"
+msgstr "「{0}」はここではまだ検索できません"
+
+msgctxt "settings.display_name"
+msgid "Display name"
+msgstr "表示名"
+
+msgctxt "settings.seconds"
+msgid "{0} seconds"
+msgstr "{0}秒"
+
+msgctxt "ai.summary"
+msgid "Summary"
+msgstr "要約"
+
+msgctxt "ai.action_items"
+msgid "To do"
+msgstr "やること"
+
+msgctxt "ai.made_on_device"
+msgid "Made on this Mac"
+msgstr "このMacで作成"
+
+msgctxt "ai.made_in_cloud"
+msgid "Made by your cloud model"
+msgstr "クラウドモデルで作成"
+
+msgctxt "ai.reply_with"
+msgid "Reply with “{0}”"
+msgstr "「{0}」で返信"
+
+msgctxt "settings.ai_privacy"
+msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
+msgstr "AIはこのMacで動作します。暗号化されたメールがクラウドモデルに送られることはありません。"

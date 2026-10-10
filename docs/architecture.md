@@ -161,4 +161,9 @@ The source for this plan, with the feature matrix, the reuse inventory and a fil
 - The dependency-graph test, the forward-only FFI test and the ABI drift test.
 
 **Performance budgets**
-- Up to 50 ms for a thread-list page at 100k messages.
+
+All at 100k messages with one 384-dimension embedding each, on the store as production opens it (SQLCipher on Apple targets). `mailune-store/benches/budgets.rs` measures them; `mailune-store/tests/budgets.rs` checks a small mailbox against ten times each budget on every `nextest` run.
+
+- Thread-list page (50 threads): up to 50 ms.
+- Cold open (open the store and show the first list page): up to 300 ms. *Proposed, awaiting creator confirmation.*
+- Search (top 10 by embedding, vectors already in memory): up to 100 ms. *Proposed, awaiting creator confirmation.* The first search after open fills the vector cache and is not covered by this budget.

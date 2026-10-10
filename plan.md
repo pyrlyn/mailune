@@ -30,17 +30,13 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | P18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | B3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M5 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M12 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M6 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M11 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| M14 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M15 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | M16 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M19 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | R3 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | P32 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| T6 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
+| T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
 | E12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L1 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -56,7 +52,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | L11 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L12 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | L13 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
-| M17 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | M18 | in progress | P1 | 2 | 0% | Cursor / grok 4.7 |
 | I1 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I2 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
@@ -102,7 +97,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | D13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | I8 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
 | W13 | in progress | P1 | 3 | 0% | Cursor / grok 4.7 |
-| S14 | in progress | P3 | 3 | 0% | Cursor / grok 4.7 |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
@@ -258,7 +252,7 @@ Execution plan: `mailune-store` only.
 
 ### S7. Change feed
 
-Depends on: S3. Reuse: `PRAGMA data_version`. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
 
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
@@ -304,14 +298,6 @@ Done when: Keychain, notifications, network path, web auth, and open-URL sit beh
 
 Execution plan: `desktop/macos` only.
 
-### M12. macOS settings
-
-Depends on: M7.
-
-Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
-
-Execution plan: `desktop/macos` only.
-
 ### P32. Relay client
 
 Depends on: P31, P16.
@@ -326,7 +312,29 @@ Depends on: S12, B1. Reuse: `divan` and `hyperfine` if already listed.
 
 Done when: cold open, a list page, and a search have a budget. `nextest` checks a small mailbox against a loose ceiling. The 100k run stays in the divan bench.
 
-Execution plan: `mailune-store` benches and one test.
+Execution plan: `mailune-store` benches and one test, on the S14 branch because the search being budgeted is the cached vector scan.
+
+- Dependencies: B1 is done. S12 (storage benches) is not on `main`, so this task brings the 100k list-page and search benches itself; S12's insert bench is still open. S5 (FTS) is not on `main` either, so "a search" is `Store::nearest` until it lands.
+- Budgets go in `docs/architecture.md`. Only the 50 ms list page at 100k is stated there; cold open and search get proposed numbers, flagged for the creator.
+- `benches/budgets.rs` (divan) times them on a 100k fixture, seeded once into Cargo's target temp directory and reused. `tests/budgets.rs` runs a 300-message mailbox against ten times each budget, which holds even in a debug build. Both share `tests/support`.
+
+Proposed budgets and why. The thresholds are from Nielsen Norman Group, "Response Times: The 3 Important Limits" (https://www.nngroup.com/articles/response-times-3-important-limits/): about 0.1 s feels instant, and about 1 s keeps the user's flow.
+
+- **Search: 100 ms.** A typed query answered within the "instant" limit. It is looser than a list page, which has to keep up with scrolling, page after page.
+- **Cold open (open the store and show the first page): 300 ms.** The store's share of a launch that should feel under a second; the rest is the native shell's.
+
+Measured (Apple M3 Max, release, SQLCipher, 100k messages with 384 dimensions, medians):
+
+| Measurement | Median | Budget |
+| --- | --- | --- |
+| Cold open to first page | 258 ms | 300 ms, met |
+| List page | 220 ms | 50 ms, **missed**; the time is in `thread_page`'s query, not the vectors |
+| Search, cached | 71 ms | 100 ms, met |
+| First search after open, which fills the cache | 1.31 s | not budgeted |
+
+Fixes for the list page and the first search are proposed in `ideas.md`.
+
+Left: creator confirmation of the two proposed budgets.
 
 ### E12. Server container
 
@@ -344,27 +352,11 @@ Done when: a prompt returns JSON from a scripted model. If the Foundation Models
 
 Execution plan: `desktop/macos` only.
 
-### M11. macOS search
-
-Depends on: M8. Citation ranking is on another branch.
-
-Done when: filter tokens narrow a fixture list, and Ask shows a citation that points at a fixture id.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-core`.
-
 ### M13. macOS onboarding
 
 Depends on: M12, P14, P15.
 
 Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
-
-Execution plan: `desktop/macos` only.
-
-### M14. macOS integration
-
-Depends on: M8.
-
-Done when: mailto, a dock badge, share, and Spotlight sit behind fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
 
 Execution plan: `desktop/macos` only.
 
@@ -383,14 +375,6 @@ Depends on: M9, M10.
 Done when: the reader and composer expose VoiceOver labels, one keyboard path, and a contrast pair that meets a checked ratio.
 
 Execution plan: `desktop/macos` only.
-
-### M19. macOS AI surfaces
-
-Depends on: M9, M10. The summary and reply engines are on another branch.
-
-Done when: the reader shows a summary and reply chips from fixtures, and settings shows a privacy line. No model call.
-
-Execution plan: `desktop/macos` only. Do not edit `mailune-ai`.
 
 ### R3. Swift CI
 
@@ -463,14 +447,6 @@ Depends on: L6, L2.
 Done when: a list description has one fixture row with a subject, and a test reads that subject.
 
 Execution plan: `desktop/linux` only.
-
-### M17. macOS UI test
-
-Depends on: M8, B7.
-
-Done when: one XCUITest opens the thread list from fixture data and sees a subject. If the test runner cannot launch the app, commit the test and say why.
-
-Execution plan: `desktop/macos` only. Commit on `batch7-imap`.
 
 ### M18. macOS release script
 
@@ -879,11 +855,3 @@ Depends on: W1, R11. Reuse: the R11 signing workflow.
 Done when: an MSIX is signed and a winget manifest installs it. Signing waits on R11.
 
 Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
-
-### S14. usearch for vectors
-
-From ideas. The in-SQLite KNN is S8.
-
-Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
-
-Execution plan: benchmark next to S8 on `batch9-store`. Switch only if S8 misses the budget.

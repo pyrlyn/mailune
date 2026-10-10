@@ -24,14 +24,10 @@
 - P18. JMAP push
 - B3. Swift package
 - M5. macOS host integrations
-- M12. macOS settings
 - M6. Apple on-device model
-- M11. macOS search
 - M13. macOS onboarding
-- M14. macOS integration
 - M15. App Intents
 - M16. macOS accessibility
-- M19. macOS AI surfaces
 - R3. Swift CI
 - P32. Relay client
 - T6. Performance budgets
@@ -50,7 +46,6 @@
 - L11. Linux desktop integration
 - L12. Linux UI scenario
 - L13. Flatpak manifest
-- M17. macOS UI test
 - M18. macOS release script
 - I1. iOS target
 - I2. iOS host
@@ -96,4 +91,3 @@
 - D13. Android release
 - I8. TestFlight pipeline
 - W13. Windows release
-- S14. usearch for vectors

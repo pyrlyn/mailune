@@ -3,36 +3,64 @@ import SwiftUI
 
 /// Category tabs over a `List`, which only builds the rows on screen. Unread
 /// rows carry a dot, a trailing swipe archives, and selection is multiple.
+/// A non-empty `query` searches every tab, as a mail search does.
 public struct ThreadList: View {
     @Binding var selected: Set<String>
+    var query: String
     @State private var category = ThreadCategory.primary
     @State private var archived: Set<String> = []
 
-    public init(selected: Binding<Set<String>>) {
+    public init(selected: Binding<Set<String>>, query: String = "") {
         _selected = selected
+        self.query = query
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: MailuneSpace.s) {
-            Picker(Copy.text("mail_list.category"), selection: $category) {
-                ForEach(ThreadCategory.allCases, id: \.self) { tab in
-                    Text(Copy.text(tab.titleKey)).tag(tab)
+            if query.allSatisfy(\.isWhitespace) {
+                Picker(Copy.text("mail_list.category"), selection: $category) {
+                    ForEach(ThreadCategory.allCases, id: \.self) { tab in
+                        Text(Copy.text(tab.titleKey)).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .padding(.horizontal, MailuneSpace.s)
+                rows(ThreadFixtures.visible(category: category, archived: archived))
+            } else {
+                switch Result(catching: { () throws(SearchError) in try SearchQuery.parse(query) }) {
+                case let .success(search):
+                    Text(Copy.format("search.results_for", query))
+                        .padding(.horizontal, MailuneSpace.s)
+                    rows(search.narrow(ThreadFixtures.all.filter { !archived.contains($0.id) }))
+                case let .failure(error):
+                    Text(Self.message(for: error))
+                        .foregroundStyle(.red)
+                        .padding(.horizontal, MailuneSpace.s)
+                    Spacer()
                 }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .padding(.horizontal, MailuneSpace.s)
+        }
+        .font(MailuneType.body)
+    }
 
-            List(ThreadFixtures.visible(category: category, archived: archived), selection: $selected) { item in
-                ThreadRowView(item: item)
-                    .tag(item.id)
-                    .swipeActions(edge: .trailing) {
-                        Button(Copy.text("data.archive")) {
-                            archived.insert(item.id)
-                            selected.remove(item.id)
-                        }
+    private func rows(_ items: [ThreadItem]) -> some View {
+        List(items, selection: $selected) { item in
+            ThreadRowView(item: item)
+                .tag(item.id)
+                .swipeActions(edge: .trailing) {
+                    Button(Copy.text("data.archive")) {
+                        archived.insert(item.id)
+                        selected.remove(item.id)
                     }
-            }
+                }
+        }
+    }
+
+    nonisolated static func message(for error: SearchError) -> String {
+        switch error {
+        case let .unsupported(token): Copy.format("search.unsupported", token)
+        case let .bad(token): Copy.format("search.bad_query", token)
         }
     }
 }
@@ -63,6 +91,7 @@ struct ThreadRowView: View {
                     Text(item.stamp)
                 }
                 Text(item.subject)
+                    .accessibilityIdentifier("thread-\(item.id)")
                 Text(item.snippet).lineLimit(1).opacity(0.7)
             }
             .font(MailuneType.body)

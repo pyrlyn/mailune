@@ -117,6 +117,8 @@ proptest = { version = "1.11.0", default-features = false, features = ["std"] }
 rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.
 libfuzzer-sys = "0.4.13"
+# mailune-store benches: the harness `rust.md` names. 0.1.21 is the latest, as in rtok and scull.
+divan = "0.1.21"
 # mailune-config only: layered TOML. 0.10.19 is the version aulo locks. The `test` feature (Jail) is
 # turned on only in mailune-config's dev-dependencies.
 figment = { version = "0.10.19", features = ["toml"] }

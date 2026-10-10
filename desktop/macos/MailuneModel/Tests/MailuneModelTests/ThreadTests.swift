@@ -20,7 +20,7 @@ final class ThreadTests: XCTestCase {
     }
 
     func testUnknownCategoryIsRejected() {
-        let json = #"{"snapshot":{"threads":[{"id":"x","from":{"email":"a@b"},"subject":"","snippet":"","stamp":"","unread":false,"has_attachment":false,"category":"spam"}]}}"#
+        let json = #"{"snapshot":{"threads":[{"id":"x","from":{"email":"a@b"},"subject":"","snippet":"","stamp":"","unread":false,"has_attachment":false,"category":"spam","labels":[]}]}}"#
         XCTAssertThrowsError(try ThreadFixtures.decode(Data(json.utf8)))
     }
 }

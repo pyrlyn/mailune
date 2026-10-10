@@ -69,6 +69,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | futures-util | local (dev) | https://github.com/rust-lang/futures-rs | `mailune-server` tests: send and receive on the client socket |
 | proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
+| divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` T6 budget benches at 100k messages |
 | figment | local | https://github.com/SergioBenitez/Figment | `mailune-config` layer merge; `Jail` in its tests |
 | toml | local | https://github.com/toml-rs/toml | `mailune-config` parses each layer alone so errors keep file:line |
 

@@ -1084,6 +1084,38 @@ Execution plan: Scripted server: UID STORE, UID COPY, UID MOVE, UID EXPUNGE and 
 
 What landed: `mutate.rs`: `store_flags` (silent +/-/replace), `copy_messages`, `move_messages` and `append` run on the scripted server. UIDPLUS `COPYUID` and `APPENDUID` become a `UidMap` and an `Appended`. Without MOVE, the fallback is COPY, `\Deleted` and `UID EXPUNGE`, and it is refused with `Unsupported` when UIDPLUS is missing, so other clients' deleted mail is never expunged. Flags and mailbox names that could break the command line are rejected (`Error::Argument`), and COPYUID ranges are bounded by the request size.
 
+### S14. usearch for vectors
+
+From ideas. The in-SQLite KNN is S8.
+
+Done when: a benchmark compares S8 with usearch at the target mailbox size. A switch happens only if S8 misses its latency budget.
+
+Execution plan: `crates/mailune-store/benches/knn.rs` (divan), nothing else in the store.
+
+1. Fixture: 100k messages, the mailbox size in `docs/architecture.md`, with one chunk each and 384-dimension vectors (a small local embedding model's size). Seeded once through the public repository API; on Apple targets the store is SQLCipher-keyed like production.
+2. Benches: `Store::nearest` (S8, exact cosine scan) and a usearch cosine HNSW index over the same vectors, top 10.
+3. Small test: a handful of vectors where usearch and `nearest` agree on the top hit, so `nextest` stays fast and the comparison uses the same metric.
+4. Budget: T6 is not on `main`, so there is no search budget yet. The only stated number is 50 ms for a thread-list page at 100k messages; it is used as the stand-in and flagged for the creator.
+5. usearch 2.26.4 and divan 0.1.21 are dev-dependencies only, with `toolchain.md` rows. Ported from `batch9-store` `beb2986`, which targets an older store API and 32-dimension vectors.
+
+Result (Apple M3 Max, release, SQLCipher store, top 10 of 100k 384-dimension vectors):
+
+- S8 `Store::nearest`: 1.44 s median.
+- Exact cosine scan over the same vectors already in memory: 79 ms.
+- usearch HNSW: 1.1 ms.
+
+S8 misses the 50 ms stand-in budget about 29 times over. Most of its time is loading and decrypting the rows on every query, not the arithmetic.
+
+Decision (creator): keep the exact scan, with the vectors cached in memory. No usearch in production.
+
+What landed:
+
+- **The comparison.** `benches/knn.rs` compared S8, an in-memory exact scan and usearch, with the numbers above. The bench and the usearch dev-dependency were then removed: with the switch declined they had no ongoing use, and usearch compiled C++ (through cxx) into every non-wasm CI test build.
+- **The cache.** `Store::nearest` now scans decoded vectors kept in memory (`vector_cache.rs`). Scores and their order are identical to the uncached scan, pinned by a test against the old implementation.
+- **Freshness.** This connection's `put_embedding` updates the cache in place; a write from another connection moves `PRAGMA data_version`, and the next query drops the cache. The reader sits in `open.rs` so S7 can build on it.
+- **Limits.** Memory only, capped at 256 MiB (a larger set is scanned once and dropped). Vector buffers are zeroized on drop and when they grow, and `Store::clear_vector_cache` frees them on demand.
+- **After the cache, 100k messages (T6 bench):** a cached search takes 71 ms (was 1.44 s) against T6's proposed 100 ms budget. The first search after open, which fills the cache, takes 1.31 s; warming the cache in the background is in `ideas.md`.
+
 ### E2. Web frontend scaffold
 
 Depends on: B8. Reuse: Vite, React, TypeScript.
@@ -1273,6 +1305,56 @@ Done when: recipient chips, a body, one attachment, send later, and undo send ro
 Execution plan: `desktop/macos` only, on the same stacked branch as M9. Port the composer from `batch7-imap` and fix it: a `Composer` state machine (editing → confirming → held) where only `confirmSend` reaches the outbox, a fake outbox with an injected time, send later and undo send as one hold window. Tests: chips, send off until confirm, undo inside and after the window, send later, and a past send-later time.
 
 What landed: `MailuneModel/Composer.swift`: `Composer` parses typed text into recipient chips (rejecting non-addresses and duplicates), holds subject, body, one attachment and an optional send-later time. `requestSend` asks for confirmation and `confirmSend` is the only call that reaches the `Outbox`; the draft is held until the later of the undo window (10 s) and the send-later time, so `undo` restores the whole draft until it goes out. `FakeOutbox` stands in for the core's queue until B3. `ComposerView` (⌘N from the shell) shows chips, a file picker for one attachment, a send-later toggle and date, a confirmation dialog before send, and Undo while held; it cannot be dismissed while a message is held. Contact suggestions (S13) are not shown yet: they need the core binding. New `compose.*` keys have de, fr and ja translations.
+
+### M11. macOS search
+
+Depends on: M8. Citation ranking is on another branch.
+
+Done when: filter tokens narrow a fixture list, and Ask shows a citation that points at a fixture id.
+
+Execution plan: `desktop/macos` only. Do not edit `mailune-core`. `SearchQuery` mirrors the core's `parse_query` grammar (`from:`, `label:`, `has:attachment`, `is:unread`, quoted and free text; `to:` and `before:` are reported as not answerable by a `ThreadRow`) and narrows the M8 fixture rows. Ask mirrors the core's rule that an answer is shown only with a citation of a retrieved passage: a fixture answerer picks the message sentence with the most shared words and cites its message id. Search field on the thread list, Ask sheet with the citation; strings from gettext.
+
+What landed: `MailuneModel/Search.swift`: `SearchQuery` mirrors the core's `parse_query` grammar (`from:`, `label:`, `has:attachment`, `is:unread`, quoted and free text) and narrows the M8 fixture rows across every tab; unknown keys, empty values and bad quotes are rejected as the core rejects them. `to:` and `before:` are reported as not searchable yet rather than ignored, because a `ThreadRow` carries neither. `FixtureAsk` follows the core's `ask` rule that an answer needs a citation: it picks the message sentence sharing the most words of four or more letters and cites its message id, and returns nothing otherwise. The shell has a search field on the thread list and an Ask sheet whose citation opens the thread. `mailune-core` is not edited; the real retrieval and citation ranking arrive over the core binding (B3). New `search.*` keys have de, fr and ja translations.
+
+### M12. macOS settings
+
+Depends on: M7.
+
+Done when: settings cover accounts, appearance, notifications, reading, compose, and sync, and a change round-trips through a fake store.
+
+Execution plan: `desktop/macos` only. Port `SettingsView` with Codable `Preferences` for accounts, appearance, notifications, reading, compose and sync, a `PreferencesStore` protocol, a `FakePreferencesStore` that round-trips through JSON, and a `UserDefaults` store for the app (no secrets). Reuse the existing `settings.*` keys. The compose undo window feeds M10's `Composer`.
+
+What landed: `MailuneModel/Settings.swift`: Codable `Preferences` for accounts (display name), appearance (theme, density), notifications, reading (conversation view, auto-advance), compose (undo-send window, signature) and sync (days, Wi-Fi only), behind a `PreferencesStore`. `FakePreferencesStore` keeps the encoded JSON, so a change in every section round-trips the same bytes `DefaultsPreferencesStore` writes for the app; unreadable data falls back to the defaults. `SettingsView` is the app's Settings scene (⌘,) and saves on change. The undo-send choice feeds M10's composer. No secret is stored here. Existing `settings.*` keys are reused; `settings.display_name` and `settings.seconds` are new.
+
+### M14. macOS integration
+
+Depends on: M8.
+
+Done when: mailto, a dock badge, share, and Spotlight sit behind fakes. Tests do not touch the real keychain. No source line contains `keyring::` or `Security.framework`.
+
+Execution plan: `desktop/macos` only. Test the app's logic, not the fakes: mailto URLs parse into a composer `Draft` (RFC 6068 to, cc, subject, body); the dock badge shows the unread count; share builds text from a message; Spotlight indexes subject, sender and message text, but never the text of an encrypted message. Each sits behind a protocol with a fake for tests and an AppKit or CoreSpotlight implementation for the app. No `keyring::` or `Security.framework`.
+
+What landed: `MailunePlatform/Integrations.swift`: `MailtoLink` turns an RFC 6068 link (addresses in the path or `to=`, `subject`, `body`) into a composer draft; it never attaches a file, and the draft still needs confirm. `UnreadBadge` sets the Dock badge to the unread count (capped at 99+), `ShareContent` hands subject and body to the share picker, and `SpotlightItems` indexes subject, sender and message text (creator decision); the text of an encrypted message is never indexed, because Spotlight's store lies outside the app's encrypted database. Each sits behind a protocol (`DockBadge`, `Sharing`, `SpotlightIndex`) with an AppKit or Core Spotlight implementation for the app and a fake for tests (`HostServices.live()` / `.fake()`). `project.yml` registers the `mailto` scheme. The workspace source scan covers these files: no `keyring::` or `Security.framework`.
+
+### M17. macOS UI test
+
+Depends on: M8, B7.
+
+Done when: one XCUITest opens the thread list from fixture data and sees a subject. If the test runner cannot launch the app, commit the test and say why.
+
+Execution plan: `desktop/macos` only. Add a `MailuneUITests` XCUITest target to `project.yml` that launches the app and finds a subject from the M8 contract fixture by accessibility identifier. Run it through `xcodebuild test`; if the runner cannot launch the app here, commit the test and record why.
+
+What landed: `MailuneUITests/ThreadListUITests.swift` launches the app with `-mailune-ui-test` (fakes for the Dock, Spotlight and saved settings, so a run leaves nothing on the machine) and finds the first contract-fixture row's subject, "Quarterly plan", by accessibility identifier. A launch that macOS keeps in the background opens no window, so the test asks File › New Window for one; with that it passed in several runs in a row on this Mac. It has its own `MailuneUITests` scheme and `scripts/uitest.sh` because it needs a logged-in GUI session; `scripts/test.sh` compiles it.
+
+### M19. macOS AI surfaces
+
+Depends on: M9, M10. The summary and reply engines are on another branch.
+
+Done when: the reader shows a summary and reply chips from fixtures, and settings shows a privacy line. No model call.
+
+Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. A fixture `assist.json` gives each thread a summary and three reply suggestions (the A11/A13 shapes); the reader shows them, and a reply chip opens the composer with the reply prefilled. Settings shows a privacy line (AI runs on this Mac by default; encrypted mail never goes to a cloud model). No model call.
+
+What landed: `MailuneModel/Assist.swift` and `Fixtures/assist.json`: each thread has a short summary, action items, three reply suggestions (the shapes of `mailune-ai`'s summary cache and smart replies) and where the text was made. The reader shows them in a card; a reply chip opens the composer with a reply to the sender ("Re:" stays untranslated so other clients still thread it). `AssistPolicy` hides cloud-made text about encrypted mail, which must never reach a cloud model. Settings shows the privacy line under Privacy & rules. No model is called and `mailune-ai` is not edited. New `ai.*` and `settings.ai_privacy` keys have de, fr and ja translations.
 
 ### R11. Windows signing workflow
 
