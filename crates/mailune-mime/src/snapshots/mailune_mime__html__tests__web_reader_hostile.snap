@@ -1,0 +1,5 @@
+---
+source: crates/mailune-mime/src/html.rs
+expression: cleaned
+---
+<p>Hello <b>Ada</b>,</p><p>The <a href="https://example.com/notes" rel="noopener noreferrer">build notes</a> are ready.</p><img src="cid:logo@mail" alt="logo"><a rel="noopener noreferrer">click</a><p>Thanks,<br>Grace</p>

@@ -252,6 +252,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "Vue par conversation"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "Conversations"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "Normal"
@@ -429,6 +433,10 @@ msgid "I agree to the terms of service and the privacy policy."
 msgstr ""
 "J'accepte les conditions d'utilisation et la politique de confidentialité."
 
+msgctxt "compose.confirm_recipients"
+msgid "I have checked the recipients and want to send this"
+msgstr "J’ai vérifié les destinataires et je veux l’envoyer"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "ICÔNES"
@@ -492,6 +500,18 @@ msgstr "Mise en page"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "Clair"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "Boîtes aux lettres"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "Message"
+
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "Corps du message"
 
 msgctxt "kit.motion"
 msgid "MOTION"
@@ -769,6 +789,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr "SUGGESTIONS"
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr "Réponses suggérées"
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr "Résumé"
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr "SURFACES"
@@ -1041,6 +1069,10 @@ msgctxt "data.updates"
 msgid "Updates"
 msgstr "Mises à jour"
 
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
+msgstr "Utiliser la suggestion"
+
 msgctxt "settings.vacation_responder"
 msgid "Vacation responder"
 msgstr "Réponse d'absence"
@@ -1116,3 +1148,71 @@ msgstr "{0} s"
 msgctxt "sheets.from_2"
 msgid "{0} · from {1}"
 msgstr "{0} · de {1}"
+
+msgctxt "shell.commands"
+msgid "Commands"
+msgstr "Commandes"
+
+msgctxt "shell.command_placeholder"
+msgid "Type a command"
+msgstr "Saisissez une commande"
+
+msgctxt "shell.go_to"
+msgid "Go to {0}"
+msgstr "Aller à {0}"
+
+msgctxt "mail_list.category"
+msgid "Category"
+msgstr "Catégorie"
+
+msgctxt "reader.show_quote"
+msgid "Show quoted text"
+msgstr "Afficher le texte cité"
+
+msgctxt "reader.hide_quote"
+msgid "Hide quoted text"
+msgstr "Masquer le texte cité"
+
+msgctxt "reader.attachment"
+msgid "Attachment: {0}"
+msgstr "Pièce jointe : {0}"
+
+msgctxt "reader.trackers"
+msgid "Tracking pixels: {0}"
+msgstr "Pixels espions : {0}"
+
+msgctxt "reader.badge.failed"
+msgid "Authentication failed"
+msgstr "Échec de l’authentification"
+
+msgctxt "reader.badge.encrypted"
+msgid "Encrypted"
+msgstr "Chiffré"
+
+msgctxt "reader.badge.signed"
+msgid "Signed"
+msgstr "Signé"
+
+msgctxt "reader.badge.authenticated"
+msgid "Sender verified"
+msgstr "Expéditeur vérifié"
+
+msgctxt "reader.badge.unverified"
+msgid "Sender not verified"
+msgstr "Expéditeur non vérifié"
+
+msgctxt "compose.attach"
+msgid "Attach file"
+msgstr "Joindre un fichier"
+
+msgctxt "compose.confirm_send"
+msgid "Send this message?"
+msgstr "Envoyer ce message ?"
+
+msgctxt "compose.remove"
+msgid "Remove {0}"
+msgstr "Retirer {0}"
+
+msgctxt "compose.invalid_recipient"
+msgid "Not an email address: {0}"
+msgstr "Adresse e-mail non valide : {0}"

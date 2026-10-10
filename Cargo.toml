@@ -24,7 +24,7 @@ serde = { version = "1", features = ["derive"] }
 schemars = "1.2.2"
 # mailune-protocol tests: turn a schema into a snapshot value.
 serde_json = "1"
-# mailune-protocol tests: the committed JSON Schema. 1.49.0 checked on crates.io 2026-10-08.
+# mailune-protocol tests: the committed JSON Schema; mailune-mime tests: the web reader fixture. 1.49.0 checked on crates.io 2026-10-08.
 insta = { version = "1.49.0", features = ["json"] }
 # mailune-cli only. Library crates return their own error type.
 anyhow = "1"
@@ -98,6 +98,12 @@ rmcp = { version = "3.5.1", default-features = false, features = ["server", "mac
 libfuzzer-sys = "0.4.13"
 # mailune-store benches: the harness `rust.md` names. 0.1.21 is the latest, as in rtok and scull.
 divan = "0.1.21"
+# mailune-config only: layered TOML. 0.10.19 is the version aulo locks. The `test` feature (Jail) is
+# turned on only in mailune-config's dev-dependencies.
+figment = { version = "0.10.19", features = ["toml"] }
+# mailune-config only: parses each layer on its own so an error keeps its byte span, which
+# becomes file:line. 1.1.6 is the version aulo locks.
+toml = "1.1.6"
 
 # Lints every member inherits through `[lints] workspace = true`. CI runs
 # clippy with `-D warnings`, so `warn` here fails the build just like `deny`.

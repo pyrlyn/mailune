@@ -1,5 +1,6 @@
 [tools]
 rust = { version = "1.99.0", components = "rustfmt,clippy" } # one Rust version for local work and CI
+node = "26.8.2" # web/: Vite, Vitest and TypeScript; nothing in the Rust core runs on it
 "pipx:translate-toolkit" = "3.20.0" # i18n/*.po → native catalogs (scripts/i18n.py)
 
 # translate-toolkit is a pipx tool, so its Python is the one inside that venv.
