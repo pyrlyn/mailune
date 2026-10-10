@@ -12,6 +12,7 @@ mod digest;
 mod engine;
 mod eval;
 mod guard;
+mod language;
 mod ledger;
 mod phishing;
 mod platform;
@@ -42,6 +43,7 @@ pub use engine::{
 };
 pub use eval::{Cassette, EvalCall, EvalResult, replay, run_cassettes, token_f1};
 pub use guard::{Policy, Tool, ToolProposal, admit, parse_proposal, proposal_from_mail};
+pub use language::{LanguageLabel, detect_language, label_language};
 pub use ledger::{FlowRecord, Ledger, Retention};
 pub use phishing::{
     Assessment, AuthOutcome, LinkFlags, ModelVerdict, PhishingSignals, Reason, Risk,

@@ -18,7 +18,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | todo | P0 | 2 | 0% | |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | todo | P0 | 2 | 0% | |
-| A23 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | C3 | todo | P1 | 3 | 0% | |
 | C4 | todo | P1 | 3 | 0% | |
 | C5 | todo | P1 | 3 | 0% | |
@@ -204,14 +203,6 @@ Depends on: nothing. Reuse: cox-store src/watch.rs.
 Done when: Two-connection test sees writes from another process. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: `packages/crates` worktree, crate `sqlite-change-feed`. Commit there. Do not push.
-
-### A23. Language detection
-
-Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
-
-Done when: a message is labelled with a language. No translation call.
-
-Execution plan: `mailune-ai` `language.rs` on a maintained detector: survey whatlang, lingua, and whichlang on crates.io. Detect on the subject and body with quoted lines and the signature stripped (`redact_for_cloud`); return an ISO 639-3 code with confidence, and no label when the detector is not reliable. No translation call. Row in `toolchain.md`.
 
 ### C3. Autocrypt headers
 

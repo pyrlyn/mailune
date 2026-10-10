@@ -56,6 +56,10 @@ axum = { version = "0.8.9", default-features = false, features = ["query"] }
 sse-stream = { version = "0.3.0", default-features = false }
 # mailune-jmap: maps the SSE block stream to typed push events. Already in the tree through sse-stream.
 futures-util = { version = "0.3.34", default-features = false }
+# mailune-ai: language detection on the device. 0.18.0 checked on crates.io 2026-10-10; pure Rust, MIT,
+# 69 languages in an 83 KB crate. lingua 1.8.0 ships per-language models (3.3 MB crate plus 75 model
+# crates) and whichlang 0.1.1 knows 16 languages.
+whatlang = "0.18.0"
 # mailune-push tests drive the router in process with `oneshot`; no socket. mailune-mcp: rmcp's
 # runtime; its tests drive the server over an in-memory duplex.
 tokio = "1.53.2"

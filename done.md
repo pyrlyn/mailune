@@ -1367,3 +1367,13 @@ Done when: a thread yields three reply suggestions.
 Execution plan: `mailune-ai` `reply.rs`. A versioned `reply-suggestions` template (DraftReply) asks for JSON with three replies; the thread is rendered with `render_thread` and completed through any `Provider`, so the privacy router and the cloud gate (`allow_cloud`) keep encrypted mail local. A policy outside the model admits exactly three distinct, non-empty, short, single-line suggestions and fails closed with `BadOutput` otherwise. Suggestions are composer text; nothing is sent. Tests use the scripted engine; the prompt registry snapshot gains the template.
 
 What landed: `mailune-ai` `reply.rs`. A new `reply-suggestions` v1 template (DraftReply, in the registry snapshot) asks for JSON with three replies. `suggest_replies` renders the thread with `render_thread` and completes it through any `Provider`, carrying the thread's privacy, so a cloud provider's `build_request` refuses encrypted mail (tested). `admit_replies` is the policy outside the model: exactly three distinct (case-insensitive), non-empty, single-line suggestions of at most 160 characters with no control character and no link, and no extra JSON keys; anything else is `BadOutput`, nothing is trimmed into shape. Suggestions are composer text; nothing is sent. Tests use the scripted engine.
+
+### A23. Language detection
+
+Depends on: A2. Reuse: NEW. Survey a maintained detector before writing a table.
+
+Done when: a message is labelled with a language. No translation call.
+
+Execution plan: `mailune-ai` `language.rs` on a maintained detector: survey whatlang, lingua, and whichlang on crates.io. Detect on the subject and body with quoted lines and the signature stripped (`redact_for_cloud`); return an ISO 639-3 code with confidence, and no label when the detector is not reliable. No translation call. Row in `toolchain.md`.
+
+What landed: `mailune-ai` `language.rs` on whatlang 0.18.0. `label_language` detects on the subject and the body with quoted lines and the signature stripped (`redact_for_cloud`), so a reply is not labelled with the language it quotes; `detect_language` takes plain text. A label is an ISO 639-3 code, the English name, and the confidence; when whatlang says the result is not reliable (a short "ok", or Cyrillic it cannot tell from Bulgarian) there is no label rather than a guess. No translation call and no model call, so it runs for encrypted mail too. Survey (crates.io, 2026-10-10): whatlang 0.18.0 (2025-10-16, MIT, pure Rust, 69 languages, 83 KB crate, one dependency); lingua 1.8.0 (2026-03-09, Apache-2.0, more accurate but a 3.3 MB crate plus an optional model crate per language, 104 declared dependencies); whichlang 0.1.1 (2025-01-21, MIT, 16 languages).

@@ -15,6 +15,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 # Model blobs are trusted only after their SHA-256 matches the catalog.
 sha2 = { workspace = true }
+# A message's language, detected on the device without a model call.
+whatlang = { workspace = true }
 
 [dev-dependencies]
 mailune-testkit = { path = "../mailune-testkit" }
