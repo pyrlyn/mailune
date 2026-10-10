@@ -2,6 +2,13 @@ import MailuneModel
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// One opening of the composer. A sheet keyed by it is built from this
+/// draft; a sheet shown by a flag can be built from the previous one.
+struct ComposeSheet: Identifiable {
+    let id = UUID()
+    var draft: Draft
+}
+
 /// Recipient chips, subject, body, one attachment and send later. Send asks
 /// for confirmation first, then the draft is held so it can be undone.
 public struct ComposerView: View {

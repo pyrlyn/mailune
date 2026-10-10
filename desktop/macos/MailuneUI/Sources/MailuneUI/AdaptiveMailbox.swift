@@ -41,8 +41,7 @@
         let requests: ComposeRequests
         @State private var feed = ThreadFeed()
         @State private var outbox = FakeOutbox()
-        @State private var composing = false
-        @State private var startDraft = Draft()
+        @State private var composing: ComposeSheet?
 
         var body: some View {
             NavigationStack {
@@ -74,21 +73,20 @@
                     compose(draft)
                 }
             }
-            .sheet(isPresented: $composing) {
+            .sheet(item: $composing) { sheet in
                 // A sheet on iOS shows toolbar items only inside a navigation container.
                 NavigationStack {
                     ComposerView(
                         outbox: outbox,
                         undoWindow: TimeInterval(preferences.current().undoSendSeconds),
-                        draft: startDraft
+                        draft: sheet.draft
                     )
                 }
             }
         }
 
         private func compose(_ draft: Draft) {
-            startDraft = draft
-            composing = true
+            composing = ComposeSheet(draft: draft)
         }
     }
 #endif
