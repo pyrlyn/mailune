@@ -19,6 +19,8 @@ mod ops;
 mod repo;
 #[cfg(not(target_arch = "wasm32"))]
 mod schema;
+#[cfg(not(target_arch = "wasm32"))]
+mod search;
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod testutil;
 #[cfg(not(target_arch = "wasm32"))]
@@ -90,4 +92,7 @@ pub enum Error {
     /// No candidate embedder produced usable vectors.
     #[error("no embedder produced usable vectors")]
     NoEmbedder,
+    /// The message is not stored, so there is nothing to attach the data to.
+    #[error("message is not stored")]
+    UnknownMessage,
 }
