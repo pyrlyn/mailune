@@ -1337,3 +1337,35 @@ Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt u
 Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
+
+### S5. FTS5 index
+
+Depends on: S3. Reuse: FTS5.
+
+Done when: subject, addresses, and body text are searchable. FTS5 virtual tables go through `sql_query` inside this crate only, with a comment that Diesel cannot model them.
+
+Execution plan: `mailune-store` only. New migration: an FTS5 table (subject, addresses, body) keyed by a `search_docs` rowid map, a view that flattens the address JSON, and triggers that keep subject and addresses in step with `messages` (plus a backfill). New `search.rs`: `Store::index_body` sets the body text and `Store::search_text` runs a quoted MATCH ranked by bm25, both through `sql_query` with a comment that Diesel cannot model FTS5. Verify with unit tests for each field, updates, deletes, account scoping and FTS syntax in the query.
+
+### S7. Change feed
+
+Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_version` for the S14 vector cache; the vector cache should drop on the feed's invalidations once the feed exists. The shared sqlite-change-feed crate does not exist yet; do not create it outside this repo.
+
+Done when: a second connection in the same process observes a write as a typed invalidation.
+
+Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
+
+### S12. Storage benchmarks
+
+Depends on: S3. Reuse: `divan` from `rust.md`.
+
+Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
+
+Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
+
+### P10. Lazy body fetch
+
+Depends on: P7. Reuse: imap-codec.
+
+Done when: BODY.PEEK partial and BINARY requests return the requested bytes from the scripted server.
+
+Execution plan: `mailune-imap` only. Teach the scripted server `UID FETCH n BODY.PEEK[section]<offset.count>` and `UID FETCH n BINARY.PEEK[section]<offset.count>` over a per-message literal. Add a `body.rs` with `Connection::fetch_body` that encodes the request with imap-codec, decodes the literal reply, and returns the bytes. Verify with scripted-server tests for a whole part, a partial range, BINARY, and a missing message.

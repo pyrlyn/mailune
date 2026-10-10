@@ -8,7 +8,9 @@
 //! Mailboxes hold message metadata only: enough for SELECT response codes,
 //! UID SEARCH SINCE, and UID FETCH of UID, FLAGS, ENVELOPE and BODYSTRUCTURE.
 //! Strings go out quoted, never as literals, so every untagged reply is one
-//! line.
+//! line, except body sections (`BODY.PEEK[...]`, `BINARY.PEEK[...]`), which
+//! are built from the metadata and sent as literals. Built bodies are ASCII, so
+//! replies stay strings.
 
 use std::collections::BTreeMap;
 
@@ -21,7 +23,15 @@ use crate::sync::{in_set, uid_set};
 pub const FIXTURE: &str = "From: ana@example.com\r\nSubject: Hi\r\n\r\nHello\r\n";
 
 /// Capabilities a new server advertises besides `IMAP4rev1` and Gmail's.
-const DEFAULT_CAPABILITIES: [&str; 3] = ["CONDSTORE", "UIDPLUS", "MOVE"];
+const DEFAULT_CAPABILITIES: [&str; 4] = ["CONDSTORE", "UIDPLUS", "MOVE", "BINARY"];
+
+/// Text of every scripted body part 1.
+const BODY_TEXT: &str = "Hello\r\n";
+/// An attachment's bytes: a PDF signature followed by NUL, so BINARY has
+/// something a text literal could not carry.
+const ATTACHMENT: &[u8] = b"%PDF-\0\x01\x02";
+/// [`ATTACHMENT`] in base64, as BODY returns it.
+const ATTACHMENT_BASE64: &str = "JVBERi0AAQI=\r\n";
 
 /// Largest APPEND literal the scripted server accepts.
 const LITERAL_LIMIT: usize = 1 << 20;
@@ -663,9 +673,73 @@ fn uid_fetch(mailbox: &ScriptMailbox, args: &str, qresync: bool) -> String {
         if items.contains("BODYSTRUCTURE") {
             fields.push_str(&format!(" BODYSTRUCTURE {}", body_structure(message)));
         }
+        if let Some(section) = body_section(message, &items) {
+            fields.push_str(&section);
+        }
         out.push_str(&format!("* {} FETCH ({fields})\r\n", index + 1));
     }
     out
+}
+
+/// ` BODY[s]<o> {n}` or ` BINARY[s]<o> ~{n}` and the bytes, for the first
+/// `BODY.PEEK[...]` or `BINARY.PEEK[...]` item. An unknown section is NIL.
+fn body_section(message: &ScriptMessage, items: &str) -> Option<String> {
+    let (name, tilde, rest) = match items.split_once("BINARY.PEEK[") {
+        Some((_, rest)) => ("BINARY", "~", rest),
+        None => ("BODY", "", items.split_once("BODY.PEEK[")?.1),
+    };
+    let (section, rest) = rest.split_once(']')?;
+    let range = rest
+        .strip_prefix('<')
+        .and_then(|rest| rest.split_once('>'))
+        .and_then(|(range, _)| range.split_once('.'))
+        .and_then(|(offset, count)| Some((offset.parse().ok()?, count.parse().ok()?)));
+    let origin = range.map_or(String::new(), |(offset, _): (usize, usize)| {
+        format!("<{offset}>")
+    });
+    let Some(bytes) = section_bytes(message, section, name == "BINARY") else {
+        return Some(format!(" {name}[{section}]{origin} NIL"));
+    };
+    let bytes: Vec<u8> = match range {
+        Some((offset, count)) => bytes.iter().skip(offset).take(count).copied().collect(),
+        None => bytes,
+    };
+    Some(format!(
+        " {name}[{section}]{origin} {tilde}{{{}}}\r\n{}",
+        bytes.len(),
+        String::from_utf8_lossy(&bytes)
+    ))
+}
+
+/// One section of the message the metadata describes: part 1 is text, part 2
+/// the attachment, base64 for BODY and decoded for BINARY.
+fn section_bytes(message: &ScriptMessage, section: &str, binary: bool) -> Option<Vec<u8>> {
+    let content_type = if message.attachment.is_some() {
+        "multipart/mixed; boundary=\"b\""
+    } else {
+        "text/plain; charset=UTF-8"
+    };
+    let header = format!(
+        "From: {}\r\nSubject: {}\r\nMessage-ID: {}\r\nMIME-Version: 1.0\r\nContent-Type: {content_type}\r\n\r\n",
+        message.from, message.subject, message.message_id
+    );
+    let text = match &message.attachment {
+        None => BODY_TEXT.to_string(),
+        Some(name) => format!(
+            "--b\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n{BODY_TEXT}--b\r\n\
+             Content-Type: application/pdf; name=\"{name}\"\r\n\
+             Content-Transfer-Encoding: base64\r\n\r\n{ATTACHMENT_BASE64}--b--\r\n"
+        ),
+    };
+    match (section, &message.attachment) {
+        ("", _) => Some(format!("{header}{text}").into_bytes()),
+        ("HEADER", _) => Some(header.into_bytes()),
+        ("TEXT", _) => Some(text.into_bytes()),
+        ("1", _) => Some(BODY_TEXT.as_bytes().to_vec()),
+        ("2", Some(_)) if binary => Some(ATTACHMENT.to_vec()),
+        ("2", Some(_)) => Some(ATTACHMENT_BASE64.as_bytes().to_vec()),
+        _ => None,
+    }
 }
 
 fn quoted(text: &str) -> String {

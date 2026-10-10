@@ -6,9 +6,9 @@
 //! zeroized when they are dropped or outgrown, because an embedding can leak mail content.
 //! It is bounded by [`MAX_CACHED_BYTES`]; a set that would not fit is scanned once and dropped.
 //!
-//! Freshness: this connection's own writes update the cache in place (`record_write`). A write
-//! from another connection or process changes `PRAGMA data_version`, and the next query drops
-//! the whole cache (`sync`).
+//! Freshness: this connection's own writes update the cache in place (`record_write`). When the
+//! change feed (`feed`) reports that another connection or process changed embeddings, the whole
+//! cache is dropped; writes to other topics leave it alone.
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -163,10 +163,9 @@ impl Drop for VectorSet {
     }
 }
 
-/// Every cached set, valid for one `PRAGMA data_version`.
+/// Every cached set.
 #[derive(Debug)]
 pub(crate) struct VectorCache {
-    version: Option<i64>,
     sets: HashMap<SetKey, VectorSet>,
     limit: usize,
 }
@@ -180,17 +179,8 @@ impl Default for VectorCache {
 impl VectorCache {
     pub(crate) fn with_limit(limit: usize) -> Self {
         Self {
-            version: None,
             sets: HashMap::new(),
             limit,
-        }
-    }
-
-    /// Drops everything when another connection has written since the cache was filled.
-    pub(crate) fn sync(&mut self, version: i64) {
-        if self.version != Some(version) {
-            self.clear();
-            self.version = Some(version);
         }
     }
 
