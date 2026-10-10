@@ -10,6 +10,8 @@ mod blob;
 #[cfg(not(target_arch = "wasm32"))]
 mod embed;
 #[cfg(not(target_arch = "wasm32"))]
+mod feed;
+#[cfg(not(target_arch = "wasm32"))]
 mod migrate;
 #[cfg(not(target_arch = "wasm32"))]
 mod open;
@@ -32,6 +34,8 @@ mod vector_cache;
 pub use blob::{BLOB_KEY_LEN, BlobHash, Blobs};
 #[cfg(not(target_arch = "wasm32"))]
 pub use embed::{Choice, Embedder, Probe};
+#[cfg(not(target_arch = "wasm32"))]
+pub use feed::{Invalidation, Topic};
 #[cfg(not(target_arch = "wasm32"))]
 pub use open::{KEY_LEN, Store};
 #[cfg(not(target_arch = "wasm32"))]

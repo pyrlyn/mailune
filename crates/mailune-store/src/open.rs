@@ -21,6 +21,7 @@ pub const KEY_LEN: usize = 32;
 pub struct Store {
     pub(crate) conn: SqliteConnection,
     pub(crate) vectors: crate::vector_cache::VectorCache,
+    pub(crate) feed: crate::feed::ChangeFeed,
 }
 
 impl std::fmt::Debug for Store {
@@ -60,9 +61,11 @@ impl Store {
         }
         configure(&mut conn)?;
         crate::migrate::run(&mut conn)?;
+        let feed = crate::feed::ChangeFeed::start(&mut conn)?;
         Ok(Self {
             conn,
             vectors: crate::vector_cache::VectorCache::default(),
+            feed,
         })
     }
 
@@ -111,8 +114,7 @@ struct DataVersion {
 }
 
 /// SQLite's counter that moves when another connection commits to the file; this connection's
-/// own writes leave it unchanged. The vector cache uses it now; the S7 change feed is meant to
-/// build on the same reader.
+/// own writes leave it unchanged. The change feed (`feed`) gates on it.
 pub(crate) fn data_version(conn: &mut SqliteConnection) -> Result<i64, Error> {
     let rows: Vec<DataVersion> = diesel::sql_query("PRAGMA data_version")
         .load(conn)
