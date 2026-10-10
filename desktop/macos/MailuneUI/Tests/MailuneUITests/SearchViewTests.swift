@@ -12,11 +12,7 @@ final class SearchViewTests: XCTestCase {
 
     @MainActor
     func testSearchingListAndAskBuild() {
-        let list = NSHostingView(rootView: ThreadList(selected: .constant([]), query: "is:unread"))
-        list.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(list.fittingSize.width, 0)
-        let ask = NSHostingView(rootView: AskView { _ in })
-        ask.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(ask.fittingSize.width, 0)
+        XCTAssertGreaterThan(Hosting.render(ThreadList(selected: .constant([]), feed: ThreadFeed(), query: "is:unread")).bounds.width, 0)
+        XCTAssertGreaterThan(Hosting.render(AskView { _ in }).bounds.width, 0)
     }
 }

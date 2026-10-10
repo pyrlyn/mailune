@@ -6,12 +6,13 @@ import SwiftUI
 /// A non-empty `query` searches every tab, as a mail search does.
 public struct ThreadList: View {
     @Binding var selected: Set<String>
+    var feed: ThreadFeed
     var query: String
     @State private var category = ThreadCategory.primary
-    @State private var archived: Set<String> = []
 
-    public init(selected: Binding<Set<String>>, query: String = "") {
+    public init(selected: Binding<Set<String>>, feed: ThreadFeed, query: String = "") {
         _selected = selected
+        self.feed = feed
         self.query = query
     }
 
@@ -26,13 +27,13 @@ public struct ThreadList: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .padding(.horizontal, MailuneSpace.s)
-                rows(ThreadFixtures.visible(category: category, archived: archived))
+                rows(feed.visible(category: category))
             } else {
                 switch Result(catching: { () throws(SearchError) in try SearchQuery.parse(query) }) {
                 case let .success(search):
                     Text(Copy.format("search.results_for", query))
                         .padding(.horizontal, MailuneSpace.s)
-                    rows(search.narrow(ThreadFixtures.all.filter { !archived.contains($0.id) }))
+                    rows(search.narrow(feed.visible(category: nil)))
                 case let .failure(error):
                     Text(Self.message(for: error))
                         .foregroundStyle(.red)
@@ -50,7 +51,7 @@ public struct ThreadList: View {
                 .tag(item.id)
                 .swipeActions(edge: .trailing) {
                     Button(Copy.text("data.archive")) {
-                        archived.insert(item.id)
+                        feed.archive([item.id])
                         selected.remove(item.id)
                     }
                 }

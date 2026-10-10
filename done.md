@@ -1226,6 +1226,66 @@ Execution plan: `desktop/macos` only. Do not edit `mailune-ai`. A fixture `assis
 
 What landed: `MailuneModel/Assist.swift` and `Fixtures/assist.json`: each thread has a short summary, action items, three reply suggestions (the shapes of `mailune-ai`'s summary cache and smart replies) and where the text was made. The reader shows them in a card; a reply chip opens the composer with a reply to the sender ("Re:" stays untranslated so other clients still thread it). `AssistPolicy` hides cloud-made text about encrypted mail, which must never reach a cloud model. Settings shows the privacy line under Privacy & rules. No model is called and `mailune-ai` is not edited. New `ai.*` and `settings.ai_privacy` keys have de, fr and ja translations.
 
+### M13. macOS onboarding
+
+Depends on: M12, P14, P15.
+
+Done when: autoconfig and an OAuth stub create an account in the fake store. No network.
+
+Execution plan: `desktop/macos` only. Mirror `mailune-auth`'s P14 and P15 shapes in Swift until B3: `ServerEndpoint` (IMAP or SMTP, host, port, TLS/STARTTLS/plain) from a fixture autoconfig source behind a lookup protocol, and an OAuth session (state, PKCE S256 challenge, a redirect listener and token issuer protocol with fakes). Plain-text-only servers are refused. The new account goes into the M12 preferences store; the token goes only into an in-memory secret vault fake, never into preferences. No network, no keychain.
+
+What landed: `MailuneModel/Onboarding.swift`: Settings › Accounts › Add account takes an address and a name, looks up servers through `AutoconfigSource` (a fixture until the core's ISPDB, SRV and MX lookup is bound over B3), and signs in through an OAuth session that mirrors `mailune-auth`'s P15 shape: a random state, a PKCE S256 challenge, and redirect-listener and token-issuer protocols with stubs. Plain-text-only providers are refused, a forged state or an empty code fails, a duplicate address is rejected, and nothing is saved when a step fails. The account (with its TLS or STARTTLS endpoints) goes into the M12 preferences store; the token goes only into an in-memory `SecretVault` until the core's keychain store (C1) is reachable, and `IssuedToken` prints redacted. No network, no keychain. New `onboarding.*` keys have de, fr and ja translations.
+
+### R3. Swift CI
+
+Depends on: M1. Required Rust checks already exist.
+
+Done when: a new workflow runs `xcodebuild test` for macOS arm64. Do not add an Intel slice. Do not edit `.github/workflows/ci.yml`.
+
+Execution plan: `.github/workflows/swift.yml` only, plus `desktop/macos/scripts`. Run `desktop/macos/scripts/test.sh` on the `xcode-27` runner (Apple Silicon) with pyrlyn/ci's `setup-xcode` action and mise (translate-toolkit for the catalogs, XcodeGen through `mise exec`), pinned like the existing workflows. Trigger on pushes to main and on pull requests that touch the macOS shell, i18n or the workflow. `ci.yml` and the required checks are not changed. The UI test joins only if a hosted runner runs it reliably. actionlint must pass.
+
+What landed: `.github/workflows/swift.yml`: the `test` job runs `desktop/macos/scripts/test.sh` (which includes `xcodebuild test` for macOS arm64) on the `xcode-27` image after pyrlyn/ci's `setup-xcode` and `jdx/mise-action` with translate-toolkit; actions are pinned like the existing workflows. Pull requests into any branch that touch `desktop/macos`, `i18n`, `scripts/i18n.py`, `mise.toml` or the workflow run it, as do pushes to main. A `ui` job runs `scripts/uitest.sh` after it; the hosted runner gave it a GUI session, and it passed. `ci.yml` and the required checks are unchanged. `.github/actionlint.yaml` names the `xcode-27` labels (as pyrlyn/ci does) because actionlint 1.7.12 predates that image; actionlint and shellcheck pass. First green run on PR #23: `test` 13 min, `ui` 1.5 min.
+
+### I1. iOS target
+
+Depends on: M7.
+
+Done when: the shared model and UI build for the iOS simulator on arm64. A compact stack and an iPad split are both present. No Intel slice.
+
+Execution plan: `desktop/macos` project only. MailuneModel, MailuneUI and MailunePlatform also target iOS 26; AppKit code is macOS-only. A `MailuneIOS` app target (arm64 simulator, no Intel slice) shows `AdaptiveMailbox`: a compact `NavigationStack` and, at regular width, the shared three-pane split. `scripts/test.sh` builds it for the iOS simulator, checks the slice, and runs the model tests on an iOS simulator.
+
+What landed: MailuneModel, MailuneUI and MailunePlatform also target iOS 26; the AppKit and Core Spotlight host code moved to a macOS-only `LiveHost.swift`. The `MailuneIOS` app (iPhone and iPad) builds for the simulator as arm64 only and shows `AdaptiveMailbox`: a `NavigationStack` at compact width and the shared three-pane `ShellView` otherwise. The toolbar image moved to a catalog both apps share; the app icon is still macOS-only, so iOS has none yet. UI tests host views through one `Hosting` helper on both platforms. `scripts/test.sh` builds the iOS app, fails on any slice but arm64, and runs the model and UI tests on the newest installed iPhone simulator. The iOS host services (badge, share, Spotlight) are fakes until I2.
+
+### I3. iOS thread list
+
+Depends on: I1, M8.
+
+Done when: the phone list has a swipe action, pull to refresh, and selection, fed by fixtures.
+
+Execution plan: `desktop/macos` only. A phone thread list in the compact stack: swipe to archive, pull to refresh through a `ThreadSource` protocol (fixture source), and selection that pushes the reader. Archive and refresh logic live in the shared model so macOS and iOS use the same rules.
+
+What landed: `PhoneThreadList`: tap pushes the thread, a trailing swipe archives, pull to refresh reloads through `ThreadSource` (fixture source), and Edit selects several rows to archive together; category tabs sit above the list. Archive and refresh live in a shared `ThreadFeed`, which the Mac list, the Dock badge and Spotlight now use too; a failed refresh keeps the rows it had and shows a localised notice.
+
+### I4. iOS reader
+
+Depends on: I3, M9.
+
+Done when: the phone reader shows a fixture message with remote content off.
+
+Execution plan: `desktop/macos` only. No remote image URL. The phone stack opens the shared M9 `ReaderView`, so the plain-text body, collapsed quote, badge and blocked-remote banner are the same code on iOS; the macOS no-web-view test covers it, and the iOS build compiles it.
+
+What landed: A tapped thread pushes the shared M9 `ReaderView` with the M19 assist card, so the phone shows the same plain-text body, collapsed quote, security badge and blocked-remote banner as the Mac; `AssistPolicy.fixture(for:)` is the one lookup both shells use. `PhoneReaderTests` opens every fixture thread at phone width and fails on any web view; it runs on the iOS simulator in `scripts/test.sh` and on macOS.
+
+### I5. iOS composer
+
+Depends on: I1, M10.
+
+Done when: the phone composer round-trips recipient, subject, and body, and send stays off until confirm.
+
+Execution plan: `desktop/macos` only. The phone stack opens the shared M10 `ComposerView` (same `Composer` confirm-then-hold design, no second model); the layout adapts to compact width. Tests: recipient, subject and body round-trip through the fake outbox, and nothing reaches it before confirm.
+
+What landed: The phone opens the shared M10 `ComposerView` from a compose button and from the reader's reply chips, inside a `NavigationStack` so its toolbar shows on iOS. It is the same `Composer` confirm-then-hold state machine, so send stays off until confirm and undo restores the draft; there is no second phone model. The minimum frame is macOS-only and the recipient chips get their own scrolling row. `PhoneComposerTests` round-trips recipient, subject and body through the fake outbox and checks nothing is sent before confirm, on the iOS simulator and on macOS.
+
 ### R11. Windows signing workflow
 
 Depends on: R10. Reuse: none yet. This is a gap in pyrlyn/ci.

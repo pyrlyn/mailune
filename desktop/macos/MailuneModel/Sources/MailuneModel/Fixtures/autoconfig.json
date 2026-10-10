@@ -1,0 +1,19 @@
+{
+  "acme.example": {
+    "incoming": [
+      { "service": "imap", "host": "imap.acme.example", "port": 143, "security": "plain" },
+      { "service": "imap", "host": "imap.acme.example", "port": 993, "security": "tls" }
+    ],
+    "outgoing": [
+      { "service": "smtp", "host": "smtp.acme.example", "port": 587, "security": "starttls" }
+    ]
+  },
+  "oldmail.example": {
+    "incoming": [
+      { "service": "imap", "host": "mail.oldmail.example", "port": 143, "security": "plain" }
+    ],
+    "outgoing": [
+      { "service": "smtp", "host": "mail.oldmail.example", "port": 25, "security": "plain" }
+    ]
+  }
+}

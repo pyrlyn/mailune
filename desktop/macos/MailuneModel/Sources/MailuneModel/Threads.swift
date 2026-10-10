@@ -33,11 +33,6 @@ public struct ThreadItem: Identifiable, Equatable, Sendable, Decodable {
 public enum ThreadFixtures {
     public static let all: [ThreadItem] = load()
 
-    /// Rows on one tab, minus anything the swipe action archived.
-    public static func visible(category: ThreadCategory, archived: Set<String>) -> [ThreadItem] {
-        all.filter { $0.category == category && !archived.contains($0.id) }
-    }
-
     static func decode(_ data: Data) throws -> [ThreadItem] {
         struct Event: Decodable {
             struct Snapshot: Decodable {

@@ -1,0 +1,83 @@
+name: swift
+
+# The Apple shells under desktop/macos: desktop/macos/scripts/test.sh on Apple
+# Silicon. `xcode-27` is the only GitHub image with Xcode 27, which the
+# packages need for the macOS 26 and iOS 26 SDKs. Intel macOS is not a target.
+# This is not a required check; ci.yml stays the Rust gate.
+#
+# Pull requests into any branch run it, so stacked shell PRs are tested
+# before they reach main. Paths keep Rust-only changes off the macOS runner.
+on:
+  push:
+    branches: [main]
+    paths:
+      - desktop/macos/**
+      - i18n/**
+      - scripts/i18n.py
+      - mise.toml
+      - .github/workflows/swift.yml
+  pull_request:
+    paths:
+      - desktop/macos/**
+      - i18n/**
+      - scripts/i18n.py
+      - mise.toml
+      - .github/workflows/swift.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: swift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pyrlyn/ci/.github/actions/setup-xcode@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+        with:
+          version: "27"
+
+      # translate-toolkit turns i18n/*.po into the Apple catalogs. Rust is not
+      # needed here.
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install_args: pipx:translate-toolkit
+
+      - name: Test
+        env:
+          # test.sh fetches XcodeGen through `mise exec`; the token avoids
+          # anonymous GitHub API rate limits.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: desktop/macos/scripts/test.sh
+
+  ui:
+    needs: test
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pyrlyn/ci/.github/actions/setup-xcode@27290ae30105592f683c236fc76dcc2ee4348bdf # main
+        with:
+          version: "27"
+
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install_args: pipx:translate-toolkit
+
+      - name: UI test
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          desktop/macos/scripts/catalogs.sh
+          desktop/macos/scripts/uitest.sh

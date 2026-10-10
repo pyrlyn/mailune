@@ -2,7 +2,7 @@
   "images" : [
     {
       "filename" : "ToolbarCompose.png",
-      "idiom" : "mac"
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -1270,3 +1270,43 @@ msgstr "「{0}」で返信"
 msgctxt "settings.ai_privacy"
 msgid "AI runs on this Mac. Encrypted mail is never sent to a cloud model."
 msgstr "AIはこのMacで動作します。暗号化されたメールがクラウドモデルに送られることはありません。"
+
+msgctxt "onboarding.address"
+msgid "Email address"
+msgstr "メールアドレス"
+
+msgctxt "onboarding.name"
+msgid "Your name"
+msgstr "名前"
+
+msgctxt "onboarding.done"
+msgid "Done"
+msgstr "完了"
+
+msgctxt "onboarding.added"
+msgid "Added {0}"
+msgstr "{0}を追加しました"
+
+msgctxt "onboarding.not_an_address"
+msgid "That is not an email address."
+msgstr "メールアドレスではありません。"
+
+msgctxt "onboarding.already_added"
+msgid "{0} is already added."
+msgstr "{0}はすでに追加されています。"
+
+msgctxt "onboarding.no_configuration"
+msgid "No server settings were found for {0}."
+msgstr "{0}のサーバー設定が見つかりませんでした。"
+
+msgctxt "onboarding.insecure_only"
+msgid "This provider only offers unencrypted connections, which Mailune does not use."
+msgstr "このプロバイダは暗号化されていない接続のみを提供しており、Mailuneでは使用しません。"
+
+msgctxt "onboarding.sign_in_failed"
+msgid "Sign-in did not complete. Try again."
+msgstr "サインインが完了しませんでした。もう一度お試しください。"
+
+msgctxt "mail_list.refresh_failed"
+msgid "Couldn’t refresh. Showing the last list."
+msgstr "更新できませんでした。前回のリストを表示しています。"

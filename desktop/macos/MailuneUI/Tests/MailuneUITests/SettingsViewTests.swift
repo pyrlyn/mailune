@@ -7,9 +7,7 @@ import XCTest
 final class SettingsViewTests: XCTestCase {
     func testSettingsBuildFromTheStoreWithoutWritingIt() {
         let store = FakePreferencesStore()
-        let host = NSHostingView(rootView: SettingsView(store: store))
-        host.layoutSubtreeIfNeeded()
-        XCTAssertGreaterThan(host.fittingSize.height, 0)
+        XCTAssertGreaterThan(Hosting.render(SettingsView(store: store)).bounds.height, 0)
         XCTAssertNil(store.data, "opening settings does not write")
     }
 
