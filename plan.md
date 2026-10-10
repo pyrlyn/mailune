@@ -18,20 +18,12 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | X9 | in progress | P0 | 2 | 60% | Cursor / claude-opus-5.5 |
 | X10 | todo | P0 | 2 | 0% | |
 | X11 | in progress | P0 | 2 | 80% | Cursor / claude-opus-5.5 |
-| C3 | todo | P1 | 3 | 0% | |
-| C4 | todo | P1 | 3 | 0% | |
-| C5 | todo | P1 | 3 | 0% | |
 | C7 | todo | P1 | 2 | 0% | |
-| T4 | todo | P1 | 3 | 0% | |
-| E1 | todo | P1 | 3 | 0% | |
-| B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
 | M6 | todo | P1 | 3 | 0% | |
 | T6 | in progress | P1 | 2 | 90% | Cursor / claude-opus-5.5 |
-| R8 | todo | P1 | 3 | 0% | |
 | E12 | todo | P1 | 2 | 0% | |
-| B6 | todo | P1 | 3 | 0% | |
 | L1 | todo | P1 | 2 | 0% | |
 | L2 | todo | P1 | 3 | 0% | |
 | L3 | todo | P1 | 2 | 0% | |
@@ -63,7 +55,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | W11 | todo | P1 | 2 | 0% | |
 | W12 | todo | P1 | 2 | 0% | |
 | R4 | todo | P1 | 2 | 0% | |
-| B4 | todo | P1 | 3 | 0% | |
 | D1 | todo | P1 | 2 | 0% | |
 | D2 | todo | P1 | 2 | 0% | |
 | D3 | todo | P1 | 2 | 0% | |
@@ -85,10 +76,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | D13 | todo | P1 | 3 | 0% | |
 | I8 | todo | P1 | 3 | 60% | |
 | W13 | todo | P1 | 3 | 0% | |
-| B10 | todo | P3 | 3 | 0% | |
-| B11 | todo | P3 | 4 | 0% | |
-| P33 | todo | P3 | 4 | 0% | |
-| P34 | todo | P3 | 5 | 0% | |
 
 ### C1. SecretStore integration: tokens, passwords, DB key; Android via host callback
 
@@ -223,30 +210,6 @@ Progress: `sqlite-change-feed` is in pyrlyn/crates-packages#45. Its test spawns 
 
 Left: merge it; the creator enables GitHub Actions on pyrlyn/crates-packages (disabled since 2026-09-25, so neither CI nor `bump.yml` runs) and adds `sqlite-change-feed` to the `CARGO_REGISTRY_TOKEN` scope on crates.io; the coordinator runs `bump.yml` with `package=sqlite-change-feed`.
 
-### C3. Autocrypt headers
-
-Depends on: C2. Reuse: the OpenPGP key type only if `mailune-crypto` can be called without editing it. Prefer a header codec in `mailune-mime`.
-
-Done when: an Autocrypt header is parsed and gossip keys are collected from a message. No WKD network lookup.
-
-Execution plan: `mailune-mime` only.
-
-### C4. S/MIME verify and decrypt
-
-Depends on: P1. Reuse: a maintained `cms` and `x509-cert` if they fit.
-
-Done when: a fixture verifies a signature and decrypts with a supplied key. No keychain.
-
-Execution plan: new crate `mailune-smime`.
-
-### C5. S/MIME sign and encrypt
-
-Depends on: C4. Reuse: the same crate.
-
-Done when: a fixture signs and encrypts, and C4 verifies and decrypts it.
-
-Execution plan: `mailune-smime` only.
-
 ### C7. DKIM ed25519, simple, and l=
 
 Depends on: the rsa-sha256 relaxed/relaxed verifier already in `mailune-mime`.
@@ -254,30 +217,6 @@ Depends on: the rsa-sha256 relaxed/relaxed verifier already in `mailune-mime`.
 Done when: ed25519, simple canonicalization, and the `l=` body-length tag verify against a supplied TXT record. No network.
 
 Execution plan: `mailune-mime` `auth.rs` only. Extend the existing verifier.
-
-### T4. Queue property tests
-
-Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
-
-Done when: random ops against a model mailbox keep idempotency and undo invariants.
-
-Execution plan: tests in `mailune-core` next to the queue. Do not add a production dependency.
-
-### E1. mailune-server
-
-Depends on: B8. Reuse: `axum` from `rust.md`.
-
-Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
-
-Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### B2. UniFFI records
-
-Depends on: B1, F6. Reuse: ketch-ffi and cox-ffi.
-
-Done when: records, errors, one async function, and a callback interface compile, and each export forwards one call.
-
-Execution plan: new crate `mailune-ffi`. Commit on `batch7-imap`. Read `crates/mailune-cli/tests/conventions.rs` before writing an export.
 
 ### B3. Swift package
 
@@ -325,14 +264,6 @@ Fixes for the list page and the first search are proposed in `ideas.md`.
 
 Left: creator confirmation of the two proposed budgets.
 
-### R8. Integration compose file
-
-Depends on: the IMAP client already on this branch. P7's sync code is on another branch.
-
-Done when: a compose file names Stalwart and Dovecot, and a test reads that file. `nextest` does not start Docker and does not open a socket. Do not edit `.github/workflows/ci.yml`.
-
-Execution plan: `docker-compose.yml` plus one test in `mailune-cli`.
-
 ### E12. Server container
 
 Depends on: E1. Another agent owns `docker-compose.yml`.
@@ -340,14 +271,6 @@ Depends on: E1. Another agent owns `docker-compose.yml`.
 Done when: a Dockerfile builds the server binary on paper (the file exists and names the binary) and `docs/self-host.md` says how to run it. Do not start Docker in tests. Do not edit `docker-compose.yml`.
 
 Execution plan: `Dockerfile` and `docs/self-host.md` only.
-
-### B6. C ABI
-
-Depends on: B1. The shared abi-drift crate is not in this repo.
-
-Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
-
-Execution plan: new crate `mailune-capi`. Commit on `batch9-store`. Do not create a package outside this repo.
 
 ### M6. Apple on-device model
 
@@ -605,14 +528,6 @@ Done when: a new workflow runs `dotnet test`. Do not edit `.github/workflows/ci.
 
 Execution plan: `.github/workflows/windows.yml` only.
 
-### B4. Kotlin core
-
-Depends on: B2. `mailune-ffi` is on another branch. The Android SDK is not installed.
-
-Done when: a Gradle JVM test round-trips one record. cargo-ndk and UniFFI are not run. The commit says so. Do not install the Android SDK.
-
-Execution plan: `desktop/android` only. Commit on `batch9-store`.
-
 ### D1. Android project
 
 Depends on: B4.
@@ -784,35 +699,3 @@ Depends on: W1, R11. Reuse: the R11 signing workflow.
 Done when: an MSIX is signed and a winget manifest installs it. Signing waits on R11.
 
 Execution plan: `desktop/windows` on `batch8-ai` only. No real code signing.
-
-### B10. BoltFFI survey
-
-From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one tool. Crux has moved to it. Revisit after the UniFFI phase.
-
-Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
-
-Execution plan: `docs/boltffi.md` on `batch7-imap`. Do not replace UniFFI.
-
-### B11. Shared view-model core
-
-From ideas. A Crux-style pure UI core in Rust, with `mailune-app` view models as a reducer.
-
-Done when: every shell can render the same state machine from that reducer.
-
-Execution plan: a pure reducer in `mailune-app` on `batch8-ai`. Stay under 500 lines of code.
-
-### P33. Calendar view
-
-From ideas. Grow the scheduling assistant (A22) and Graph calendar access (P25) into a calendar view.
-
-Done when: the view shows local ICS suggestions. A JMAP Calendars source is added only after that RFC is published.
-
-Execution plan: a calendar view on `batch7-imap` from fixture ICS. No JMAP Calendars source until that RFC is published.
-
-### P34. Shared inboxes
-
-From ideas. Shared inboxes and comments, as in Spark and Missive, conflict with a no-server path unless they use JMAP Sharing (RFC 9670).
-
-Done when: a design shows shared inboxes and comments on RFC 9670, or records that the RFC cannot carry them.
-
-Execution plan: `docs/jmap-sharing.md` on `batch7-imap`. No Mailune server in the path.

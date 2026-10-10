@@ -1,0 +1,613 @@
+{
+  "$comment": "Generated from the Rust records by `MAILUNE_BLESS=1 cargo nextest run -p mailune-capi`. Do not edit.",
+  "$defs": {
+    "Address": {
+      "description": "Someone a message is from, to or copied to.",
+      "properties": {
+        "email": {
+          "description": "Addr-spec (`ana@acme.io`).",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name when the header had one.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "email"
+      ],
+      "type": "object"
+    },
+    "Category": {
+      "description": "Triage tab.",
+      "oneOf": [
+        {
+          "const": "primary",
+          "description": "Primary.",
+          "type": "string"
+        },
+        {
+          "const": "social",
+          "description": "Social.",
+          "type": "string"
+        },
+        {
+          "const": "promotions",
+          "description": "Promotions.",
+          "type": "string"
+        },
+        {
+          "const": "updates",
+          "description": "Updates.",
+          "type": "string"
+        }
+      ]
+    },
+    "ComposerDraft": {
+      "description": "The composer draft.",
+      "properties": {
+        "body": {
+          "description": "Plain body.",
+          "type": "string"
+        },
+        "subject": {
+          "description": "Subject line.",
+          "type": "string"
+        },
+        "to": {
+          "description": "Recipient address, as the notice wrote it.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ],
+      "type": "object"
+    },
+    "ErrorBody": {
+      "description": "An error, with the sentence a person can be shown next to its kind.",
+      "oneOf": [
+        {
+          "description": "The host (keychain, network, platform) failed. Raised by a foreign\nimplementation too, so its text must not carry a secret.",
+          "properties": {
+            "message": {
+              "description": "What went wrong, with no secret material.",
+              "type": "string"
+            },
+            "type": {
+              "const": "host",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "message"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "No bearer token is stored for this account.",
+          "properties": {
+            "account": {
+              "description": "The account id. A name, not the token.",
+              "type": "string"
+            },
+            "type": {
+              "const": "missing_token",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "account"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "The domain refused the call.",
+          "properties": {
+            "message": {
+              "description": "Why the domain refused.",
+              "type": "string"
+            },
+            "type": {
+              "const": "core",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "message"
+          ],
+          "type": "object"
+        }
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "type": "object"
+    },
+    "Event": {
+      "description": "A fact the UI renders.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "A sentence the UI shows as a notice.",
+          "properties": {
+            "notice": {
+              "properties": {
+                "message": {
+                  "description": "Text the UI can show. Not a message body.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "notice"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The current page of the thread list.",
+          "properties": {
+            "snapshot": {
+              "properties": {
+                "threads": {
+                  "description": "Rows in list order.",
+                  "items": {
+                    "$ref": "#/$defs/ThreadRow"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "snapshot"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "PendingAction": {
+      "description": "The confirmation a shell must show.",
+      "oneOf": [
+        {
+          "const": "send",
+          "description": "Send the composer draft.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Move these conversations to Trash.",
+          "properties": {
+            "delete": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "delete"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Settings": {
+      "description": "Settings the UI is showing.",
+      "properties": {
+        "language": {
+          "description": "Language code; English is `en`.",
+          "type": "string"
+        },
+        "plan": {
+          "description": "Plan key (`free`, `plus`, `team`).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "language",
+        "plan"
+      ],
+      "type": "object"
+    },
+    "ThreadRow": {
+      "description": "One row in the thread list.",
+      "properties": {
+        "account": {
+          "description": "Owning account id.",
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/Category",
+          "description": "Triage tab."
+        },
+        "draft": {
+          "description": "The conversation is a draft.",
+          "type": "boolean"
+        },
+        "flagged": {
+          "description": "Starred.",
+          "type": "boolean"
+        },
+        "from": {
+          "$ref": "#/$defs/Address",
+          "description": "Sender shown on the row."
+        },
+        "has_attachment": {
+          "description": "At least one message has an attachment.",
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Conversation id.",
+          "type": "string"
+        },
+        "important": {
+          "description": "Marked important.",
+          "type": "boolean"
+        },
+        "labels": {
+          "description": "Label texts.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "mailbox": {
+          "description": "Mailbox id the row was listed from.",
+          "type": "string"
+        },
+        "message_count": {
+          "description": "How many messages the conversation holds.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pinned": {
+          "description": "Pinned to the top of the list.",
+          "type": "boolean"
+        },
+        "snippet": {
+          "description": "One-line preview.",
+          "type": "string"
+        },
+        "snoozed": {
+          "description": "Hidden until a snooze wakes it.",
+          "type": "boolean"
+        },
+        "stamp": {
+          "description": "Display stamp.",
+          "type": "string"
+        },
+        "subject": {
+          "description": "Subject.",
+          "type": "string"
+        },
+        "unread": {
+          "description": "The row is unread.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "account",
+        "from",
+        "subject",
+        "snippet",
+        "stamp",
+        "message_count",
+        "unread",
+        "flagged",
+        "important",
+        "pinned",
+        "snoozed",
+        "draft",
+        "has_attachment",
+        "category",
+        "mailbox",
+        "labels"
+      ],
+      "type": "object"
+    },
+    "UiMsg": {
+      "description": "Something the user did, or something the core said: the input of the\nshared reducer (`mailune_app::Msg`).",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "Events from the core.",
+          "properties": {
+            "core": {
+              "properties": {
+                "events": {
+                  "description": "Events in order.",
+                  "items": {
+                    "$ref": "#/$defs/Event"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "events"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "core"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user opened a row.",
+          "properties": {
+            "select": {
+              "properties": {
+                "thread": {
+                  "description": "Conversation id.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "thread"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "select"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "compose_new",
+          "description": "The user opened an empty composer.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user edited the composer.",
+          "properties": {
+            "edit_draft": {
+              "properties": {
+                "draft": {
+                  "$ref": "#/$defs/ComposerDraft",
+                  "description": "The composer as it is now."
+                }
+              },
+              "required": [
+                "draft"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "edit_draft"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "close_composer",
+          "description": "The user closed the composer; the draft is saved, not sent.",
+          "type": "string"
+        },
+        {
+          "const": "send",
+          "description": "The user pressed send. Nothing leaves until `Confirm`.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user asked to delete conversations. Nothing leaves until `Confirm`.",
+          "properties": {
+            "delete": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "delete"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user archived conversations.",
+          "properties": {
+            "archive": {
+              "properties": {
+                "threads": {
+                  "description": "Conversation ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "threads"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "archive"
+          ],
+          "type": "object"
+        },
+        {
+          "const": "confirm",
+          "description": "The user confirmed the pending action.",
+          "type": "string"
+        },
+        {
+          "const": "cancel",
+          "description": "The user dismissed the pending action.",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The user ran a search.",
+          "properties": {
+            "search": {
+              "properties": {
+                "query": {
+                  "description": "The query string.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "search"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "UiState": {
+      "description": "Everything the shared reducer says a shell renders.",
+      "properties": {
+        "composing": {
+          "description": "The composer is on screen.",
+          "type": "boolean"
+        },
+        "pending": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PendingAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The confirmation to show, if any."
+        },
+        "query": {
+          "description": "The last search query.",
+          "type": "string"
+        },
+        "view": {
+          "$ref": "#/$defs/ViewState",
+          "description": "The view models."
+        }
+      },
+      "required": [
+        "view",
+        "composing",
+        "query"
+      ],
+      "type": "object"
+    },
+    "ViewState": {
+      "description": "Everything a shell renders, read in one call.",
+      "properties": {
+        "composer": {
+          "$ref": "#/$defs/ComposerDraft",
+          "description": "Composer draft."
+        },
+        "list": {
+          "description": "Thread list rows in list order.",
+          "items": {
+            "$ref": "#/$defs/ThreadRow"
+          },
+          "type": "array"
+        },
+        "open": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ThreadRow"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The open conversation, while the list still holds it."
+        },
+        "settings": {
+          "$ref": "#/$defs/Settings",
+          "description": "Settings."
+        }
+      },
+      "required": [
+        "list",
+        "composer",
+        "settings"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The envelope every mailune-capi call returns. `ok` holds the value named in that function's comment in include/mailune.h; `mailune_core_fold` takes a JSON array of `Event`, `mailune_core_dispatch` one `UiMsg`.",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "ok": true
+      },
+      "required": [
+        "ok"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ErrorBody"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "mailune-capi payloads"
+}

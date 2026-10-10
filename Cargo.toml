@@ -104,6 +104,25 @@ zeroize = "1.9.1"
 aes-gcm = { version = "0.10.3", default-features = false, features = ["aes", "alloc"] }
 # mailune-store tests: a scratch directory per test database.
 tempfile = "3.27.0"
+# mailune-ffi: Swift, Kotlin and C# bindings from proc-macros. 0.32.2 is the line ketch-ffi and cox-ffi use.
+uniffi = "0.32.2"
+# mailune-capi: `malloc`/`free` for answers, so GLib's `g_free` frees them. Same line as ketch-capi.
+libc = "0.2.189"
+# mailune-capi tests: the header drift test; the library alone, without its CLI. Same line as ketch-capi.
+cbindgen = { version = "0.29.4", default-features = false }
+# mailune-smime: CMS SignedData and EnvelopedData. 0.2.3 is the stable line (0.3 is a pre-release on x509-cert 0.3 and rsa 0.10-rc), checked on crates.io 2026-10-08.
+# `builder` signs and encrypts; it uses the same rsa 0.9 as the rest of the workspace.
+cms = { version = "0.2.3", features = ["builder"] }
+# mailune-smime: certificates. 0.2.5 is the line cms 0.2 is built on (0.3.0 needs cms 0.3).
+x509-cert = { version = "0.2.5", default-features = false, features = ["pem"] }
+# mailune-smime: the AES-CBC content cipher of S/MIME 4.0. The 0.8/0.1 lines share cipher 0.4 with cms 0.2.
+aes = "0.8.4"
+cbc = { version = "0.1.2", features = ["alloc"] }
+# mailune-server tests: a real WebSocket client. 0.29.0 is the line axum 0.8.9 already depends on, so no second copy is built.
+tokio-tungstenite = "0.29.0"
+# mailune-core tests: property tests of the op queue. 1.11.0 checked on crates.io 2026-10-08.
+# Without default features: no fork or timeout support, which would spawn processes and write temp files.
+proptest = { version = "1.11.0", default-features = false, features = ["std"] }
 # mailune-mcp: MCP server types and stdio JSON-RPC. 3.5.1 checked on crates.io 2026-10-08.
 rmcp = { version = "3.5.1", default-features = false, features = ["server", "macros"] }
 # fuzz/: libFuzzer. That package is a separate workspace, so fuzz/Cargo.toml repeats this version.

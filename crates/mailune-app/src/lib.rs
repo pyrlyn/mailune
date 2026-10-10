@@ -4,10 +4,14 @@
 //! Token bytes are read through [`SecretStore`] and never placed on a `Debug`
 //! or log path.
 
+mod calendar;
+mod reducer;
 mod views;
 
 use mailune_protocol::{AccountId, Secret, SecretId, SecretStore};
 
+pub use calendar::{CalendarDay, CalendarEntry, CalendarView, calendar_view};
+pub use reducer::{Msg, Pending, Ui};
 pub use views::{ComposerDraft, OpenThread, SettingsSnapshot, ThreadList, Views};
 
 /// Failure returned by assembly.
@@ -59,6 +63,22 @@ pub async fn read_token(store: &impl SecretStore, account: &AccountId) -> Result
     }
 }
 
+/// Whether a bearer token is stored for `account`.
+///
+/// Front ends ask this to choose between the inbox and sign-in. The answer is
+/// a bool so the token bytes never cross into a surface.
+///
+/// # Errors
+///
+/// Returns [`Error::Secret`] when the store itself fails.
+pub async fn has_token(store: &impl SecretStore, account: &AccountId) -> Result<bool, Error> {
+    match read_token(store, account).await {
+        Ok(_) => Ok(true),
+        Err(Error::MissingToken { .. }) => Ok(false),
+        Err(err) => Err(err),
+    }
+}
+
 /// Log text for a token that was just read.
 ///
 /// The account id is a name. The secret is not a parameter, so the line cannot
@@ -75,7 +95,7 @@ mod tests {
 
     use mailune_protocol::{AccountId, Secret, SecretId, SecretKind, SecretStore};
 
-    use super::{read_token, token_log_line};
+    use super::{has_token, read_token, token_log_line};
 
     fn drive<T>(future: impl Future<Output = T>) -> T {
         let mut future = pin!(future);
@@ -131,6 +151,16 @@ mod tests {
         let line = token_log_line(&account);
         assert!(!line.contains(text));
         assert!(line.contains(account.as_str()));
+    }
+
+    #[test]
+    fn has_token_answers_without_the_bytes() {
+        let account = AccountId::new("ada");
+        let stored = Mem {
+            token: Some(Secret::new(b"t")),
+        };
+        assert!(drive(has_token(&stored, &account)).unwrap());
+        assert!(!drive(has_token(&Mem { token: None }, &account)).unwrap());
     }
 
     #[test]

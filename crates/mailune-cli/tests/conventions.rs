@@ -1,11 +1,12 @@
 //! Convention gates: every Rust file opens with a `//!` header, and an
-//! exported surface body (`#[uniffi::export]`, `#[wasm_bindgen]`) is one
-//! expression.
+//! exported surface body (`#[uniffi::export]`, `#[unsafe(no_mangle)]`,
+//! `#[wasm_bindgen]`) is one expression.
 //!
-//! Fixtures prove the gate, and the same check walks the surface crates
-//! that exist (`mailune-wasm` now, `mailune-ffi` once it lands). The shape
-//! follows cox-ffi's forward-only test: `syn` parses the file, and a body
-//! that is not a single expression statement fails.
+//! Fixtures prove the gate, and the same check walks every surface crate:
+//! `mailune-ffi` (`#[uniffi::export]`), `mailune-capi` (`#[unsafe(no_mangle)]`)
+//! and `mailune-wasm` (`#[wasm_bindgen]`). The shape follows cox-ffi's
+//! forward-only test: `syn` parses the file, and a body that is not a single
+//! expression statement fails.
 
 #![allow(clippy::unwrap_used, clippy::panic)]
 
@@ -39,7 +40,8 @@ fn has_module_header(source: &str) -> bool {
     source.starts_with("//!")
 }
 
-fn is_export(attrs: &[Attribute]) -> bool {
+/// `#[uniffi::export]` or `#[wasm_bindgen]`: a binding generator's export.
+fn is_binding_export(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
         let path = attr.path();
         let mut segments = path.segments.iter();
@@ -47,6 +49,19 @@ fn is_export(attrs: &[Attribute]) -> bool {
         let export = segments.next().is_some_and(|seg| seg.ident == "export");
         (uniffi && export && segments.next().is_none()) || path.is_ident("wasm_bindgen")
     })
+}
+
+/// `#[no_mangle]` or the 2024 spelling `#[unsafe(no_mangle)]`: a C export.
+fn is_c_export(attrs: &[Attribute]) -> bool {
+    attrs.iter().any(|attr| match &attr.meta {
+        Meta::Path(path) => path.is_ident("no_mangle"),
+        Meta::List(list) => list.path.is_ident("unsafe") && list.tokens.to_string() == "no_mangle",
+        Meta::NameValue(_) => false,
+    })
+}
+
+fn is_export(attrs: &[Attribute]) -> bool {
+    is_binding_export(attrs) || is_c_export(attrs)
 }
 
 fn is_cfg_test(attrs: &[Attribute]) -> bool {
@@ -158,27 +173,43 @@ fn wasm_bindgen_exports_are_checked_too() {
 }
 
 #[test]
-fn surface_sources_stay_forward_only_when_the_crate_exists() {
+fn a_multi_statement_c_export_fails() {
+    let source = "#[unsafe(no_mangle)]\npub extern \"C\" fn send() { let a = 1; go(a) }\n";
+    assert_eq!(
+        violations_in("abi.rs", source),
+        ["abi.rs: fn send — 2 statements"]
+    );
+}
+
+fn assert_forward_only(krate: &str) {
+    let src = workspace_root().join("crates").join(krate).join("src");
+    assert!(src.is_dir(), "{krate} has no src/");
+    let mut files = Vec::new();
+    rust_sources(&src, &mut files);
     let mut found = Vec::new();
-    let mut walked = 0;
-    for krate in ["mailune-ffi", "mailune-wasm"] {
-        let src = workspace_root().join("crates").join(krate).join("src");
-        if !src.is_dir() {
-            continue;
-        }
-        walked += 1;
-        let mut files = Vec::new();
-        rust_sources(&src, &mut files);
-        for path in files {
-            let source = fs::read_to_string(&path).unwrap();
-            let name = format!("{krate}/{}", path.file_name().unwrap().to_string_lossy());
-            found.extend(violations_in(&name, &source));
-        }
+    for path in files {
+        let source = fs::read_to_string(&path).unwrap();
+        let name = format!("{krate}/{}", path.file_name().unwrap().to_string_lossy());
+        found.extend(violations_in(&name, &source));
     }
-    assert!(walked > 0, "no surface crate found to check");
     assert!(
         found.is_empty(),
-        "a surface holds a multi-expression export — forward one call:\n{}",
+        "{krate} holds a multi-expression export — forward one call:\n{}",
         found.join("\n")
     );
+}
+
+#[test]
+fn ffi_sources_stay_forward_only() {
+    assert_forward_only("mailune-ffi");
+}
+
+#[test]
+fn capi_sources_stay_forward_only() {
+    assert_forward_only("mailune-capi");
+}
+
+#[test]
+fn wasm_sources_stay_forward_only() {
+    assert_forward_only("mailune-wasm");
 }

@@ -33,3 +33,7 @@ jobs:
     with:
       rust: false
       codeql-languages: '["actions", "rust"]'
+      # The S/MIME fixtures hold throwaway OpenSSL test keys on purpose (the
+      # interop tests decrypt OpenSSL output), and a PEM file cannot carry a
+      # nosemgrep comment.
+      semgrep-extra-args: --exclude crates/mailune-smime/fixtures

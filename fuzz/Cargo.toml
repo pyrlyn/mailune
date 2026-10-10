@@ -37,3 +37,9 @@ name = "search-query"
 path = "fuzz_targets/search_query.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "autocrypt-header"
+path = "fuzz_targets/autocrypt_header.rs"
+test = false
+doc = false

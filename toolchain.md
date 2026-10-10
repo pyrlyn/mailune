@@ -12,16 +12,22 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | hdiutil | system (macOS) | Makes and checks the release DMG in `desktop/macos/scripts/release.sh` | https://developer.apple.com/library/archive/documentation/Darwin/Reference/ManPages/man1/hdiutil.1.html |
 | actionlint | mise (`mise exec actionlint@1.7.12 -- actionlint`) | Validates `.github/workflows/*.yml`, including `testflight.yml` | https://github.com/rhysd/actionlint |
 | translate-toolkit | mise (`pipx:`) | `i18n/*.po` → native catalogs (`scripts/i18n.py`); its venv Python runs the script | https://github.com/translate/translate |
+| java | mise (`desktop/android/mise.toml`) | Runs Gradle for the Android shell | https://openjdk.org |
+| gradle | mise (`desktop/android/mise.toml`) | Builds and tests `desktop/android` | https://github.com/gradle/gradle |
+| kotlin | mise (`desktop/android/mise.toml`) | Kotlin compiler for the Android shell | https://github.com/JetBrains/kotlin |
+| meson | system | Builds and runs the Vala test of `mailune-capi` | https://github.com/mesonbuild/meson |
+| vala | system (with GLib, GObject and json-glib) | Compiles `crates/mailune-capi/tests/capi.vala` against the VAPI | https://gitlab.gnome.org/GNOME/vala |
+| openssl | system | Regenerates the `mailune-smime` interop fixtures (`fixtures/regenerate.sh`); not needed to build or test | https://github.com/openssl/openssl |
+| docker (compose) | system | Runs the Stalwart and Dovecot integration servers in `docker-compose.yml` by hand; not needed to build or test | https://github.com/docker/compose |
 | node | mise | Runs Vite, Vitest and TypeScript for `web/` | https://github.com/nodejs/node |
 | npm | with node | Installs `web/` packages from `web/package-lock.json` | https://github.com/npm/cli |
 
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
-| anyhow | local | https://github.com/dtolnay/anyhow | Errors in `mailune-cli` only |
+| anyhow | local | https://github.com/dtolnay/anyhow | Errors in the `mailune-cli` and `mailune-server` binaries only |
 | clap | local | https://github.com/clap-rs/clap | `account add` and `account list` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Mozilla autoconfig XML |
-| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; blob-store content addresses |
-| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests |
+| sha2 | local | https://github.com/RustCrypto/hashes | PKCE S256 challenge; model blob digests; blob-store content addresses |
 | base64 | local | https://github.com/marshallpierce/rust-base64 | PKCE base64url verifier and challenge |
 | insta | local | https://github.com/mitsuhiko/insta | Committed JSON Schema snapshot; the sanitised-HTML fixture the web reader renders |
 | schemars | local | https://github.com/GREsau/schemars | JSON Schema for the contract |
@@ -35,8 +41,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | mail-parser | local | https://github.com/stalwartlabs/mail-parser | RFC 5322 / MIME parse |
 | ammonia | local | https://github.com/rust-ammonia/ammonia | HTML sanitizer for the message body |
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
-| rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
-| rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
+| rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification; S/MIME signatures and key transport |
+| rand | local | https://github.com/rust-random/rand | DKIM test keys, OpenPGP key generation, S/MIME content keys, `mailune-server` tokens |
 | imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses, including RFC 3516 BINARY; exact `=2.0.0-alpha.9` pin because 1.x has no BINARY and alphas break the API |
 | chrono | local | https://github.com/chronotope/chrono | IMAP SEARCH SINCE dates for the sync window |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
@@ -49,18 +55,34 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | tempfile | local | https://github.com/Stebalien/tempfile | Scratch directories for store tests |
 | aes-gcm | local | https://github.com/RustCrypto/AEADs | Seals blob-store bodies with a caller-supplied key |
 | ews | local | https://github.com/thunderbird/ews-rs | Typed EWS operations and SOAP for on-premises Exchange (MPL-2.0, unmodified) |
-| axum | local | https://github.com/tokio-rs/axum | Push relay webhook router |
-| tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime in `mailune-mcp`; push relay router tests (dev) |
+| axum | local | https://github.com/tokio-rs/axum | Push relay webhook router; `mailune-server`: HTTP and the WebSocket upgrade |
+| tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime in `mailune-mcp`; push relay router tests (dev); `mailune-server` runtime and TCP listener |
 | tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |
 | sse-stream | local | https://github.com/4t145/sse-stream | Decodes the JMAP EventSource push stream in `mailune-jmap` |
-| futures-util | local | https://github.com/rust-lang/futures-rs | Maps the SSE block stream to typed JMAP push events |
+| futures-util | local | https://github.com/rust-lang/futures-rs | Maps the SSE block stream to typed JMAP push events; `mailune-server` tests (dev): send and receive on the client socket |
 | whatlang | local | https://github.com/greyblake/whatlang-rs | On-device language label for a message in `mailune-ai` |
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
+| uniffi | local | https://github.com/mozilla/uniffi-rs | `mailune-ffi`: Swift, Kotlin and C# bindings from proc-macros |
+| libc | local | https://github.com/rust-lang/libc | `mailune-capi`: `malloc`ed answers GLib can `g_free` |
+| cbindgen | local (dev) | https://github.com/mozilla/cbindgen | `mailune-capi`: header drift test |
+| cms | local | https://github.com/RustCrypto/formats/tree/master/cms | `mailune-smime`: CMS SignedData and EnvelopedData |
+| x509-cert | local | https://github.com/RustCrypto/formats/tree/master/x509-cert | `mailune-smime`: signer and recipient certificates |
+| aes | local | https://github.com/RustCrypto/block-ciphers | `mailune-smime`: AES content cipher |
+| cbc | local | https://github.com/RustCrypto/block-modes | `mailune-smime`: CBC mode for S/MIME content |
+| tokio-tungstenite | local (dev) | https://github.com/snapview/tokio-tungstenite | `mailune-server` tests: real WebSocket client; the line axum already uses |
+| proptest | local (dev) | https://github.com/proptest-rs/proptest | `mailune-core` tests: random op sequences against a model mailbox |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |
 | divan | local (dev) | https://github.com/nvzqz/divan | `mailune-store` T6 budget benches at 100k messages |
 | figment | local | https://github.com/SergioBenitez/Figment | `mailune-config` layer merge; `Jail` in its tests |
 | toml | local | https://github.com/toml-rs/toml | `mailune-config` parses each layer alone so errors keep file:line |
+
+Gradle (`desktop/android`):
+
+| Package | Where | Source | Why here |
+| --- | --- | --- | --- |
+| org.jetbrains.kotlin.jvm | local | https://github.com/JetBrains/kotlin | Kotlin JVM plugin for the `core` module |
+| kotlin-test | local | https://github.com/JetBrains/kotlin | JUnit 5 tests for the `core` module |
 
 npm (`web/package.json`):
 

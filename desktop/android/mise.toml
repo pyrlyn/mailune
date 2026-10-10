@@ -1,0 +1,8 @@
+# Toolchains for the Android shell. mise reads this file only inside
+# `desktop/android/`, so a contributor who works on the Rust core installs
+# none of them. Same versions as cox `plugins/mise.toml`.
+
+[tools]
+java = "27.0.0"
+gradle = "9.8.0"
+kotlin = "2.4.20"

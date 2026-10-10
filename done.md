@@ -554,6 +554,136 @@ Done when: translate-toolkit is pinned in `mise.toml`; `i18n/*.po` is the single
 
 What landed: `"pipx:translate-toolkit" = "3.20.0"` in `mise.toml` with `i18n`, `i18n --check` and `i18n:test` tasks. `i18n/mailune.pot` plus `de`, `fr`, `ja` catalogs imported from research/mail-app (276 strings, msgctxt keys, `{0}` placeholders). `scripts/i18n.py` writes `target/i18n/`: Apple `Localizable.strings` and `.stringsdict`, Android `strings.xml`, Windows `.resw` (plurals as `<key>_<tag>`), Linux `.mo`, web i18next v4 JSON. Gettext plural forms are spread over CLDR tags; placeholders become `%n$@`, `%n$s`, `{n}` or `{{n}}` (`{{count}}` in plurals).
 
+### B2. UniFFI records
+
+Depends on: B1, F6. Reuse: ketch-ffi and cox-ffi.
+
+Done when: records, errors, one async function, and a callback interface compile, and each export forwards one call.
+
+Execution plan: new crate `mailune-ffi` (uniffi 0.32.2 in proc-macro mode, as ketch-ffi and cox-ffi). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the four view models with `From` conversions; `MailuneError` is the one error enum. `HostSecrets` is a foreign trait that becomes the protocol `SecretStore`; the async export `has_token` forwards to a new `mailune_app::has_token`. `MailuneCore` wraps `Views` and exports `fold` and `state`. Every export body is one expression; the existing syn test walks the crate. Verify with nextest, clippy, fmt.
+
+What landed: New crate `mailune-ffi` (uniffi 0.32.2, proc-macro mode). Records mirror `Address`, `Category`, `ThreadRow`, `Event` and the view models; `MailuneError` is the one error enum; the foreign trait `HostSecrets` becomes the protocol `SecretStore`; the async export `has_token` forwards to the new `mailune_app::has_token`; `MailuneCore` exports `fold` and `state`. Every export is one expression, checked by the existing syn test. No bindgen binary yet; B3 adds it.
+
+### B4. Kotlin core
+
+Depends on: B2. `mailune-ffi` is on another branch. The Android SDK is not installed.
+
+Done when: a Gradle JVM test round-trips one record. cargo-ndk and UniFFI are not run. The commit says so. Do not install the Android SDK.
+
+Execution plan: `desktop/android` only. A Gradle build (Kotlin JVM 2.4.20, Gradle 9.8.0 and Java 27 from `desktop/android/mise.toml`, as cox `plugins/` does, so Rust-only contributors install nothing) with one `core` module. `Address` mirrors the B2 record and its converter writes the UniFFI buffer layout; a JUnit test round-trips it. Generated bindings replace the hand-written converter once uniffi-bindgen runs. No Android SDK, no cargo-ndk. Verify with `gradle test` in `desktop/android`.
+
+What landed: A Gradle build in `desktop/android` (Kotlin JVM 2.4.20, Gradle 9.8.0, Java 27 from its own `mise.toml`, bytecode level 17) with a `core` module. `Address` mirrors the B2 record and `FfiConverterAddress` writes the RustBuffer layout; four JUnit tests round-trip it, and a Rust test in `mailune-ffi` checks uniffi writes the same bytes. cargo-ndk and uniffi-bindgen are not run and the Android SDK is not installed.
+
+### B6. C ABI
+
+Depends on: B1. The shared abi-drift crate is not in this repo.
+
+Done when: a cbindgen header, a VAPI, and a meson file exist, and a test fails if the header drifts from the Rust records. Each export forwards one call.
+
+Execution plan: new crate `mailune-capi`, the C ABI for the Vala shell, shaped like ketch-capi. One opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, so both bindings run the same code; records cross as JSON in an `{"ok"}` / `{"error"}` envelope (serde derives added to the `mailune-ffi` records, JSON Schema behind its `schema` feature). Answers are `malloc`ed (libc) so `g_free` frees them; every export catches panics and is one expression, and the syn test in `mailune-cli` now walks `mailune-capi` `no_mangle` functions too. Commit `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with a Vala test, and `schema/payloads.schema.json`; drift tests regenerate the header with the cbindgen library and the schema from the records. valac is not installed, so the Meson test is not run here.
+
+What landed: New crate `mailune-capi`: one opaque `MailuneCore` handle over `mailune_ffi::MailuneCore`, records as contract JSON in an `ok`/`error` envelope, `malloc`ed answers, a panic guard in `respond`. Committed `include/mailune.h` (cbindgen), `vapi/mailune.vapi`, `meson.build` with `tests/capi.vala`, and `schema/payloads.schema.json`; drift tests regenerate the header and the schema of the records and fail on any difference. The forward-only syn test now covers `no_mangle` exports in `mailune-capi`. A C program linked against the cdylib was run by hand; valac is not installed, so the Meson test was not run.
+
+### B10. BoltFFI survey
+
+From ideas. BoltFFI 0.31 generates Swift, Kotlin, C#, and WASM bindings from one tool. Crux has moved to it. Revisit after the UniFFI phase.
+
+Done when: a note compares BoltFFI 0.31 with the UniFFI bindings already in the tree and says whether a switch is worth it.
+
+Execution plan: `docs/boltffi.md`. Facts from crates.io, the BoltFFI README and docs, and the Crux repository, each with its URL and the 2026-10-08 check date; a comparison against `mailune-ffi` and `mailune-capi`; a decision and triggers to revisit. Do not replace UniFFI.
+
+What landed: `docs/boltffi.md` compares BoltFFI 0.31.0 with the UniFFI 0.32.2 bindings (B2) and the C ABI (B6), with primary sources checked on 2026-10-08. Decision: no switch now. The native C# target is BoltFFI's real gain; the vendor speed numbers are marked unverified and do not matter for coarse calls; the C target is experimental and sync-only; minor releases break every few weeks. Triggers to revisit are listed.
+
+### B11. Shared view-model core
+
+From ideas. A Crux-style pure UI core in Rust, with `mailune-app` view models as a reducer.
+
+Done when: every shell can render the same state machine from that reducer.
+
+Execution plan: a pure reducer in `mailune-app` (`reducer.rs`), Crux-style: `Ui` holds the B1 `Views` plus UI-only state (composer open, pending confirmation, query); `Ui::update(Msg)` changes state and queues typed `Submission`s in an outbox the runtime drains; send and delete only leave after `Confirm`. Shells reach the same machine through `mailune-ffi` (`MailuneCore::dispatch` → `UiState`, Swift/Kotlin/C#) and `mailune-capi` (`mailune_core_dispatch`, JSON, Vala); the header and payload schema are re-blessed. No I/O. Under 500 lines of code.
+
+What landed: `mailune_app::Ui` is a pure Crux-style reducer: `Msg` in, state plus an outbox of typed `Submission`s out, with the B1 `Views` folded from `Msg::Core`. Send and delete wait for `Confirm`; archive, search and select go straight to the outbox; closing the composer saves the draft. Swift, Kotlin and C# reach it through `MailuneCore::dispatch` / `ui_state` in `mailune-ffi`, and Vala through `mailune_core_dispatch` in `mailune-capi` (header and payload schema re-blessed). The web shell will reach it through `mailune-server` once that forwards a dispatch method; that is not wired in this task.
+
+### C3. Autocrypt headers
+
+Depends on: C2. Reuse: the OpenPGP key type only if `mailune-crypto` can be called without editing it. Prefer a header codec in `mailune-mime`.
+
+Done when: an Autocrypt header is parsed and gossip keys are collected from a message. No WKD network lookup.
+
+Execution plan: `mailune-mime` only, plus a fuzz target. New `autocrypt.rs`: a header codec for Autocrypt Level 1 (`addr`, `prefer-encrypt`, `keydata`; `_`-prefixed attributes ignored, any other unknown attribute voids the header; keydata base64 with folding stripped and a size cap). `sender_autocrypt` returns the From address's key only when exactly one valid header matches From; `gossip_keys` reads `Autocrypt-Gossip` from a decrypted payload and keeps keys for the outer recipients only. Keydata stays opaque bytes (no `mailune-crypto` call). No WKD, no network. Fixture tests plus an `autocrypt-header` fuzz target in the nightly matrix.
+
+What landed: `mailune-mime::autocrypt` with `sender_autocrypt` (exactly one valid header whose `addr` is the single From address; delivery reports ignored) and `gossip_keys` (decrypted payload only, filtered to the outer recipients, first key per address, no preference). Underscore attributes are ignored, any other unknown or duplicate attribute voids the header, keydata is unfolded base64 capped at 64 KiB and kept opaque. Seven fixture tests and an `autocrypt-header` fuzz target in the nightly matrix. No WKD and no network.
+
+### C4. S/MIME verify and decrypt
+
+Depends on: P1. Reuse: a maintained `cms` and `x509-cert` if they fit.
+
+Done when: a fixture verifies a signature and decrypts with a supplied key. No keychain.
+
+Execution plan: new crate `mailune-smime` (the card names it; `docs/architecture.md` moves S/MIME out of the `mailune-crypto` row) on RustCrypto `cms` 0.2.3 and `x509-cert` 0.2.5, the stable lines that share the workspace rsa 0.9. `verify` checks every SignerInfo (issuer/serial or key id, message-digest and content-type attributes, RSA PKCS #1 v1.5 over SHA-256/384/512; SHA-1 refused); `decrypt` finds the RSA key-transport entry for the supplied certificate and opens AES-128/192/256-CBC content. CMS layer only: MIME extraction and certificate trust stay with the caller. Fixtures made by OpenSSL (`fixtures/regenerate.sh`) so the tests prove interop, not a round trip with ourselves.
+
+What landed: new crate `mailune-smime` on `cms` 0.2.3 and `x509-cert` 0.2.5 (plus `aes` 0.8 and `cbc` 0.1, which share cipher 0.4 with cms). `verify(signed, detached)` checks every signer (issuer/serial or key id; message-digest and content-type attributes; RSA PKCS #1 v1.5 over SHA-256/384/512, SHA-1 refused) and returns the content and signer certificates, untrusted; `decrypt(enveloped, certificate, key)` opens RSA key transport and AES-128/192/256-CBC. `Certificate` exposes subject, `emails()` and DER; `PrivateKey` is redacted in `Debug`. Twelve tests against OpenSSL-made fixtures (detached, opaque by key id, AES-256 to one recipient, AES-128 to two; tampered content and signature, stranger and wrong key). CMS layer only: MIME extraction and certificate trust are left to the caller. No keychain.
+
+### C5. S/MIME sign and encrypt
+
+Depends on: C4. Reuse: the same crate.
+
+Done when: a fixture signs and encrypts, and C4 verifies and decrypts it.
+
+Execution plan: `mailune-smime` only. `sign(content, certificate, key, Signature::Detached | Opaque)` builds SignedData with the cms builder (SHA-256, RSA PKCS #1 v1.5, issuer/serial sid, signing-time attribute, signer certificate included); `encrypt(content, recipients)` builds EnvelopedData with AES-256-CBC and RSA key transport per recipient, refusing RSA keys under 2048 bits. Randomness from the OS. Tests: both shapes verify through C4 `verify`, a two-recipient message decrypts through C4 `decrypt` for each recipient, a small key is refused; a manual OpenSSL cross-check of the output is noted in the commit.
+
+What landed: `mailune-smime::sign(content, certificate, key, Signature::Detached | Opaque)` builds SignedData with the cms builder (SHA-256 with RSA PKCS #1 v1.5, issuer/serial sid, signing-time attribute, signer certificate included; a key that is not the certificate's is refused) and `encrypt(content, recipients)` builds AES-256-CBC EnvelopedData with RSA key transport per recipient, refusing keys under 2048 bits. Six tests: both shapes verify through C4, a two-recipient message decrypts through C4 for each recipient, sign-then-encrypt round-trips, and the refusals. OpenSSL 3.6 verified both signature shapes and decrypted the two-recipient message by hand.
+
+### E1. mailune-server
+
+Depends on: B8. Reuse: `axum` from `rust.md`.
+
+Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
+
+Execution plan: new binary crate `mailune-server` on axum 0.8.9 (`ws`, default features off) and tokio. `GET /rpc` upgrades to a WebSocket only with the bearer token, from `Authorization: Bearer` or, for browsers that cannot set headers, a `mailune.token.<t>` subprotocol next to `mailune-rpc`; compared in constant time; 401 otherwise. Each text frame goes through `mailune_rpc::dispatch` unchanged. The token is random per start and printed once to stderr, so nothing is stored outside the keychain. Until the app runtime has an rpc handler, `main` wires one that refuses every method. Tests bind 127.0.0.1:0 and use tokio-tungstenite 0.29 (the line axum already pulls in): a `search` call answers, missing and wrong tokens get 401, the subprotocol path works. `deps.rs` gains an axum-only-in-server check. No passkey: no WebAuthn crate is in the tree.
+
+What landed: new binary crate `mailune-server` on axum 0.8.9 (`http1`, `tokio`, `ws` only) and tokio 1.53. `GET /rpc` upgrades only with the bearer token, from `Authorization: Bearer` or a `mailune.token.<t>` subprotocol next to `mailune-rpc` (browsers cannot set headers on a WebSocket), compared in constant time; anything else is 401 before the upgrade. Each text frame goes through `mailune_rpc::dispatch` unchanged, with a 1 MiB frame cap; `mailune-rpc` is untouched. The token is random per start (256 bits) and printed once to stderr; the default address is loopback, overridable by `MAILUNE_SERVER_ADDR`. `main` wires a handler that refuses every method until the app runtime exposes one. Five tests on 127.0.0.1:0 with a tokio-tungstenite 0.29 client (the line axum already pulls in): bearer and subprotocol calls answer, missing/wrong/Basic tokens get 401, a bad frame is a JSON-RPC parse error. `deps.rs` now keeps axum in `mailune-server`. No passkey: no WebAuthn crate is in the tree.
+
+### T4. Queue property tests
+
+Depends on: the in-memory queue. Reuse: `proptest` from rust.md.
+
+Done when: random ops against a model mailbox keep idempotency and undo invariants.
+
+Execution plan: a `props` module inside the queue tests drives random steps (enqueue, replay, key reuse, ack, conflict resolve, undo, clock ticks) against a small model mailbox where every thread starts in the inbox and a move's `from` is where the thread is now. After every step the queue's pending keys, locations, schedules and due list must equal the model's; a replay must change nothing; a reused key must fail and change nothing; a fresh op undone at once must leave no trace. proptest 1.11 as a dev-dependency only, default features off, no regression files; `deps.rs` allows it in `mailune-core` as a dev-dependency and nothing else.
+
+What landed: a proptest model test in `mailune-core/src/queue.rs` (`tests::props`). Up to 60 random steps (enqueue, replay, key reuse, ack, conflict resolve, undo, clock ticks) run against a model mailbox; after each, the queue's pending keys, locations, schedules and due list equal the model's, a replay changes nothing, a reused key fails without effect, and a fresh op undone at once leaves no trace. Two hand mutations of the queue (an idempotency bypass and an undo that does not revert) both fail it. proptest 1.11 is a dev-dependency only, default features off, with no regression files; `deps.rs` allows exactly that.
+
+### R8. Integration compose file
+
+Depends on: the IMAP client already on this branch. P7's sync code is on another branch.
+
+Done when: a compose file names Stalwart and Dovecot, and a test reads that file. `nextest` does not start Docker and does not open a socket. Do not edit `.github/workflows/ci.yml`.
+
+Execution plan: `docker-compose.yml` at the root with `stalwart` (stalwartlabs/stalwart:v0.16.25) and `dovecot` (dovecot/dovecot:2.4.5), tags checked on Docker Hub; ports on 127.0.0.1 only; the Dovecot password comes from `MAILUNE_IT_PASSWORD` so none is committed. `crates/mailune-cli/tests/compose.rs` reads the file as text (no YAML crate) and checks the two services, pinned tags, loopback ports and no literal password. CI is untouched.
+
+What landed: `docker-compose.yml` names `stalwart` (stalwartlabs/stalwart:v0.16.25: IMAP, submission, JMAP/admin HTTP) and `dovecot` (dovecot/dovecot:2.4.5, IMAP on its unprivileged 31143), tags checked on Docker Hub on 2026-10-08. Every port binds to 127.0.0.1, no volume is kept, and the Dovecot password is read from `MAILUNE_IT_PASSWORD`. `crates/mailune-cli/tests/compose.rs` reads the file as text and checks the two services, pinned tags, loopback ports and that no password is committed. Nothing starts Docker or opens a socket; `.github/workflows/ci.yml` is untouched.
+
+### P33. Calendar view
+
+From ideas. Grow the scheduling assistant (A22) and Graph calendar access (P25) into a calendar view.
+
+Done when: the view shows local ICS suggestions. A JMAP Calendars source is added only after that RFC is published.
+
+Execution plan: A22 and P25 have not landed on `main`, so this slice stands alone and leaves room for them: `mailune-app::calendar_view` turns local `text/calendar` parts (through the existing `mailune_mime::parse_invite`) into a `CalendarView` of days with suggested events. REQUESTs only; a re-sent UID replaces the older invite; unreadable or undated parts are counted and skipped; days are `YYYY-MM-DD` as written, time-zone conversion left to the shell. Fixture ICS under `crates/mailune-app/fixtures/`. No JMAP Calendars, no network. The "Done when" names local ICS suggestions only, so the task closes on that; feeding A22 and P25 into the same view belongs to those tasks.
+
+What landed: `mailune-app::calendar_view(parts)` builds a `CalendarView` (days of `CalendarEntry`: uid, title, start, end, organizer) from local ICS through `mailune_mime::parse_invite`. REQUESTs are suggestions, REPLYs are skipped, a re-sent UID replaces the older invite, all-day events sort first in their day, and unreadable or undated parts are counted in `skipped` rather than failing. Three tests over four fixture ICS files. No JMAP Calendars source and no network; A22 and P25 had not landed, so they are not wired in.
+
+### P34. Shared inboxes
+
+From ideas. Shared inboxes and comments, as in Spark and Missive, conflict with a no-server path unless they use JMAP Sharing (RFC 9670).
+
+Done when: a design shows shared inboxes and comments on RFC 9670, or records that the RFC cannot carry them.
+
+Execution plan: `docs/jmap-sharing.md`, design only. Read RFC 9670, RFC 8621 and `draft-ietf-jmap-mail-sharing-02` (sources with dates), and list the IETF JMAP drafts. Record that shared inboxes work on RFC 8621 shared accounts plus RFC 9670 Principals and ShareNotifications, with sharing management only behind the mail-sharing capability; and that RFC 9670 cannot carry comments, so comments become Emails in a shared mailbox. No Mailune server in the path, no code.
+
+What landed: `docs/jmap-sharing.md`. Shared inboxes: read through RFC 8621 shared accounts, with RFC 9670 Principals for owners and ShareNotifications for notices; the sharing editor appears only when the account has `urn:ietf:params:jmap:mail:share` (draft-ietf-jmap-mail-sharing-02) and `mayShare`; assignment and status as keywords, with keyword sharing between users marked unverified. Comments: recorded that RFC 9670 cannot carry them (no JMAP comment type in any RFC or draft), so they become Emails in a shared `Comments` mailbox threaded by `In-Reply-To`, with the costs listed. Sources cited with URLs, checked 2026-10-08. No Mailune server in the path.
+
 ### S1. mailune-store
 
 Depends on: F2. Reuse: Diesel. Only this crate may depend on `diesel`, `diesel_migrations`, or `libsqlite3-sys`.

@@ -1,0 +1,27 @@
+[package]
+name = "mailune-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Self-hosted server: the core behind JSON-RPC over WebSocket"
+
+[dependencies]
+anyhow = { workspace = true }
+# The workspace entry is minimal; the server adds what it serves with.
+axum = { workspace = true, features = ["http1", "tokio", "ws"] }
+base64 = { workspace = true }
+mailune-protocol = { path = "../mailune-protocol" }
+mailune-rpc = { path = "../mailune-rpc" }
+rand = { workspace = true }
+tokio = { workspace = true, features = ["macros", "net", "rt-multi-thread"] }
+
+[dev-dependencies]
+# Sink on the client socket; the workspace entry has no features.
+futures-util = { workspace = true, features = ["sink"] }
+serde_json = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+[lints]
+workspace = true
