@@ -1,7 +1,7 @@
 //! IMAP mailbox roles, sync over a session, and an in-memory scripted server.
 //!
-//! `imap-codec` 1.0.0 parses LIST and FETCH. SPECIAL-USE attributes win over
-//! a mailbox name. The session drives any `Read + Write` stream; tests use the
+//! `imap-codec` 2.0 parses LIST and FETCH and encodes body FETCH requests.
+//! SPECIAL-USE attributes win over a mailbox name. The session drives any `Read + Write` stream; tests use the
 //! scripted server over bytes the caller already holds. Nothing here connects.
 
 mod body;

@@ -37,7 +37,7 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | html2text | local | https://github.com/jugglerchris/rust-html2text | Plain text from sanitized HTML |
 | rsa | local | https://github.com/RustCrypto/RSA | DKIM rsa-sha256 verification |
 | rand | local | https://github.com/rust-random/rand | DKIM test keys and OpenPGP key generation |
-| imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses |
+| imap-codec | local | https://github.com/duesee/imap-codec | IMAP LIST, commands, and responses, including RFC 3516 BINARY; exact `=2.0.0-alpha.9` pin because 1.x has no BINARY and alphas break the API |
 | chrono | local | https://github.com/chronotope/chrono | IMAP SEARCH SINCE dates for the sync window |
 | icalendar | local | https://github.com/hoodie/icalendar | iCalendar REQUEST and REPLY |
 | pgp | local | https://github.com/rpgp/rpgp | OpenPGP sign, encrypt, decrypt, and verify |
