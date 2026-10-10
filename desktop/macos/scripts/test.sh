@@ -35,6 +35,8 @@ xcodebuild build-for-testing \
     -derivedDataPath DerivedData \
     -quiet
 only_arm64 DerivedData/Build/Products/Debug/Mailune.app/Contents/MacOS/Mailune
+# The release layout from the Debug app, with no identity, so nothing reaches Apple.
+scripts/release_test.sh DerivedData/Build/Products/Debug/Mailune.app
 
 xcodebuild build \
     -project Mailune.xcodeproj \
