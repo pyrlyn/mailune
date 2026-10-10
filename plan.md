@@ -28,7 +28,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | T4 | todo | P1 | 3 | 0% | |
 | A31 | todo | P1 | 2 | 0% | |
 | E1 | todo | P1 | 3 | 0% | |
-| S12 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | P18 | todo | P1 | 2 | 0% | |
 | B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
@@ -285,14 +284,6 @@ Depends on: B8. Reuse: `axum` from `rust.md`.
 Done when: one WebSocket JSON-RPC method from `mailune-rpc` answers on a bound ephemeral port in a test. Auth token is checked. No passkey yet if it needs a crate that is not already in the tree; say so in the commit.
 
 Execution plan: new binary crate `mailune-server`. `anyhow` is allowed. Do not rewrite `mailune-rpc`.
-
-### S12. Storage benchmarks
-
-Depends on: S3. Reuse: `divan` from `rust.md`.
-
-Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
-
-Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.
 
 ### P18. JMAP push
 

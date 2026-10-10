@@ -1353,3 +1353,11 @@ Depends on: S3. Reuse: `PRAGMA data_version`, already read by `open::data_versio
 Done when: a second connection in the same process observes a write as a typed invalidation.
 
 Execution plan: `mailune-store` only. New migration: a `change_counters` table bumped by triggers per topic (accounts, mailboxes, threads, messages, embeddings, sync state, ops, contacts). New `feed.rs`: when `open::data_version` moves, diff the counters and record a typed `Invalidation`; `Store::poll_changes` drains it. The vector cache drops only on an embeddings invalidation instead of on every external write. Verify with a two-connection test in one process and the existing vector cache tests.
+
+### S12. Storage benchmarks
+
+Depends on: S3. Reuse: `divan` from `rust.md`.
+
+Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
+
+Execution plan: `mailune-store` only. Reuse T6's `benches/budgets.rs` and `tests/support`: split the message seeding out of `seed`, add a 100k insert bench (fresh file per sample) and a FTS text search bench next to the existing list page and vector search benches, and add a small insert test to `tests/budgets.rs`.

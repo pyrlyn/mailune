@@ -22,7 +22,6 @@
 - T4. Queue property tests
 - A31. Voice dictation
 - E1. mailune-server
-- S12. Storage benchmarks
 - P18. JMAP push
 - B2. UniFFI records
 - B3. Swift package
