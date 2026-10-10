@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config",
+  "description": "Root of the user `config.toml` and the project `.mailune.toml`.\n\nEvery table rejects unknown keys, so a typo is an error at its line instead of a silently\nignored setting.",
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "description": "Accounts this file names. A later layer that sets `accounts` replaces the list.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Account"
+      }
+    },
+    "listen": {
+      "description": "Address `mailune-server` binds, such as `127.0.0.1:4173`.",
+      "type": "string",
+      "default": "127.0.0.1:4173"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Account": {
+      "description": "One mail account. Its credentials live in the keychain under `id`, never here.",
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Server host name, such as `imap.example.com`.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Stable account id, also the keychain entry name.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "host"
+      ]
+    }
+  }
+}

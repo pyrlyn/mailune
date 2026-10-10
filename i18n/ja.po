@@ -251,6 +251,10 @@ msgctxt "settings.conversation_view"
 msgid "Conversation view"
 msgstr "スレッド表示"
 
+msgctxt "app.conversations"
+msgid "Conversations"
+msgstr "会話"
+
 msgctxt "settings.cozy"
 msgid "Cozy"
 msgstr "標準"
@@ -427,6 +431,10 @@ msgctxt "auth.i_agree_to_the"
 msgid "I agree to the terms of service and the privacy policy."
 msgstr "利用規約とプライバシーポリシーに同意します。"
 
+msgctxt "compose.confirm_recipients"
+msgid "I have checked the recipients and want to send this"
+msgstr "宛先を確認しました。送信します"
+
 msgctxt "kit.icons"
 msgid "ICONS"
 msgstr "アイコン"
@@ -490,6 +498,18 @@ msgstr "レイアウト"
 msgctxt "settings.light"
 msgid "Light"
 msgstr "ライト"
+
+msgctxt "app.mailboxes"
+msgid "Mailboxes"
+msgstr "メールボックス"
+
+msgctxt "app.message"
+msgid "Message"
+msgstr "メッセージ"
+
+msgctxt "thread.message_body"
+msgid "Message body"
+msgstr "メッセージ本文"
 
 msgctxt "kit.motion"
 msgid "MOTION"
@@ -767,6 +787,14 @@ msgctxt "compose.suggested"
 msgid "SUGGESTED"
 msgstr "候補"
 
+msgctxt "thread.suggested_replies"
+msgid "Suggested replies"
+msgstr "返信の候補"
+
+msgctxt "thread.summary"
+msgid "Summary"
+msgstr "要約"
+
 msgctxt "kit.surfaces"
 msgid "SURFACES"
 msgstr "サーフェス"
@@ -1038,6 +1066,10 @@ msgstr "たった今更新しました"
 msgctxt "data.updates"
 msgid "Updates"
 msgstr "更新情報"
+
+msgctxt "compose.use_suggestion"
+msgid "Use suggestion"
+msgstr "候補を使う"
 
 msgctxt "settings.vacation_responder"
 msgid "Vacation responder"

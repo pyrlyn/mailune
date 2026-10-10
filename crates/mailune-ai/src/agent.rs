@@ -295,6 +295,7 @@ impl Agent {
     ///
     /// # Errors
     ///
+    /// As [`Agent::propose`] for the call in `pending`, and
     /// [`Error::NeedsConfirmation`] when the tool needs the app's
     /// confirmation and `confirmation` is not [`Confirmation::Confirmed`].
     pub fn commit(
@@ -304,13 +305,21 @@ impl Agent {
     ) -> Result<Vec<Submission>, Error> {
         let tool = pending.call.tool();
         let threads = pending.call.threads().len();
-        if pending.preview.needs_confirmation && confirmation != Confirmation::Confirmed {
+        // `Pending` is plain data a caller can build or edit after `propose`,
+        // so the decision is taken again from the call, not from its preview
+        // or its undo record.
+        if let Err(err) = self.check(&pending.call) {
+            self.log(pending.id, Some(tool), threads, Outcome::Denied);
+            return Err(err);
+        }
+        if needs_confirmation(tool) && confirmation != Confirmation::Confirmed {
             self.log(pending.id, Some(tool), threads, Outcome::Unconfirmed);
             return Err(Error::NeedsConfirmation);
         }
         self.log(pending.id, Some(tool), threads, Outcome::Committed);
-        if !pending.undo.inverse.is_empty() {
-            self.undo.push(pending.undo);
+        let undo = self.undo_record(pending.id, &pending.call);
+        if !undo.inverse.is_empty() {
+            self.undo.push(undo);
         }
         Ok(submissions(pending.call))
     }
@@ -609,6 +618,79 @@ mod tests {
         let sent = agent.approve(call, Confirmation::Confirmed).unwrap();
         assert!(matches!(sent[0], Submission::Send { .. }));
         assert!(agent.held().is_empty());
+    }
+
+    #[test]
+    fn commit_does_not_trust_an_edited_pending() {
+        let mut agent = agent([Tool::Summarize, Tool::Send, Tool::Archive]);
+        let send = ToolCall::Send {
+            to: vec![],
+            subject: "Hi".into(),
+            body: "Body".into(),
+        };
+
+        let mut forged = agent.propose(send.clone()).unwrap();
+        forged.preview.needs_confirmation = false;
+        assert!(matches!(
+            agent.commit(forged, Confirmation::NotAsked),
+            Err(Error::NeedsConfirmation)
+        ));
+
+        let mut swapped = agent
+            .propose(ToolCall::Summarize {
+                thread: ThreadId::new("t1"),
+            })
+            .unwrap();
+        swapped.call = send;
+        assert!(matches!(
+            agent.commit(swapped, Confirmation::NotAsked),
+            Err(Error::NeedsConfirmation)
+        ));
+
+        let mut widened = agent
+            .propose(ToolCall::Archive {
+                threads: vec![ThreadId::new("t1")],
+            })
+            .unwrap();
+        widened.call = ToolCall::Archive {
+            threads: vec![ThreadId::new("elsewhere")],
+        };
+        assert!(matches!(
+            agent.commit(widened, Confirmation::Confirmed),
+            Err(Error::OutOfScope)
+        ));
+
+        let mut unlisted = agent
+            .propose(ToolCall::Archive {
+                threads: vec![ThreadId::new("t1")],
+            })
+            .unwrap();
+        unlisted.call = ToolCall::Delete {
+            threads: vec![ThreadId::new("t1")],
+        };
+        assert!(matches!(
+            agent.commit(unlisted, Confirmation::Confirmed),
+            Err(Error::ToolDenied)
+        ));
+
+        let mut rewound = agent
+            .propose(ToolCall::Archive {
+                threads: vec![ThreadId::new("t2")],
+            })
+            .unwrap();
+        rewound.undo.inverse = vec![Submission::MoveTo {
+            thread: ThreadId::new("t2"),
+            mailbox: MailboxId::new("elsewhere"),
+        }];
+        agent.commit(rewound, Confirmation::NotAsked).unwrap();
+        assert_eq!(
+            agent.undo().unwrap(),
+            [Submission::MoveTo {
+                thread: ThreadId::new("t2"),
+                mailbox: MailboxId::new("work"),
+            }]
+        );
+        assert!(agent.undo().is_none());
     }
 
     #[test]
