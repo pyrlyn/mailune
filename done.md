@@ -1337,3 +1337,13 @@ Done when: Required checks green on PR. Workspace checks (nextest, clippy, fmt u
 Execution plan: Add GitHub Actions reused from `pyrlyn/ci` (`ci-rust.yml`, `changes.yml`, `pipeline.yml`) and the packages/crates path-gates pattern. Matrix is arm64 macOS only plus Linux/Windows x86_64. Do not edit protocol sources or `docs/threat-model.md`.
 
 What landed: `.github/workflows/ci.yml` calls pyrlyn/ci `changes.yml` and `ci-rust.yml` (pinned at `27290ae`), and `pipeline.yml` calls pyrlyn/ci `pipeline.yml`. The `rust` matrix is arm64 macOS, Linux x86_64 and arm64, and Windows x86_64; the `cross` matrix builds iOS, the iOS simulator, Android and wasm32. A docs-only diff turns the suite into no-ops that still report, and a failed `changes` job runs the suite (the path-gates fail-open rule). R1 was unblocked by #22 and #24, and every PR since has been green. `main` has no branch protection, so no check is required yet; making them required is a repository setting for the creator.
+
+### P18. JMAP push
+
+Depends on: P17.
+
+Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
+
+Execution plan: `mailune-jmap` `push.rs`. The session keeps `eventSourceUrl` and the RFC 8887 WebSocket capability. A typed `StateChange` (account, type, state, pushState); EventSource `state` and `ping` events parsed with a maintained SSE parser if one fits; RFC 8887 frames (`StateChange`, `Response`, `RequestError`) decoded and `WebSocketPushEnable`/`Disable` encoded; the `{types}`, `{closeafter}`, `{ping}` URL template expanded. Tests feed fixture frames; no TCP.
+
+What landed: New module `push.rs` in `mailune-jmap`. The session now keeps `eventSourceUrl` and the RFC 8887 WebSocket capability (`url`, `supportsPush`). `event_source_request` expands the RFC 6570 template (`types`, `closeafter`, `ping`) into an authorized `GET` with `Accept: text/event-stream` for the host's streaming transport; `event_source` turns body chunks (split anywhere) into typed `PushEvent::State(StateChange)` and `Ping` through sse-stream 0.3.0, skipping unknown event types. `ws_message` decodes RFC 8887 `StateChange` (with `pushState`), `Response` and `RequestError` frames, and `push_enable`/`push_disable` encode the client messages. `StateChange::is_newer` tells the caller which saved state is behind. No TCP: tests feed fixture frames. New deps: sse-stream 0.3.0 (eventsource-stream 0.2.3, used by cox, has had no release since 2022-02) and futures-util 0.3.34, already in the tree.

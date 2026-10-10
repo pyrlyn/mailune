@@ -50,6 +50,8 @@ Only what the project uses today. Rows are added in the task that adds the progr
 | axum | local | https://github.com/tokio-rs/axum | Push relay webhook router |
 | tokio | local | https://github.com/tokio-rs/tokio | rmcp runtime in `mailune-mcp`; push relay router tests (dev) |
 | tower | local (dev) | https://github.com/tower-rs/tower | `ServiceExt::oneshot` drives the relay router without a socket |
+| sse-stream | local | https://github.com/4t145/sse-stream | Decodes the JMAP EventSource push stream in `mailune-jmap` |
+| futures-util | local | https://github.com/rust-lang/futures-rs | Maps the SSE block stream to typed JMAP push events |
 | wasm-bindgen | local | https://github.com/wasm-bindgen/wasm-bindgen | JavaScript exports of `mailune-wasm` |
 | getrandom (0.2, `js`) | local (wasm32) | https://github.com/rust-random/getrandom | Browser randomness for rsa's rand in the wasm32 build |
 | rmcp | local | https://github.com/modelcontextprotocol/rust-sdk | `mailune-mcp` local MCP server |

@@ -2018,6 +2018,7 @@ dependencies = [
 name = "mailune-jmap"
 version = "0.1.0"
 dependencies = [
+ "futures-util",
  "mailune-core",
  "mailune-fixture",
  "mailune-protocol",
@@ -2025,6 +2026,7 @@ dependencies = [
  "mailune-testkit",
  "serde",
  "serde_json",
+ "sse-stream",
  "tempfile",
  "thiserror 2.0.21",
 ]
@@ -3250,6 +3252,20 @@ checksum = "717e14271e332de37b8f7793913d53e2f952b3d21f96efd5880aea42a3c32d18"
 dependencies = [
  "cc",
  "rsqlite-vfs",
+]
+
+[[package]]
+name = "sse-stream"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d385160fc0fba84f7b9cc8ef3263e410d0e3ca7ab4927f1356df33145ace69a4"
+dependencies = [
+ "bytes",
+ "futures-util",
+ "http-body",
+ "http-body-util",
+ "pin-project-lite",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

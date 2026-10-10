@@ -31,7 +31,6 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | A31 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | E1 | todo | P1 | 3 | 0% | |
 | S12 | todo | P1 | 2 | 0% | |
-| P18 | in progress | P1 | 2 | 0% | Cursor / claude-opus-5.5 |
 | B2 | todo | P1 | 3 | 0% | |
 | B3 | todo | P1 | 2 | 0% | |
 | M5 | todo | P1 | 3 | 0% | |
@@ -311,14 +310,6 @@ Depends on: S3. Reuse: `divan` from `rust.md`.
 Done when: benches measure 100k inserts, a list page, and a search. A small test covers the same path with a handful of rows so `nextest` stays fast.
 
 Execution plan: `mailune-store` only. Commit on `batch9-store`.
-
-### P18. JMAP push
-
-Depends on: P17.
-
-Done when: an EventSource frame and a WebSocket push frame (RFC 8887) become a typed state change. No TCP.
-
-Execution plan: `mailune-jmap` `push.rs`. The session keeps `eventSourceUrl` and the RFC 8887 WebSocket capability. A typed `StateChange` (account, type, state, pushState); EventSource `state` and `ping` events parsed with a maintained SSE parser if one fits; RFC 8887 frames (`StateChange`, `Response`, `RequestError`) decoded and `WebSocketPushEnable`/`Disable` encoded; the `{types}`, `{closeafter}`, `{ping}` URL template expanded. Tests feed fixture frames; no TCP.
 
 ### B2. UniFFI records
 

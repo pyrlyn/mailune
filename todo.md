@@ -25,7 +25,6 @@
 - A31. Voice dictation
 - E1. mailune-server
 - S12. Storage benchmarks
-- P18. JMAP push
 - B2. UniFFI records
 - B3. Swift package
 - M5. macOS host integrations

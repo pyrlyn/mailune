@@ -51,6 +51,11 @@ sha2 = "0.11"
 ews = "0.1.2"
 # mailune-push: the relay's webhook router. Serving features are added by the binary.
 axum = { version = "0.8.9", default-features = false, features = ["query"] }
+# mailune-jmap: EventSource push frames. 0.3.0 checked on crates.io 2026-10-10; eventsource-stream
+# 0.2.3 (cox) has had no release since 2022-02.
+sse-stream = { version = "0.3.0", default-features = false }
+# mailune-jmap: maps the SSE block stream to typed push events. Already in the tree through sse-stream.
+futures-util = { version = "0.3.34", default-features = false }
 # mailune-push tests drive the router in process with `oneshot`; no socket. mailune-mcp: rmcp's
 # runtime; its tests drive the server over an in-memory duplex.
 tokio = "1.53.2"

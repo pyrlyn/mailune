@@ -8,6 +8,7 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::mail::{EMAIL_PROPERTIES, GetResult, WireEmail, WireMailbox, WireThread};
+use crate::push::{WEBSOCKET, WebSocket};
 use crate::wire::{USING, decode, encode, json_error, reference, take};
 use crate::{Changes, Error, JmapEmail, JmapMailbox, JmapThread, QueryResult};
 
@@ -20,6 +21,10 @@ pub struct Session {
     pub account_id: String,
     /// Session state, to notice a changed session.
     pub state: String,
+    /// EventSource push URL template (RFC 8620 §7.3), when offered.
+    pub event_source_url: Option<String>,
+    /// WebSocket transport (RFC 8887), when offered.
+    pub websocket: Option<WebSocket>,
 }
 
 /// What one sync step found.
@@ -60,6 +65,10 @@ struct WireSession {
     state: String,
     #[serde(default)]
     primary_accounts: BTreeMap<String, String>,
+    #[serde(default)]
+    event_source_url: Option<String>,
+    #[serde(default)]
+    capabilities: BTreeMap<String, Value>,
 }
 
 impl<'h, H: Http> JmapClient<'h, H> {
@@ -85,10 +94,18 @@ impl<'h, H: Http> JmapClient<'h, H> {
             .get("urn:ietf:params:jmap:mail")
             .cloned()
             .ok_or(Error::NoMailAccount)?;
+        let websocket = wire
+            .capabilities
+            .get(WEBSOCKET)
+            .map(WebSocket::deserialize)
+            .transpose()
+            .map_err(json_error)?;
         let session = Session {
             api_url: wire.api_url,
             account_id,
             state: wire.state,
+            event_source_url: wire.event_source_url,
+            websocket,
         };
         self.session = Some(session.clone());
         Ok(session)
@@ -286,13 +303,19 @@ impl<'h, H: Http> JmapClient<'h, H> {
             .ok_or(Error::NoSession)
     }
 
-    async fn send(&self, request: HttpRequest) -> Result<Vec<u8>, Error> {
+    pub(crate) fn session(&self) -> Result<&Session, Error> {
+        self.session.as_ref().ok_or(Error::NoSession)
+    }
+
+    pub(crate) fn authorize(&self, request: HttpRequest) -> HttpRequest {
         // The token is UTF-8 by contract; a non-UTF-8 byte is replaced, which
         // the server then rejects, rather than being logged anywhere.
         let bearer = format!("Bearer {}", String::from_utf8_lossy(self.token.as_bytes()));
-        let request = request
-            .header("Authorization", bearer)
-            .header("Accept", "application/json");
+        request.header("Authorization", bearer)
+    }
+
+    async fn send(&self, request: HttpRequest) -> Result<Vec<u8>, Error> {
+        let request = self.authorize(request).header("Accept", "application/json");
         let response = self.http.send(request).await?;
         if !(200..300).contains(&response.status) {
             return Err(Error::Status {

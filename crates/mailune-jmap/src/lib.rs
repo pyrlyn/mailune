@@ -9,11 +9,16 @@ mod client;
 mod extras;
 mod mail;
 mod mutate;
+mod push;
 mod wire;
 
 pub use client::{JmapClient, Session, SyncBatch};
 pub use extras::{MaskedEmail, SieveScript};
 pub use mail::{Changes, JmapEmail, JmapMailbox, JmapThread, QueryResult};
+pub use push::{
+    PushEvent, StateChange, WebSocket, WsMessage, event_source, push_disable, push_enable,
+    ws_message,
+};
 
 /// Failure returned by the JMAP adapter. No variant carries the token.
 #[derive(Debug, thiserror::Error)]
@@ -48,4 +53,10 @@ pub enum Error {
     /// A call was made before the session was fetched.
     #[error("JMAP session not loaded")]
     NoSession,
+    /// The session offers no EventSource URL.
+    #[error("JMAP session offers no push")]
+    NoPush,
+    /// The push stream failed or is not an event stream.
+    #[error("JMAP push stream: {0}")]
+    Stream(String),
 }
