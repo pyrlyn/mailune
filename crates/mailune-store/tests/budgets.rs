@@ -3,6 +3,7 @@
 //! only a gross regression (a scan per row, a missing index, a cache that never fills) trips
 //! them; the 100k numbers come from `benches/budgets.rs`.
 
+#![cfg(not(target_arch = "wasm32"))]
 #![allow(clippy::unwrap_used)]
 
 mod support;
