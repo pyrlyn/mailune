@@ -7,7 +7,7 @@ A local-first, AI-first mail client: one Rust core (IMAP/SMTP, JMAP, Gmail API, 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
 | C1 | todo | P0 | 2 | 40% | |
-| C11 | in progress | P0 | 2 | 10% | Cursor / claude-opus-5.5 |
+| C11 | in progress | P0 | 2 | 90% | Cursor / claude-opus-5.5 |
 | F5 | todo | P0 | 2 | 0% | |
 | F10 | todo | P0 | 2 | 0% | |
 | R17 | todo | P0 | 2 | 40% | |
@@ -116,6 +116,10 @@ Depends on: F7. Reuse: aulo conventions (untrusted model output, fail closed); c
 Done when: docs/threat-model.md reviewed by creator. Workspace checks (nextest, clippy, fmt under `mise exec`) are green.
 
 Execution plan: Write `docs/threat-model.md` for the core, AI pipeline, MCP, and the push relay. Trust boundaries follow the architecture (untrusted mail, model output, MCP clients; fail closed; encrypted mail never leaves the device for a cloud model). Reuse the shape of aulo's untrusted-output rules and cox's `SECURITY.md` guard list: one table of assets, one of boundaries, and the guard that holds each one, naming the code that implements it. Link to the security sections of `docs/architecture.md` instead of restating them. Do not edit other tasks' files. Verify: every guard named in the document exists in the tree.
+
+Progress: `docs/threat-model.md` now covers the push relay and speech as well, links to the Security section of `docs/architecture.md` instead of restating it, and has a guard table naming the function or test that holds each rule (every name checked against the tree). A known-gaps section lists what the tree does not hold yet: SQLCipher only on Apple targets, no header escape/bidi cleaning until X10, fuzz targets for three parsers only, relay channel ids that can trigger wakes, and empty wakes that sync every relay account on a device (a creator decision).
+
+Left: creator review.
 
 ### F5. Telemetry: tracing, rotating logs, secret redaction, optional OTLP (off by default)
 
